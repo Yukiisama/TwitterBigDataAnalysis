@@ -33,12 +33,9 @@ public class TPSpark {
 		// hashtags.foreach( f -> System.out.println(f));
 		// r.foreach(f -> System.out.println(f));
 
-
 		mostUseHashtag(100, file);
 	}
-
-
-
+	
 	public static void mostUseHashtag (int k, JavaRDD<String> file) {
 		if (k < 1 || k > 10000 ) {
 			System.err.println("[ERROR] Invalid range in mostUseHashtag@void, valid value is between 1 and 10000.");
@@ -48,14 +45,16 @@ public class TPSpark {
 
 		// Premier essai sans construire tout le gson en une classe
 		long startTime = System.currentTimeMillis();
-		JavaRDD<String> hashtags = file.flatMap(line -> JsonUtils.withoutReflexivityAndWholeJson(line));
-		JavaPairRDD<String, Integer> r = hashtags.mapToPair(hash -> new Tuple2<>(hash, 1)).reduceByKey((a, b) -> a + b);
-		HashtagComparator comparator = new HashtagComparator();
-		List<Tuple2<String, Integer>> top = r.top(k, comparator);
-		System.out.println(top);
+		JavaRDD<String []> hashtags = file.flatMap(line -> JsonUtils.withoutReflexivityAndWholeJson(line));
+		JavaPairRDD<String[], Integer> r = hashtags.mapToPair(hash -> new Tuple2<>(hash, 1)).reduceByKey((a, b) -> a + b);
+		List<Tuple2<String[], Integer>> top = r.top(k, new HashtagComparator());
+		for (Tuple2<String[], Integer> t: top) {
+			System.out.println("hashtag: " + t._1[0] + " username: " + t._1[1] 
+								+ " userId: " + t._1[2] + " count: " + t._2);
+		}
 		long endTime = System.currentTimeMillis();
 		System.out.println("That took without Reflexivity : (map + reduce + topK) " + (endTime - startTime) + " milliseconds");
 
 	}
-
+	
 }

@@ -40,16 +40,24 @@ public class JsonUtils {
 		"/raw_data/tweet_21_03_2020.nljson"
 	};
 
-    public static Iterator<String> withoutReflexivityAndWholeJson(String line) {
-		List<String> hashs = new ArrayList<>();
+    public static Iterator<String[]> withoutReflexivityAndWholeJson(String line) {
+		List<String[]> hashs = new ArrayList<>();
 		JsonElement json = new JsonParser().parse(line);
 		JsonObject jsonObj = json.getAsJsonObject();
 		JsonElement entities = jsonObj.get("entities");
 		if (entities != null && entities.isJsonObject()) {
+			JsonElement user = jsonObj.get("user");
+			JsonElement name = user.getAsJsonObject().get("name");
+			JsonElement id = user.getAsJsonObject().get("id_str");
 			JsonElement hashtags = (entities.getAsJsonObject()).get("hashtags");
 			if (hashtags != null) {
 				for (JsonElement hash : hashtags.getAsJsonArray()) {
-					hashs.add(hash.getAsJsonObject().get("text").getAsString());
+					String [] infos = new String[] {
+							hash.getAsJsonObject().get("text").getAsString(),
+							name.getAsString(),
+							id.getAsString()
+						};
+					hashs.add(infos);
 				}
 				return hashs.iterator();
 			}
