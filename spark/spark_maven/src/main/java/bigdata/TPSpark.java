@@ -23,7 +23,7 @@ public class TPSpark {
 
 		SparkConf conf = new SparkConf().setAppName("TP Spark");
 		JavaSparkContext context = new JavaSparkContext(conf);
-		JavaRDD<String> file = context.textFile("/raw_data/tweet_01_03_2020_first10000.nljson");
+		JavaRDD<String> file = context.textFile(JsonUtils.data[1]);
 		context.defaultParallelism();
 		context.setLogLevel("ERROR");
 		System.out.println("Number of partitions : " + file.getNumPartitions());
