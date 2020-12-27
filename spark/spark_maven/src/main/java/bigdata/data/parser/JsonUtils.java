@@ -42,8 +42,9 @@ public class JsonUtils {
 
     public static Iterator<String[]> withoutReflexivityAndWholeJson(String line) {
 		List<String[]> hashs = new ArrayList<>();
-		JsonElement json = new JsonParser().parse(line);
-		JsonObject jsonObj = json.getAsJsonObject();
+		
+		JsonObject jsonObj = JsonParser.parseString(line).getAsJsonObject();
+
 		JsonElement entities = jsonObj.get("entities");
 		if (entities != null && entities.isJsonObject()) {
 			JsonElement user = jsonObj.get("user");
@@ -66,12 +67,13 @@ public class JsonUtils {
     }
     
 
-    public static Tuple2 <String, HashSet<String>> withoutReflexivityAndWholeJsonUsers(String requested_user_id, String line) {
+    public static Tuple2 <String, HashSet<String>> getHashtagsFromUserInJSON(String requested_user_id, String line) {
 		Tuple2 <String, HashSet<String>> res = new Tuple2<String, HashSet<String>>(requested_user_id, new HashSet<String>());
 
 		HashSet<String> hashs = new HashSet<>();
-		JsonElement json = new JsonParser().parse(line);
-		JsonObject jsonObj = json.getAsJsonObject();
+		
+		JsonObject jsonObj = JsonParser.parseString(line).getAsJsonObject();
+
 		JsonElement users = jsonObj.get("user");
 		JsonElement entities = jsonObj.get("entities");
 		if (entities != null && entities.isJsonObject()) {
@@ -81,8 +83,6 @@ public class JsonUtils {
 			if(!user_id.equals(requested_user_id)) {
 				return res;
 			}
-
-            
             
 			if (hashtags != null) {
 				for (JsonElement hash : hashtags.getAsJsonArray()) {
@@ -91,10 +91,29 @@ public class JsonUtils {
             }
             
 			res = new Tuple2<String, HashSet<String>>(jsonObj.get("id").getAsString(), hashs);
-			
-
-			System.out.println("Found a value:" + res);
 		}
+
+
 		return res;
+	}
+
+
+
+    public static Tuple2 <String, String> getTweetLangageAndTimestamp( String line ) {
+		if(line.isEmpty()){
+			return new Tuple2<String,String>("","");
+		}
+
+		
+		JsonObject jsonObj = JsonParser.parseString(line).getAsJsonObject();
+
+
+		
+		JsonElement user = jsonObj.get("user");
+		JsonElement name = user.getAsJsonObject().get("name");
+
+		Tuple2<String, String> tuple2 = new Tuple2<String, String>(name.getAsString(), "");
+
+		return tuple2; //jsonObj.get("lang").getAsString(),jsonObj.get("timestamp_ms").getAsString()
 	}
 }

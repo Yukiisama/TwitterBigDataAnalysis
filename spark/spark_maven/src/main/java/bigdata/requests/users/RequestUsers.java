@@ -35,10 +35,10 @@ public class RequestUsers {
 
 		// Content
 		JavaPairRDD<String, HashSet<String>> user_hashtags = file.mapToPair(line 
-				-> JsonUtils.withoutReflexivityAndWholeJsonUsers(user_id, line));
+				-> JsonUtils.getHashtagsFromUserInJSON(user_id, line));
 		
 		if(user_hashtags == null) {
-			System.err.println("[ERROR] Null dataset in UserHashtagsList@void, user probably don't have used any hashtags.");
+			System.err.println("[ERROR] Null dataset in UserUniqueHashtagsList@void, user probably don't have used any hashtags.");
 		}
 
 		Map<String, HashSet<String>> data = user_hashtags.collectAsMap();
@@ -59,8 +59,29 @@ public class RequestUsers {
 	/**
 	 * 
 	 */
-	public static void TweetsPerLangages (String lang) {
+	public static void TweetsPerLangagesAndTimestamp (String lang) {
 		
+		// Time calculation
+		long startTime = System.currentTimeMillis();
+
+
+
+		// Content
+		JavaPairRDD<String, String> tweets_per_langages_and_timestamp = file.mapToPair(line 
+				-> JsonUtils.getTweetLangageAndTimestamp(line));
+
+
+
+		if(tweets_per_langages_and_timestamp == null) {
+			System.err.println("[ERROR] Null dataset in UserUniqueHashtagsList@void, user probably don't have used any hashtags.");
+		}
+
+		Map<String, String> data = tweets_per_langages_and_timestamp.collectAsMap();
+
+		// Output
+		System.out.println(data);
+		long endTime = System.currentTimeMillis();
+		System.out.println("That took without Reflexivity : (map + reduce + topK) " + (endTime - startTime) + " milliseconds");
 	}
 
 
@@ -82,6 +103,17 @@ public class RequestUsers {
 	 * number of likes
 	 */
 	public static void UserMostFavoredTweet (String user_id) {
+
+	}
+
+
+	/**
+	 * OPTIONAL
+	 * 
+	 * Return the count of localisations where the user
+	 * has been the most
+	 */
+	public static void UserGetMostTweetedPlace (String user_id) {
 
 	}
 }

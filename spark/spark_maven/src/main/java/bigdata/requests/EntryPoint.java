@@ -124,7 +124,7 @@ public enum EntryPoint {
 
             String user_name = (String) args[0];
 
-            RequestUsers.TweetsPerLangages(user_name);
+            RequestUsers.TweetsPerLangagesAndTimestamp(user_name);
         }
     },
 
