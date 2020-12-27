@@ -1,5 +1,9 @@
-/autofs/unitytravail/travail/jmasson/Annee/Master2/LargeEchelle/TwitterBigDataAnalysis/spark/spark_maven/src/main/java/bigdata/file/json/JsonUtils.java
+/autofs/unitytravail/travail/jmasson/Annee/Master2/LargeEchelle/TwitterBigDataAnalysis/spark/spark_maven/src/main/java/bigdata/requests/influencers/RequestInfluenceurs.java
 /autofs/unitytravail/travail/jmasson/Annee/Master2/LargeEchelle/TwitterBigDataAnalysis/spark/spark_maven/src/main/java/bigdata/data/User.java
-/autofs/unitytravail/travail/jmasson/Annee/Master2/LargeEchelle/TwitterBigDataAnalysis/spark/spark_maven/src/main/java/bigdata/comparator/UniqueHashtagComparator.java
 /autofs/unitytravail/travail/jmasson/Annee/Master2/LargeEchelle/TwitterBigDataAnalysis/spark/spark_maven/src/main/java/bigdata/TPSpark.java
-/autofs/unitytravail/travail/jmasson/Annee/Master2/LargeEchelle/TwitterBigDataAnalysis/spark/spark_maven/src/main/java/bigdata/comparator/HashtagComparator.java
+/autofs/unitytravail/travail/jmasson/Annee/Master2/LargeEchelle/TwitterBigDataAnalysis/spark/spark_maven/src/main/java/bigdata/data/parser/JsonUtils.java
+/autofs/unitytravail/travail/jmasson/Annee/Master2/LargeEchelle/TwitterBigDataAnalysis/spark/spark_maven/src/main/java/bigdata/requests/users/RequestUsers.java
+/autofs/unitytravail/travail/jmasson/Annee/Master2/LargeEchelle/TwitterBigDataAnalysis/spark/spark_maven/src/main/java/bigdata/data/comparator/UniqueHashtagComparator.java
+/autofs/unitytravail/travail/jmasson/Annee/Master2/LargeEchelle/TwitterBigDataAnalysis/spark/spark_maven/src/main/java/bigdata/requests/hashtags/RequestHashtags.java
+/autofs/unitytravail/travail/jmasson/Annee/Master2/LargeEchelle/TwitterBigDataAnalysis/spark/spark_maven/src/main/java/bigdata/requests/EntryPoint.java
+/autofs/unitytravail/travail/jmasson/Annee/Master2/LargeEchelle/TwitterBigDataAnalysis/spark/spark_maven/src/main/java/bigdata/data/comparator/HashtagComparator.java

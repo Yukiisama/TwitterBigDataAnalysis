@@ -1,9 +1,17 @@
 package bigdata.data;
 
+import java.io.Serializable;
 import java.util.Set;
 
-public class User {
 
+public class User implements Serializable {
+
+    /**
+     *
+     */
+    private static final long serialVersionUID = 4569293528740761201L;
+
+    
     private int nb_tweets;
     private Set<String> hashtags;
     private String id;
@@ -46,4 +54,12 @@ public class User {
         this.nb_tweets = nb_tweets;
     }
 
+
+    public void id(String id) {
+        this.id = id;
+    }    
+
+    public String getID() {
+        return id;
+    }
 }

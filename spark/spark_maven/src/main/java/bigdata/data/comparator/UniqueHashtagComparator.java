@@ -1,4 +1,4 @@
-package bigdata.comparator;
+package bigdata.data.comparator;
 
 import java.io.Serializable;
 import java.util.Comparator;
