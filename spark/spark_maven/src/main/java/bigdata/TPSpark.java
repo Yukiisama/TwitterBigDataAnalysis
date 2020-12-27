@@ -21,8 +21,14 @@ public class TPSpark {
 
 		SparkConf conf = new SparkConf().setAppName("TP Spark");
 		context = new JavaSparkContext(conf);
-		file = context.textFile("/raw_data/tweet_01_03_2020_first10000.nljson");
+
+
+		// file = context.textFile("/raw_data/tweet_01_03_2020_first10000.nljson");
 		// file = context.textFile("/raw_data/tweet_02_03_2020.nljson");
+
+		// JavaRDD<String> file = context.textFile(JsonUtils.data[1]);
+
+
 		context.defaultParallelism();
 		context.setLogLevel("ERROR");
 		System.out.println("Number of partitions : " + file.getNumPartitions());
@@ -33,7 +39,7 @@ public class TPSpark {
 		// r.foreach(f -> System.out.println(f));
 
 
-		// mostUseHashtag(100, file);
+		// mostUseHashtag(100);
 
 
 		System.out.println("--- Utilisateurs ---");
