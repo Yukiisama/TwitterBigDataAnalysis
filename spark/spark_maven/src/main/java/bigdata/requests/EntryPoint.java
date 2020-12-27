@@ -19,7 +19,61 @@ public enum EntryPoint {
 
             int k = (Integer) args[0];
 
-            RequestHashtags.mostUseHashtag(k);
+            RequestHashtags.mostUsedHashtags(k);
+        }
+    },
+    
+
+    HASHTAGS_BEST_WITH_COUNTS {
+        @Override
+        public void apply (Object ... args) {
+            if(args.length == 1) {
+                if(!(args[0] instanceof Integer)) {
+                    throw new IllegalArgumentException("Invalid arguments for EntryPoint@HASHTAGS_BEST_WITH_COUNTS. Required argument(s) are: (Integer).");
+                }
+            } else {
+                throw new IllegalArgumentException("Invalid number of arguments for EntryPoint@HASHTAGS_BEST_WITH_COUNTS. Required argument(s) are: (Integer).");
+            }
+
+            int k = (Integer) args[0];
+
+            RequestHashtags.mostUsedHashtagsWithCount(k);
+        }
+    },
+    
+
+    HASHTAGS_APPARITIONS_COUNT {
+        @Override
+        public void apply (Object ... args) {
+            if(args.length == 1) {
+                if(!(args[0] instanceof String)) {
+                    throw new IllegalArgumentException("Invalid arguments for EntryPoint@HASHTAGS_APPARITIONS_COUNT. Required argument(s) are: (String).");
+                }
+            } else {
+                throw new IllegalArgumentException("Invalid number of arguments for EntryPoint@HASHTAGS_APPARITIONS_COUNT. Required argument(s) are: (String).");
+            }
+
+            String k = (String) args[0];
+
+            RequestHashtags.numberOfApparitions(k);
+        }
+    },
+    
+
+    HASHTAGS_USED_BY {
+        @Override
+        public void apply (Object ... args) {
+            if(args.length == 1) {
+                if(!(args[0] instanceof String)) {
+                    throw new IllegalArgumentException("Invalid arguments for EntryPoint@HASHTAGS_USED_BY. Required argument(s) are: (String).");
+                }
+            } else {
+                throw new IllegalArgumentException("Invalid number of arguments for EntryPoint@HASHTAGS_USED_BY. Required argument(s) are: (String).");
+            }
+
+            String k = (String) args[0];
+
+            RequestHashtags.usersList(k);
         }
     },
 

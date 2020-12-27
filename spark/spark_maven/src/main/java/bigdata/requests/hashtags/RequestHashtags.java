@@ -14,23 +14,58 @@ import scala.Tuple2;
 import static bigdata.TPSpark.file;
 
 public class RequestHashtags {
-	public static void mostUseHashtag (int k) {
+
+	
+
+	public static void mostUsedHashtags (int k) {
 		if (k < 1 || k > 10000 ) {
-			System.err.println("[ERROR] Invalid range in mostUseHashtag@void, valid value is between 1 and 10000.");
+			System.err.println("[ERROR] Invalid range in mostUsedHashtags@void, valid value is between 1 and 10000.");
 			
 			return;
 		}
-
+		
 		// Premier essai sans construire tout le gson en une classe
 		long startTime = System.currentTimeMillis();
-		JavaRDD<String> hashtags = file.flatMap(line -> JsonUtils.withoutReflexivityAndWholeJson(line));
-		JavaPairRDD<String, Integer> r = hashtags.mapToPair(hash -> new Tuple2<>(hash, 1)).reduceByKey((a, b) -> a + b);
-		HashtagComparator comparator = new HashtagComparator();
-		List<Tuple2<String, Integer>> top = r.top(k, comparator);
-		System.out.println(top);
+		JavaRDD<String []> hashtags = file.flatMap(line -> JsonUtils.withoutReflexivityAndWholeJson(line));
+		JavaPairRDD<String[], Integer> r = hashtags.mapToPair(hash -> new Tuple2<>(hash, 1)).reduceByKey((a, b) -> a + b);
+		List<Tuple2<String[], Integer>> top = r.top(k, new HashtagComparator());
+		for (Tuple2<String[], Integer> t: top) {
+			System.out.println("hashtag: " + t._1[0] + " username: " + t._1[1] 
+								+ " userId: " + t._1[2] + " count: " + t._2);
+		}
 		long endTime = System.currentTimeMillis();
 		System.out.println("That took without Reflexivity : (map + reduce + topK) " + (endTime - startTime) + " milliseconds");
+	}
+	
 
-    }
+	public static void mostUsedHashtagsWithCount (int k) {
+		if (k < 1 || k > 10000 ) {
+			System.err.println("[ERROR] Invalid range in mostUsedHashtagsWithCount@void, valid value is between 1 and 10000.");
+			
+			return;
+		}
+		
+		// Premier essai sans construire tout le gson en une classe
+		long startTime = System.currentTimeMillis();
+		JavaRDD<String []> hashtags = file.flatMap(line -> JsonUtils.withoutReflexivityAndWholeJson(line));
+		JavaPairRDD<String[], Integer> r = hashtags.mapToPair(hash -> new Tuple2<>(hash, 1)).reduceByKey((a, b) -> a + b);
+		List<Tuple2<String[], Integer>> top = r.top(k, new HashtagComparator());
+		for (Tuple2<String[], Integer> t: top) {
+			System.out.println("hashtag: " + t._1[0] + " username: " + t._1[1] 
+								+ " userId: " + t._1[2] + " count: " + t._2);
+		}
+		long endTime = System.currentTimeMillis();
+		System.out.println("That took without Reflexivity : (map + reduce + topK) " + (endTime - startTime) + " milliseconds");
+	}
+
+	public static void numberOfApparitions (String hashtag_label) {
+		// TODO
+
+	}
+
+	public static void usersList (String hashtag_label) {
+		// TODO
+
+	}
     
 }
