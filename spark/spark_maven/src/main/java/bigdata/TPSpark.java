@@ -26,7 +26,7 @@ public class TPSpark {
 		// file = context.textFile("/raw_data/tweet_01_03_2020_first10000.nljson");
 		// file = context.textFile("/raw_data/tweet_02_03_2020.nljson");
 
-		// JavaRDD<String> file = context.textFile(JsonUtils.data[1]);
+		file = context.textFile(JsonUtils.data[0]);
 
 
 		context.defaultParallelism();
@@ -43,7 +43,7 @@ public class TPSpark {
 	
 	public static void mostUseHashtag (int k, JavaRDD<String> file) {
 
-		// mostUseHashtag(100);
+		mostUseHashtag(100);
 
 
 		System.out.println("--- Utilisateurs ---");
