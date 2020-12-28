@@ -100,7 +100,7 @@ public class JsonUtils {
 		}
 
 		
-		JsonObject jsonObj = JsonParser.parseString(line).getAsJsonObject();
+		JsonObject jsonObj = new JsonParser().parse(line).getAsJsonObject();
 
 
 		
