@@ -15,13 +15,17 @@ public class TPSpark {
 	public static JavaSparkContext context = null;
 
 	static {
-		conf = new SparkConf().setAppName("TP Spark");
+		conf = new SparkConf()
+				.setAppName("TP Spark")
+				.set("spark.executor.instances", "20")
+			    .set("spark.executor.cores", "2");
 		context = new JavaSparkContext(conf);
 
 		context.defaultParallelism();
 		context.setLogLevel("ERROR");
 
 		file = context.textFile(JsonUtils.data[1]);
+		
 		// file = context.textFile("/raw_data/tweet_02_03_2020.nljson");
 	}
 
@@ -30,8 +34,8 @@ public class TPSpark {
 
 		try {
 			
-			//System.out.println("Number of partitions : " + file.getNumPartitions());
-			//System.out.println("Lines Count" + file.count());
+			System.out.println("Number of partitions : " + file.getNumPartitions());
+			System.out.println("Lines Count" + file.count());
 			// Print val
 			// file.foreach(f -> System.out.println(f));
 			// hashtags.foreach( f -> System.out.println(f));
@@ -102,7 +106,7 @@ public class TPSpark {
 		System.out.println("b) Nombre de tweets d'un utilisateur:");
 		// EntryPoint.USERS_NUMBER_OF_TWEETS.apply("gouvernementFR");
 		System.out.println("c) Nombre de tweets par langue:");
-		EntryPoint.USERS_NUMBER_OF_TWEETS_PER_LANGAGE.apply("fr");
+		//EntryPoint.USERS_NUMBER_OF_TWEETS_PER_LANGAGE.apply("fr");
 		/**
 		 * Optional
 		 */
