@@ -40,10 +40,10 @@ public class JsonUtils {
 		"/raw_data/tweet_21_03_2020.nljson"
 	};
 
-    public static Iterator<String[]> withoutReflexivityAndWholeJson(String line) {
-		List<String[]> hashs = new ArrayList<>();
+    public static Iterator<String> withoutReflexivityAndWholeJson(String line) {
+		List<String> hashs = new ArrayList<>();
 		
-		JsonObject jsonObj = JsonParser.parseString(line).getAsJsonObject();
+		JsonObject jsonObj = new JsonParser().parse(line).getAsJsonObject();
 
 		JsonElement entities = jsonObj.get("entities");
 		if (entities != null && entities.isJsonObject()) {
@@ -53,12 +53,7 @@ public class JsonUtils {
 			JsonElement hashtags = (entities.getAsJsonObject()).get("hashtags");
 			if (hashtags != null) {
 				for (JsonElement hash : hashtags.getAsJsonArray()) {
-					String [] infos = new String[] {
-							hash.getAsJsonObject().get("text").getAsString(),
-							name.getAsString(),
-							id.getAsString()
-						};
-					hashs.add(infos);
+					hashs.add(hash.getAsJsonObject().get("text").getAsString());
 				}
 				return hashs.iterator();
 			}
@@ -72,7 +67,7 @@ public class JsonUtils {
 
 		HashSet<String> hashs = new HashSet<>();
 		
-		JsonObject jsonObj = JsonParser.parseString(line).getAsJsonObject();
+		JsonObject jsonObj = new JsonParser().parse(line).getAsJsonObject();
 
 		JsonElement users = jsonObj.get("user");
 		JsonElement entities = jsonObj.get("entities");

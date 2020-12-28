@@ -26,13 +26,10 @@ public class RequestHashtags {
 		
 		// Premier essai sans construire tout le gson en une classe
 		long startTime = System.currentTimeMillis();
-		JavaRDD<String []> hashtags = file.flatMap(line -> JsonUtils.withoutReflexivityAndWholeJson(line));
-		JavaPairRDD<String[], Integer> r = hashtags.mapToPair(hash -> new Tuple2<>(hash, 1)).reduceByKey((a, b) -> a + b);
-		List<Tuple2<String[], Integer>> top = r.top(k, new HashtagComparator());
-		for (Tuple2<String[], Integer> t: top) {
-			System.out.println("hashtag: " + t._1[0] + " username: " + t._1[1] 
-								+ " userId: " + t._1[2] + " count: " + t._2);
-		}
+		JavaRDD<String> hashtags = file.flatMap(line -> JsonUtils.withoutReflexivityAndWholeJson(line));
+		JavaPairRDD<String, Integer> r = hashtags.mapToPair(hash -> new Tuple2<>(hash, 1)).reduceByKey((a, b) -> a + b);
+		List<Tuple2<String, Integer>> top = r.top(k, new HashtagComparator());
+		System.out.println(top);
 		long endTime = System.currentTimeMillis();
 		System.out.println("That took without Reflexivity : (map + reduce + topK) " + (endTime - startTime) + " milliseconds");
 	}
@@ -45,15 +42,11 @@ public class RequestHashtags {
 			return;
 		}
 		
-		// Premier essai sans construire tout le gson en une classe
 		long startTime = System.currentTimeMillis();
-		JavaRDD<String []> hashtags = file.flatMap(line -> JsonUtils.withoutReflexivityAndWholeJson(line));
-		JavaPairRDD<String[], Integer> r = hashtags.mapToPair(hash -> new Tuple2<>(hash, 1)).reduceByKey((a, b) -> a + b);
-		List<Tuple2<String[], Integer>> top = r.top(k, new HashtagComparator());
-		for (Tuple2<String[], Integer> t: top) {
-			System.out.println("hashtag: " + t._1[0] + " username: " + t._1[1] 
-								+ " userId: " + t._1[2] + " count: " + t._2);
-		}
+		JavaRDD<String> hashtags = file.flatMap(line -> JsonUtils.withoutReflexivityAndWholeJson(line));
+		JavaPairRDD<String, Integer> r = hashtags.mapToPair(hash -> new Tuple2<>(hash, 1)).reduceByKey((a, b) -> a + b);
+		List<Tuple2<String, Integer>> top = r.top(k, new HashtagComparator());
+		System.out.println(top);
 		long endTime = System.currentTimeMillis();
 		System.out.println("That took without Reflexivity : (map + reduce + topK) " + (endTime - startTime) + " milliseconds");
 	}

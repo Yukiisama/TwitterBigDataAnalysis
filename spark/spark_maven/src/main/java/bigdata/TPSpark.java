@@ -1,9 +1,11 @@
 package bigdata;
 
+import org.apache.hadoop.hdfs.web.JsonUtil;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 
+import bigdata.data.parser.JsonUtils;
 import bigdata.requests.EntryPoint;
 
 public class TPSpark {
@@ -19,7 +21,7 @@ public class TPSpark {
 		context.defaultParallelism();
 		context.setLogLevel("ERROR");
 
-		file = context.textFile("/raw_data/tweet_01_03_2020_first10000.nljson");
+		file = context.textFile(JsonUtils.data[1]);
 		// file = context.textFile("/raw_data/tweet_02_03_2020.nljson");
 	}
 
@@ -28,8 +30,8 @@ public class TPSpark {
 
 		try {
 			
-			System.out.println("Number of partitions : " + file.getNumPartitions());
-			System.out.println("Lines Count" + file.count());
+			//System.out.println("Number of partitions : " + file.getNumPartitions());
+			//System.out.println("Lines Count" + file.count());
 			// Print val
 			// file.foreach(f -> System.out.println(f));
 			// hashtags.foreach( f -> System.out.println(f));
