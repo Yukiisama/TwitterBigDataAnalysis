@@ -11,6 +11,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import bigdata.data.User;
 import scala.Tuple2;
 
 public class JsonUtils {
@@ -43,7 +44,9 @@ public class JsonUtils {
     public static Iterator<String[]> withoutReflexivityAndWholeJson(String line) {
 		List<String[]> hashs = new ArrayList<>();
 		
-		JsonObject jsonObj = JsonParser.parseString(line).getAsJsonObject();
+		JsonElement json = new JsonParser().parse(line);
+		JsonObject jsonObj = json.getAsJsonObject();
+		// JsonObject jsonObj = JsonParser.parseString(line).getAsJsonObject();
 
 		JsonElement entities = jsonObj.get("entities");
 		if (entities != null && entities.isJsonObject()) {
@@ -67,34 +70,46 @@ public class JsonUtils {
     }
     
 
-    public static Tuple2 <String, HashSet<String>> getHashtagsFromUserInJSON(String requested_user_id, String line) {
-		Tuple2 <String, HashSet<String>> res = new Tuple2<String, HashSet<String>>(requested_user_id, new HashSet<String>());
+    public static User getHashtagsFromUserInJSON(String requested_user_id, String line) {
 
+		User user_instance = null;
 		HashSet<String> hashs = new HashSet<>();
-		
-		JsonObject jsonObj = JsonParser.parseString(line).getAsJsonObject();
 
-		JsonElement users = jsonObj.get("user");
+
+		JsonElement json = new JsonParser().parse(line);
+		JsonObject jsonObj = json.getAsJsonObject();
+		// JsonObject jsonObj = JsonParser.parseString(line).getAsJsonObject();
+
 		JsonElement entities = jsonObj.get("entities");
+
+		
 		if (entities != null && entities.isJsonObject()) {
             JsonElement hashtags = (entities.getAsJsonObject()).get("hashtags");
-			String user_id = (users.getAsJsonObject().get("name")).getAsString();
+			JsonElement user = jsonObj.get("user");
+			JsonElement username = user.getAsJsonObject().get("name");
+			JsonElement id = user.getAsJsonObject().get("id_str");
+			JsonElement geo = user.getAsJsonObject().get("place");
 			
-			if(!user_id.equals(requested_user_id)) {
-				return res;
-			}
+			// Use only if looking for a specific user.
+			// if(!user_id.equals(requested_user_id)) {
+			// 	return res;
+			// }
             
 			if (hashtags != null) {
 				for (JsonElement hash : hashtags.getAsJsonArray()) {
 					hashs.add(hash.getAsJsonObject().get("text").getAsString());
                 }
-            }
-            
-			res = new Tuple2<String, HashSet<String>>(jsonObj.get("id").getAsString(), hashs);
+			}
+
+			user_instance = new User(username.getAsString(), hashs);
+			
+			if(geo != null)
+				user_instance.setGeo(geo.getAsString() );
+			else
+				user_instance.setGeo("");
 		}
 
-
-		return res;
+		return user_instance;
 	}
 
 
@@ -105,7 +120,9 @@ public class JsonUtils {
 		}
 
 		
-		JsonObject jsonObj = JsonParser.parseString(line).getAsJsonObject();
+		JsonElement json = new JsonParser().parse(line);
+		JsonObject jsonObj = json.getAsJsonObject();
+		// JsonObject jsonObj = JsonParser.parseString(line).getAsJsonObject();
 
 
 		

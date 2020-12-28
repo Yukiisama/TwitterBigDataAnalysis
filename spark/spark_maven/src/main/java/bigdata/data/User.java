@@ -2,6 +2,10 @@ package bigdata.data;
 
 import java.io.Serializable;
 import java.util.Set;
+import java.util.HashSet;
+import java.util.List;
+import java.util.ArrayList;
+
 
 
 public class User implements Serializable {
@@ -14,13 +18,17 @@ public class User implements Serializable {
     
     private int nb_tweets;
     private Set<String> hashtags;
+    private List<String> localisations;
     private String id;
 
     public User(String id, Set<String> hashtags, int nb_tweets) {
         this.id = id;
-        this.setHashtags(hashtags);
-        this.setNb_tweets(nb_tweets);
+        this.nb_tweets = nb_tweets;
+        
+        this.hashtags = new HashSet<String>(hashtags);
+        this.localisations = new ArrayList<String>();
     }
+
     public User(String id, Set<String> hashtags) {
         this(id, hashtags, 0);
     }
@@ -30,6 +38,7 @@ public class User implements Serializable {
      * @return the hashtags
      */
     public Set<String> getHashtags() {
+
         return hashtags;
     }
 
@@ -44,6 +53,7 @@ public class User implements Serializable {
      * @return the nb_tweets
      */
     public int getNb_tweets() {
+
         return nb_tweets;
     }
 
@@ -60,6 +70,38 @@ public class User implements Serializable {
     }    
 
     public String getID() {
+
         return id;
     }
+
+    public void setGeo(String localisations) {
+        this.localisations.add(localisations);
+    }
+
+
+    @Override
+    public boolean equals(Object obj){
+        if(obj instanceof User) {
+            User user_obj = (User) obj;
+
+            if(this.id.equals(user_obj.id)){
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        String output = "{ User: " + this.id + ", "
+        + "Hashtags: {[" + this.hashtags + "]}" + ", " 
+        + "counts:" + this.nb_tweets + ", "
+        + "geo: {[" + this.localisations + "]}" + ", "
+        + "}";
+
+        return output;
+    }
+
 }

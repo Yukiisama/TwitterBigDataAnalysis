@@ -3,11 +3,14 @@ package bigdata.requests.users;
 
 import java.util.HashSet;
 import java.util.Map;
+import java.util.List;
 
 
 import org.apache.spark.api.java.JavaPairRDD;
+import org.apache.spark.api.java.JavaRDD;
 
 import bigdata.data.parser.JsonUtils;
+import bigdata.data.User;
 
 
 // import static bigdata.TPSpark.context;
@@ -34,17 +37,18 @@ public class RequestUsers {
 
 
 		// Content
-		JavaPairRDD<String, HashSet<String>> user_hashtags = file.mapToPair(line 
-				-> JsonUtils.getHashtagsFromUserInJSON(user_id, line));
+		JavaRDD<User> user_hashtags = file.map(line -> JsonUtils.getHashtagsFromUserInJSON(user_id, line));
 		
 		if(user_hashtags == null) {
 			System.err.println("[ERROR] Null dataset in UserUniqueHashtagsList@void, user probably don't have used any hashtags.");
 		}
 
-		Map<String, HashSet<String>> data = user_hashtags.collectAsMap();
+		List<User> data = user_hashtags.collect();
 
 		// Output
-		System.out.println(data);
+		for(User u : data){
+			System.out.println(u);
+		}
 		long endTime = System.currentTimeMillis();
 		System.out.println("That took without Reflexivity : (map + reduce + topK) " + (endTime - startTime) + " milliseconds");
 	}

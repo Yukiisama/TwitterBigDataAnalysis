@@ -15,11 +15,16 @@ public class TPSpark {
 	static {
 		conf = new SparkConf().setAppName("TP Spark");
 		context = new JavaSparkContext(conf);
-
 		context.defaultParallelism();
 		context.setLogLevel("ERROR");
 
 		file = context.textFile("/raw_data/tweet_01_03_2020_first10000.nljson");
+
+
+		// int nb_of_workers = context.sc().getExecutorStorageStatus().length - 1;
+		
+		System.out.println("There is " + context.sc().statusTracker().getExecutorInfos().length + " Workers.");
+
 		// file = context.textFile("/raw_data/tweet_02_03_2020.nljson");
 	}
 
@@ -90,23 +95,23 @@ public class TPSpark {
 		 */
 		System.out.println("a) Liste des Hashtags sans doublons:");
 		EntryPoint.USERS_UNIQUE_HASHTAGS_LIST.apply("jakefm");
-		// EntryPoint.USERS_UNIQUE_HASHTAGS_LIST.apply("LePoint");
-		// EntryPoint.USERS_UNIQUE_HASHTAGS_LIST.apply("gouvernementFR");
-		// EntryPoint.USERS_UNIQUE_HASHTAGS_LIST.apply("LEXPRESS");
+		// // EntryPoint.USERS_UNIQUE_HASHTAGS_LIST.apply("LePoint");
+		// // EntryPoint.USERS_UNIQUE_HASHTAGS_LIST.apply("gouvernementFR");
+		// // EntryPoint.USERS_UNIQUE_HASHTAGS_LIST.apply("LEXPRESS");
 
-		/**
-		 * TODO
-		 */
-		System.out.println("b) Nombre de tweets d'un utilisateur:");
-		// EntryPoint.USERS_NUMBER_OF_TWEETS.apply("gouvernementFR");
-		System.out.println("c) Nombre de tweets par langue:");
-		EntryPoint.USERS_NUMBER_OF_TWEETS_PER_LANGAGE.apply("fr");
-		/**
-		 * Optional
-		 */
-		System.out.println("* Message le plus liké d'un utilisateur:");
-		// EntryPoint.USERS_MOST_LIKED_TWEET.apply("gouvernementFR");
-		System.out.println("* Message le plus retweeté d'un utilisateur:");
-		// EntryPoint.USERS_MOST_RETWEETED_TWEET.apply("LEXPRESS");
+		// /**
+		//  * TODO
+		//  */
+		// System.out.println("b) Nombre de tweets d'un utilisateur:");
+		// // EntryPoint.USERS_NUMBER_OF_TWEETS.apply("gouvernementFR");
+		// System.out.println("c) Nombre de tweets par langue:");
+		// EntryPoint.USERS_NUMBER_OF_TWEETS_PER_LANGAGE.apply("fr");
+		// /**
+		//  * Optional
+		//  */
+		// System.out.println("* Message le plus liké d'un utilisateur:");
+		// // EntryPoint.USERS_MOST_LIKED_TWEET.apply("gouvernementFR");
+		// System.out.println("* Message le plus retweeté d'un utilisateur:");
+		// // EntryPoint.USERS_MOST_RETWEETED_TWEET.apply("LEXPRESS");
 	}
 }
