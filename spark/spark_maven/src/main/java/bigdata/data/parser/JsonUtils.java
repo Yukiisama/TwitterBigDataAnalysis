@@ -47,9 +47,9 @@ public class JsonUtils {
 	
 			JsonElement entities = jsonObj.get("entities");
 			if (entities != null && entities.isJsonObject()) {
-				JsonElement user = jsonObj.get("user");
-				JsonElement name = user.getAsJsonObject().get("name");
-				JsonElement id = user.getAsJsonObject().get("id_str");
+				//JsonElement user = jsonObj.get("user");
+				//JsonElement name = user.getAsJsonObject().get("name");
+				//JsonElement id = user.getAsJsonObject().get("id_str");
 				JsonElement hashtags = (entities.getAsJsonObject()).get("hashtags");
 				if (hashtags != null) {
 					for (JsonElement hash : hashtags.getAsJsonArray()) {

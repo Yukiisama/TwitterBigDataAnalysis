@@ -15,13 +15,13 @@ public class TPSpark {
 	private static SparkConf conf = null;
 	public static JavaRDD<String> file = null;
 	public static JavaSparkContext context = null;
-	//public static ArrayList<JavaRDD<String>> files = null;
 	public static JavaRDD<String> files = null;
 	static {
 		conf = new SparkConf()
 				.setAppName("TP Spark")
-				.set("spark.executor.instances", "20")
+				.set("spark.executor.instances", "5")
 			    .set("spark.executor.cores", "2");
+
 		context = new JavaSparkContext(conf);
 
 		context.defaultParallelism();

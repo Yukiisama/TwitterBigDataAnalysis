@@ -44,9 +44,11 @@ public class RequestHashtags {
 		}
 		
 		long startTime = System.currentTimeMillis();
-		// on all files 
-		JavaPairRDD<String, Integer> r = files.mapToPair(hash -> new Tuple2<>(hash, 1)).reduceByKey((a, b) -> a + b);
-		List<Tuple2<String, Integer>> top = r.top(k, new HashtagComparator());
+		List<Tuple2<String, Integer>> top = files
+											.flatMap(line -> JsonUtils.withoutReflexivityAndWholeJson(line))
+											.mapToPair(hash -> new Tuple2<>(hash, 1))
+											.reduceByKey((a, b) -> a + b)
+											.top(k, new HashtagComparator());
 		System.out.println(top);
 		long endTime = System.currentTimeMillis();
 		System.out.println("That took without Reflexivity : (map + reduce + topK) " + (endTime - startTime) + " milliseconds");
