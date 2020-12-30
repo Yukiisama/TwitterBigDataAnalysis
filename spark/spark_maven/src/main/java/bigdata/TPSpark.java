@@ -1,37 +1,41 @@
 package bigdata;
 
-import java.util.ArrayList;
-
-import org.apache.hadoop.hdfs.BlockMissingException;
-import org.apache.hadoop.hdfs.web.JsonUtil;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 
-import bigdata.data.parser.JsonUtils;
+import bigdata.infrastructure.database.runners.HBaseUser;
 import bigdata.requests.EntryPoint;
 
 public class TPSpark {
 
-	private static SparkConf conf = null;
+	public static SparkConf conf = null;
 
 	public static JavaRDD<String> file = null;
 	public static JavaRDD<String> files = null;
 
 	public static JavaSparkContext context = null;
 
+
+	public static HBaseUser database_user = HBaseUser.INSTANCE();
+
 	static {
 		conf = new SparkConf()
 				.setAppName("TP Spark")
 				.set("spark.executor.instances", "5")
-			    .set("spark.executor.cores", "2");
+			    .set("spark.executor.cores", "*");
 
 		context = new JavaSparkContext(conf);
 		context.defaultParallelism();
 		context.setLogLevel("ERROR");
 
+
 		file = context.textFile("/raw_data/tweet_01_03_2020_first10000.nljson");
 		files = context.textFile("/raw_data/tweet_01_03_2020_first10000.nljson");
+
+
+		
+		
 
 
 		// // int nb_of_workers = context.sc().getExecutorStorageStatus().length - 1;

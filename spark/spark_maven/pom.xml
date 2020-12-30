@@ -1,47 +1,92 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>bigdata</groupId>
-  <artifactId>TPSpark</artifactId>
-  <version>0.0.1</version>
-  <name>TPSpark</name>
-  
-  
-  <dependencies>
-  	<dependency>
-  		<groupId>org.apache.spark</groupId>
-  		<artifactId>spark-core_2.10</artifactId>
-  		<version>2.0.1</version>
-  	</dependency>
-	<!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
-<dependency>
-    <groupId>com.google.code.gson</groupId>
-    <artifactId>gson</artifactId>
-    <version>2.8.6</version>
-</dependency>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>bigdata</groupId>
+	<artifactId>TPSpark</artifactId>
+	<version>0.0.1</version>
+	<name>TPSpark</name>
 
-  </dependencies>
-  <build>
-  	<plugins>
-  		<plugin>
-  			<groupId>org.apache.maven.plugins</groupId>
-  			<artifactId>maven-jar-plugin</artifactId>
-  			<version>3.0.0</version>
-  			<configuration>
-  				<archive>
-  					<manifest>
-  						<mainClass>bigdata.TPSpark</mainClass>
-  					</manifest>
-  				</archive>
-  			</configuration>
-  		</plugin>
-		 <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-compiler-plugin</artifactId>
-            <configuration>
-                <source>8</source>
-                <target>8</target>
-            </configuration>
-        </plugin>
-  	</plugins>
-  </build>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.spark</groupId>
+			<artifactId>spark-core_2.10</artifactId>
+			<version>2.0.1</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.8.6</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.hadoop</groupId>
+			<artifactId>hadoop-common</artifactId>
+			<version>2.7.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.hadoop</groupId>
+			<artifactId>hadoop-hdfs</artifactId>
+			<version>2.7.3</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-core -->
+
+
+		<!-- far better -->
+		<!-- <dependency>
+			<groupId>org.apache.hbase</groupId>
+			<artifactId>hbase-client</artifactId>
+			<version>1.4.11</version>
+		</dependency> -->
+
+		<dependency>
+			<groupId>org.apache.hbase</groupId>
+			<artifactId>hbase-client</artifactId>
+			<version>1.4.11</version>
+			<scope>system</scope>
+			<systemPath>${HADOOP_HOME}/../hbase/lib/hbase-client-1.4.11.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.hbase</groupId>
+			<artifactId>hbase-common</artifactId>
+			<version>1.4.11</version>
+			<scope>system</scope>
+			<systemPath>${HADOOP_HOME}/../hbase/lib/hbase-common-1.4.11.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.hbase</groupId>
+			<artifactId>hbase-hadoop-compat</artifactId>
+			<version>1.4.11</version>
+			<scope>system</scope>
+			<systemPath>${HADOOP_HOME}/../hbase/lib/hbase-hadoop-compat-1.4.11.jar</systemPath>
+		</dependency>
+
+
+	</dependencies>
+	<build>
+		<plugins>
+
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.0.0</version>
+				<configuration>
+					<archive>
+						<manifest>
+							<mainClass>bigdata.TPSpark</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>8</source>
+					<target>8</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>
