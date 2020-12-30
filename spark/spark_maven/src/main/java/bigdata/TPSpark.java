@@ -23,7 +23,7 @@ public class TPSpark {
 		conf = new SparkConf()
 				.setAppName("TP Spark")
 				.set("spark.executor.instances", "5")
-			    .set("spark.executor.cores", "*");
+			    .set("spark.executor.cores", "2");
 
 		context = new JavaSparkContext(conf);
 		context.defaultParallelism();
