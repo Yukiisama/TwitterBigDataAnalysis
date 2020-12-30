@@ -16,52 +16,52 @@ import static bigdata.TPSpark.file;
 import static bigdata.TPSpark.files;
 public class RequestHashtags {
 
-	
+    
 
-	public static void mostUsedHashtags (int k) {
-		if (k < 1 || k > 10000 ) {
-			System.err.println("[ERROR] Invalid range in mostUsedHashtags@void, valid value is between 1 and 10000.");
-			
-			return;
-		}
-		
-		// Premier essai sans construire tout le gson en une classe
-		long startTime = System.currentTimeMillis();
-		JavaRDD<String> hashtags = file.flatMap(line -> JsonUtils.withoutReflexivityAndWholeJson(line));
-		JavaPairRDD<String, Integer> r = hashtags.mapToPair(hash -> new Tuple2<>(hash, 1)).reduceByKey((a, b) -> a + b);
-		List<Tuple2<String, Integer>> top = r.top(k, new HashtagComparator());
-		System.out.println(top);
-		long endTime = System.currentTimeMillis();
-		System.out.println("That took without Reflexivity : (map + reduce + topK) " + (endTime - startTime) + " milliseconds");
-	}
-	
+    public static void mostUsedHashtags (int k) {
+        if (k < 1 || k > 10000 ) {
+            System.err.println("[ERROR] Invalid range in mostUsedHashtags@void, valid value is between 1 and 10000.");
+            
+            return;
+        }
+        
+        // Premier essai sans construire tout le gson en une classe
+        long startTime = System.currentTimeMillis();
+        JavaRDD<String> hashtags = file.flatMap(line -> JsonUtils.withoutReflexivityAndWholeJson(line));
+        JavaPairRDD<String, Integer> r = hashtags.mapToPair(hash -> new Tuple2<>(hash, 1)).reduceByKey((a, b) -> a + b);
+        List<Tuple2<String, Integer>> top = r.top(k, new HashtagComparator());
+        System.out.println(top);
+        long endTime = System.currentTimeMillis();
+        System.out.println("That took without Reflexivity : (map + reduce + topK) " + (endTime - startTime) + " milliseconds");
+    }
+    
 
-	public static void mostUsedHashtagsWithCount (int k) {
-		if (k < 1 || k > 10000 ) {
-			System.err.println("[ERROR] Invalid range in mostUsedHashtagsWithCount@void, valid value is between 1 and 10000.");
-			
-			return;
-		}
-		
-		long startTime = System.currentTimeMillis();
-		List<Tuple2<String, Integer>> top = files
-											.flatMap(line -> JsonUtils.withoutReflexivityAndWholeJson(line))
-											.mapToPair(hash -> new Tuple2<>(hash, 1))
-											.reduceByKey((a, b) -> a + b)
-											.top(k, new HashtagComparator());
-		System.out.println(top);
-		long endTime = System.currentTimeMillis();
-		System.out.println("That took without Reflexivity : (map + reduce + topK) " + (endTime - startTime) + " milliseconds");
-	}
+    public static void mostUsedHashtagsWithCount (int k) {
+        if (k < 1 || k > 10000 ) {
+            System.err.println("[ERROR] Invalid range in mostUsedHashtagsWithCount@void, valid value is between 1 and 10000.");
+            
+            return;
+        }
+        
+        long startTime = System.currentTimeMillis();
+        List<Tuple2<String, Integer>> top = files
+                                            .flatMap(line -> JsonUtils.withoutReflexivityAndWholeJson(line))
+                                            .mapToPair(hash -> new Tuple2<>(hash, 1))
+                                            .reduceByKey((a, b) -> a + b)
+                                            .top(k, new HashtagComparator());
+        System.out.println(top);
+        long endTime = System.currentTimeMillis();
+        System.out.println("That took without Reflexivity : (map + reduce + topK) " + (endTime - startTime) + " milliseconds");
+    }
 
-	public static void numberOfApparitions (String hashtag_label) {
-		// TODO
+    public static void numberOfApparitions (String hashtag_label) {
+        // TODO
 
-	}
+    }
 
-	public static void usersList (String hashtag_label) {
-		// TODO
+    public static void usersList (String hashtag_label) {
+        // TODO
 
-	}
+    }
     
 }
