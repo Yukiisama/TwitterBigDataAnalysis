@@ -2,6 +2,7 @@ package bigdata;
 
 import java.util.ArrayList;
 
+import org.apache.hadoop.hdfs.BlockMissingException;
 import org.apache.hadoop.hdfs.web.JsonUtil;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
@@ -15,7 +16,7 @@ public class TPSpark {
 	private static SparkConf conf = null;
 	public static JavaRDD<String> file = null;
 	public static JavaSparkContext context = null;
-	public static JavaRDD<String> files = null;
+
 	static {
 		conf = new SparkConf()
 				.setAppName("TP Spark")
@@ -42,7 +43,7 @@ public class TPSpark {
 		// 	s = s.concat("," + JsonUtils.data[i]);
 		// }
 		// file = context.textFile(s);
-		// // file = context.textFile("/raw_data/tweet_02_03_2020.nljson");
+		// file = context.textFile("/raw_data/tweet_05_03_2020.nljson");
 	}
 
 	
@@ -67,6 +68,7 @@ public class TPSpark {
 			e.printStackTrace();
 
 		} finally {
+
 			// Always close the Spark Context.
 			context.close();
 		}
