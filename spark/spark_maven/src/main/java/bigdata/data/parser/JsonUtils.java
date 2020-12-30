@@ -35,9 +35,6 @@ public class JsonUtils {
 
 			JsonElement entities = jsonObj.get("entities");
 			if (entities != null && entities.isJsonObject()) {
-				// JsonElement user = jsonObj.get("user");
-				// JsonElement name = user.getAsJsonObject().get("name");
-				// JsonElement id = user.getAsJsonObject().get("id_str");
 				JsonElement hashtags = (entities.getAsJsonObject()).get("hashtags");
 				if (hashtags != null) {
 					for (JsonElement hash : hashtags.getAsJsonArray()) {
@@ -51,7 +48,7 @@ public class JsonUtils {
 		}
 		return hashs.iterator();
 	}
-
+		
 	public static Tuple2<String, User> getHashtagsFromUserInJSON(String line) {
 
 		User user_instance = new User("", new HashSet<String>());
