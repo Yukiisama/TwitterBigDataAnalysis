@@ -27,7 +27,7 @@ public class RequestHashtags {
         
         // Premier essai sans construire tout le gson en une classe
         long startTime = System.currentTimeMillis();
-        JavaRDD<String> hashtags = file.flatMap(line -> JsonUtils.withoutReflexivityAndWholeJson(line));
+        JavaRDD<String> hashtags = file.flatMap(line -> JsonUtils.getHashtagFromJson(line));
         JavaPairRDD<String, Integer> r = hashtags.mapToPair(hash -> new Tuple2<>(hash, 1)).reduceByKey((a, b) -> a + b);
         List<Tuple2<String, Integer>> top = r.top(k, new HashtagComparator());
         System.out.println(top);
