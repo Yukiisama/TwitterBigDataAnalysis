@@ -36,7 +36,7 @@ public class RequestHashtags {
     }
     
 
-	public static void mostUsedHashtagsWithCount (int k) {
+	public static void mostUsedHashtagsOnAllFiles(int k) {
 		if (k < 1 || k > 10000 ) {
 			System.err.println("[ERROR] Invalid range in mostUsedHashtagsWithCount@void, valid value is between 1 and 10000.");
 			
@@ -44,7 +44,7 @@ public class RequestHashtags {
 		}
 		
 		long startTime = System.currentTimeMillis();
-		List<Tuple2<String, Integer>> top = file
+		List<Tuple2<String, Integer>> top = files
 											.flatMap(line -> JsonUtils.withoutReflexivityAndWholeJson(line))
 											.mapToPair(hash -> new Tuple2<>(hash, 1))
 											.reduceByKey((a, b) -> a + b)

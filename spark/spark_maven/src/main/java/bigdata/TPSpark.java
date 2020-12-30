@@ -81,10 +81,10 @@ public class TPSpark {
 		/**
 		 * DONE
 		 */
-		System.out.println("a) K Hashtags les plus utilisés avec nombre d'apparition:");
+		System.out.println("a) K Hashtags les plus utilisés avec nombre d'apparition sur un jour:");
 		EntryPoint.HASHTAGS_DAILY_TOPK.apply(10);
-		System.out.println("b) K Hashtags les plus utilisés:");
-		EntryPoint.HASHTAGS_BEST_WITH_COUNTS.apply(10);
+		System.out.println("b) K Hashtags les plus utilisés avec nombre d'apparition sur toutes les données: (commenté)");
+		//EntryPoint.HASHTAGS_BEST_ALL_FILES_TOPK.apply(10);
 
 		/**
 		 * TODO
