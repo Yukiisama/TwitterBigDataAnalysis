@@ -14,7 +14,10 @@ import bigdata.requests.EntryPoint;
 public class TPSpark {
 
 	private static SparkConf conf = null;
+
 	public static JavaRDD<String> file = null;
+	public static JavaRDD<String> files = null;
+
 	public static JavaSparkContext context = null;
 
 	static {
@@ -28,6 +31,7 @@ public class TPSpark {
 		context.setLogLevel("ERROR");
 
 		file = context.textFile("/raw_data/tweet_01_03_2020_first10000.nljson");
+		files = context.textFile("/raw_data/tweet_01_03_2020_first10000.nljson");
 
 
 		// // int nb_of_workers = context.sc().getExecutorStorageStatus().length - 1;
