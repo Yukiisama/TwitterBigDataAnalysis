@@ -54,14 +54,24 @@ public class RequestHashtags {
 		System.out.println("That took without Reflexivity : (map + reduce + topK) " + (endTime - startTime) + " milliseconds");
 	}
 
-	public static void numberOfApparitions () {
-		// TODO
+	public static void numberOfApparitions (boolean allFiles) {
+		
+		long startTime = System.currentTimeMillis();
+		JavaPairRDD<String, Integer> res = ((allFiles) ? files : file)
+											.flatMap(line -> JsonUtils.withoutReflexivityAndWholeJson(line))
+											.mapToPair(hash -> new Tuple2<>(hash, 1))
+											.reduceByKey((a, b) -> a + b);
+		
+		System.out.println(res.collectAsMap()); // A enlever après fais exploser la mémoire
+		
+		long endTime = System.currentTimeMillis();
+		System.out.println("That took without Reflexivity : (map + reduce + topK) " + (endTime - startTime) + " milliseconds");
 
     }
 
 	public static void usersList () {
 		// TODO
-
+		
     }
     
 }

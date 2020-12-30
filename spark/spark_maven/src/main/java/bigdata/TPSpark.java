@@ -90,11 +90,12 @@ public class TPSpark {
 		 * TODO
 		 */
 		System.out.println("c) Nombre d'apparitions d'un hashtag:");
-		EntryPoint.HASHTAGS_USED_BY.apply();
+		final Boolean allFiles = false; // Doit être fait sur tous les fichiers mais bon pour test.
+		EntryPoint.HASHTAGS_APPARITIONS_COUNT.apply(allFiles);
 
 
 		System.out.println("d) Utilisateurs ayant utilisé un Hashtag:");
-		EntryPoint.HASHTAGS_APPARITIONS_COUNT.apply();
+		EntryPoint.HASHTAGS_USED_BY.apply();
 
 		/**
 		 * Optional
