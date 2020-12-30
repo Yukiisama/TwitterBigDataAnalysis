@@ -10,10 +10,12 @@ import java.util.Map;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function2;
+import org.apache.spark.api.java.function.Function;
 
 import bigdata.data.User;
 import bigdata.data.parser.JsonUtils;
 import scala.Tuple2;
+import java.util.HashSet;
 
 public class RequestUsers {
     
@@ -21,50 +23,55 @@ public class RequestUsers {
 	 * 
 	 * @param user_id
 	 */
-	public static void UserUniqueHashtagsList (String user_id) {
-		// // Input checking
-		// Pattern p = Pattern.compile("\d{19}");
-		// Matcher m = p.matcher(user_id);
-		// if(!m.find()) {
-		// 	System.err.println("[ERROR] Invalid input in mostUseHashtag@void, user_id must be a string matching regex r'\d{19}'.");
-		// 	return;
-		// }
-
+	public static void UserUniqueHashtagsList () {
 		// Time calculation
 		long startTime = System.currentTimeMillis();
 
 
 
 		// Content
-		JavaRDD<Tuple2<String, User>> users = file.mapToPair(line -> JsonUtils.getHashtagsFromUserInJSON(user_id, line));//.reduceByKey((a, b) -> a + b);;
+		JavaPairRDD<String, User> tuple_users = file.mapToPair(line -> JsonUtils.getHashtagsFromUserInJSON(line))
+			.filter(new Function<Tuple2<String, User>, Boolean>() {
+				@Override
+				public Boolean call(Tuple2<String, User> val) throws Exception {
+					return val._1() != "";
+				}
+			});//.reduceByKey((a, b) -> a + b);;
 		
-		
-		if(users == null) {
+
+		if(tuple_users == null) {
 			System.err.println("[ERROR] Null dataset in UserUniqueHashtagsList@void, user probably don't have used any hashtags.");
 		}
 
-		users.reduceByKey(new Function2<Tuple2<String, User>, Tuple2<String, User>, User>() {
-			public User call (Tuple2<String, User> a , Tuple2<String, User> b) {
-				if(a._1().equals(b._1()))	
-					a._2().setNb_tweets(a._2().getNb_tweets() + b._2().getNb_tweets());
-				return a._2();	
+
+		JavaPairRDD<String,User> users = tuple_users.reduceByKey(new Function2<User, User, User>() {
+			public User call (User a, User b) {
+				a.setNbTweets(a._nbTweets() + b._nbTweets());
+
+				return a;	
 			}
 		});
 
-		List<User> data = users.collect();
+		List<Tuple2<String, User>> data = users.collect();
 
 
 		// Output
-		for(User u : data){
-			System.out.println(u);
+		int counter = 0;
+		for(Tuple2<String, User> user : data){
+			if(user._2()._nbTweets() != 1)
+				System.out.println(user._2());
+			else
+				counter = counter + 1;
 		}
+
+		System.out.println("There is " + counter + " users with a single messages on this dataset.");
 		long endTime = System.currentTimeMillis();
 		System.out.println("That took without Reflexivity : (map + reduce + topK) " + (endTime - startTime) + " milliseconds");
 	}
 
 
 
-	public static void UserNumberOfTweets (String user_id) {
+	public static void UserNumberOfTweets () {
 		
 	}
 
@@ -72,7 +79,7 @@ public class RequestUsers {
 	/**
 	 * 
 	 */
-	public static void TweetsPerLangagesAndTimestamp (String lang) {
+	public static void TweetsPerLangagesAndTimestamp () {
 		
 		// Time calculation
 		long startTime = System.currentTimeMillis();
@@ -105,7 +112,7 @@ public class RequestUsers {
 	 * Return the tweet from an user that has got the highest
 	 * number of rt
 	 */
-	public static void UserMostRetweetedTweet (String user_id) {
+	public static void UserMostRetweetedTweet () {
 
 	}
 
@@ -115,7 +122,7 @@ public class RequestUsers {
 	 * Return the tweet from an user that has got the highest
 	 * number of likes
 	 */
-	public static void UserMostFavoredTweet (String user_id) {
+	public static void UserMostFavoredTweet () {
 
 	}
 
@@ -126,7 +133,7 @@ public class RequestUsers {
 	 * Return the count of localisations where the user
 	 * has been the most
 	 */
-	public static void UserGetMostTweetedPlace (String user_id) {
+	public static void UserGetMostTweetedPlace () {
 
 	}
 }

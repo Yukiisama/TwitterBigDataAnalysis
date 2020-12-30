@@ -1,5 +1,7 @@
 package bigdata;
 
+import java.util.ArrayList;
+
 import org.apache.hadoop.hdfs.web.JsonUtil;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
@@ -13,12 +15,13 @@ public class TPSpark {
 	private static SparkConf conf = null;
 	public static JavaRDD<String> file = null;
 	public static JavaSparkContext context = null;
-
+	public static JavaRDD<String> files = null;
 	static {
 		conf = new SparkConf()
 				.setAppName("TP Spark")
-				.set("spark.executor.instances", "20")
+				.set("spark.executor.instances", "5")
 			    .set("spark.executor.cores", "2");
+
 		context = new JavaSparkContext(conf);
 		context.defaultParallelism();
 		context.setLogLevel("ERROR");
@@ -26,13 +29,20 @@ public class TPSpark {
 		file = context.textFile("/raw_data/tweet_01_03_2020_first10000.nljson");
 
 
-		// int nb_of_workers = context.sc().getExecutorStorageStatus().length - 1;
+		// // int nb_of_workers = context.sc().getExecutorStorageStatus().length - 1;
 		
-		System.out.println("There is " + context.sc().statusTracker().getExecutorInfos().length + " Workers.");
+		// System.out.println("There is " + context.sc().statusTracker().getExecutorInfos().length + " Workers.");
 
-		// file = context.textFile(JsonUtils.data[1]);
+		// // file = context.textFile(JsonUtils.data[1]);
+		// file = context.textFile(JsonUtils.data[5]);
 		
-		// file = context.textFile("/raw_data/tweet_02_03_2020.nljson");
+		// String s = JsonUtils.data[1];
+
+		// for (int i = 2; i < JsonUtils.data.length; i++) {
+		// 	s = s.concat("," + JsonUtils.data[i]);
+		// }
+		// file = context.textFile(s);
+		// // file = context.textFile("/raw_data/tweet_02_03_2020.nljson");
 	}
 
 	
@@ -42,6 +52,7 @@ public class TPSpark {
 			
 			System.out.println("Number of partitions : " + file.getNumPartitions());
 			System.out.println("Lines Count" + file.count());
+			
 			// Print val
 			// file.foreach(f -> System.out.println(f));
 			// hashtags.foreach( f -> System.out.println(f));
@@ -79,11 +90,11 @@ public class TPSpark {
 		 * TODO
 		 */
 		System.out.println("c) Nombre d'apparitions d'un hashtag:");
-		EntryPoint.HASHTAGS_USED_BY.apply("hashtag_text");
+		EntryPoint.HASHTAGS_USED_BY.apply();
 
 
 		System.out.println("d) Utilisateurs ayant utilisé un Hashtag:");
-		EntryPoint.HASHTAGS_APPARITIONS_COUNT.apply("hashtag_text");
+		EntryPoint.HASHTAGS_APPARITIONS_COUNT.apply();
 
 		/**
 		 * Optional
@@ -100,17 +111,12 @@ public class TPSpark {
 		/**
 		 * DONE
 		 */
-		System.out.println("a) Liste des Hashtags sans doublons:");
-		EntryPoint.USERS_UNIQUE_HASHTAGS_LIST.apply("jakefm");
-		// // EntryPoint.USERS_UNIQUE_HASHTAGS_LIST.apply("LePoint");
-		// // EntryPoint.USERS_UNIQUE_HASHTAGS_LIST.apply("gouvernementFR");
-		// // EntryPoint.USERS_UNIQUE_HASHTAGS_LIST.apply("LEXPRESS");
+		// System.out.println("a) Liste des Hashtags sans doublons:");
+		EntryPoint.USERS_UNIQUE_HASHTAGS_LIST.apply();
 
 		// /**
 		//  * TODO
 		//  */
-		// System.out.println("b) Nombre de tweets d'un utilisateur:");
-		// // EntryPoint.USERS_NUMBER_OF_TWEETS.apply("gouvernementFR");
 		// System.out.println("c) Nombre de tweets par langue:");
 		// EntryPoint.USERS_NUMBER_OF_TWEETS_PER_LANGAGE.apply("fr");
 		// /**

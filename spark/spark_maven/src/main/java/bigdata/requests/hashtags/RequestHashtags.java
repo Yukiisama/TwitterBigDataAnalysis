@@ -1,6 +1,7 @@
 package bigdata.requests.hashtags;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.spark.api.java.JavaPairRDD;
@@ -12,7 +13,7 @@ import scala.Tuple2;
 
 // import static bigdata.TPSpark.context;
 import static bigdata.TPSpark.file;
-
+import static bigdata.TPSpark.files;
 public class RequestHashtags {
 
 	
@@ -43,20 +44,22 @@ public class RequestHashtags {
 		}
 		
 		long startTime = System.currentTimeMillis();
-		JavaRDD<String> hashtags = file.flatMap(line -> JsonUtils.withoutReflexivityAndWholeJson(line));
-		JavaPairRDD<String, Integer> r = hashtags.mapToPair(hash -> new Tuple2<>(hash, 1)).reduceByKey((a, b) -> a + b);
-		List<Tuple2<String, Integer>> top = r.top(k, new HashtagComparator());
+		List<Tuple2<String, Integer>> top = file
+											.flatMap(line -> JsonUtils.withoutReflexivityAndWholeJson(line))
+											.mapToPair(hash -> new Tuple2<>(hash, 1))
+											.reduceByKey((a, b) -> a + b)
+											.top(k, new HashtagComparator());
 		System.out.println(top);
 		long endTime = System.currentTimeMillis();
 		System.out.println("That took without Reflexivity : (map + reduce + topK) " + (endTime - startTime) + " milliseconds");
 	}
 
-	public static void numberOfApparitions (String hashtag_label) {
+	public static void numberOfApparitions () {
 		// TODO
 
 	}
 
-	public static void usersList (String hashtag_label) {
+	public static void usersList () {
 		// TODO
 
 	}

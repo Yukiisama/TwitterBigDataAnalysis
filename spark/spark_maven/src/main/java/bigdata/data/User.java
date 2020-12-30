@@ -30,14 +30,14 @@ public class User implements Serializable {
     }
 
     public User(String id, Set<String> hashtags) {
-        this(id, hashtags, 0);
+        this(id, hashtags, 1);
     }
 
     
     /**
      * @return the hashtags
      */
-    public Set<String> getHashtags() {
+    public Set<String> _hashtags() {
 
         return hashtags;
     }
@@ -52,7 +52,7 @@ public class User implements Serializable {
     /**
      * @return the nb_tweets
      */
-    public int getNb_tweets() {
+    public int _nbTweets() {
 
         return nb_tweets;
     }
@@ -60,16 +60,16 @@ public class User implements Serializable {
     /**
      * @param nb_tweets the nb_tweets to set
      */
-    public void setNb_tweets(int nb_tweets) {
+    public void setNbTweets(int nb_tweets) {
         this.nb_tweets = nb_tweets;
     }
 
 
-    public void id(String id) {
+    public void setId(String id) {
         this.id = id;
     }    
 
-    public String getID() {
+    public String _id() {
 
         return id;
     }
@@ -96,7 +96,7 @@ public class User implements Serializable {
     public String toString() {
         String output = "{ User: " + this.id + ", "
         + "Hashtags: {[" + this.hashtags + "]}" + ", " 
-        + "counts:" + this.nb_tweets + ", "
+        + "tweets_count:" + this.nb_tweets + ", "
         + "geo: {[" + this.localisations + "]}" + ", "
         + "}";
 
