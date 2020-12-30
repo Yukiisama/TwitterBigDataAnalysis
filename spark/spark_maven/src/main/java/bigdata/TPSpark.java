@@ -1,9 +1,11 @@
 package bigdata;
 
+import org.apache.hadoop.hdfs.web.JsonUtil;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 
+import bigdata.data.parser.JsonUtils;
 import bigdata.requests.EntryPoint;
 
 public class TPSpark {
@@ -13,7 +15,10 @@ public class TPSpark {
 	public static JavaSparkContext context = null;
 
 	static {
-		conf = new SparkConf().setAppName("TP Spark");
+		conf = new SparkConf()
+				.setAppName("TP Spark")
+				.set("spark.executor.instances", "20")
+			    .set("spark.executor.cores", "2");
 		context = new JavaSparkContext(conf);
 		context.defaultParallelism();
 		context.setLogLevel("ERROR");
@@ -25,6 +30,8 @@ public class TPSpark {
 		
 		System.out.println("There is " + context.sc().statusTracker().getExecutorInfos().length + " Workers.");
 
+		// file = context.textFile(JsonUtils.data[1]);
+		
 		// file = context.textFile("/raw_data/tweet_02_03_2020.nljson");
 	}
 

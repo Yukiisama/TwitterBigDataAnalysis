@@ -41,12 +41,10 @@ public class JsonUtils {
 		"/raw_data/tweet_21_03_2020.nljson"
 	};
 
-    public static Iterator<String[]> withoutReflexivityAndWholeJson(String line) {
-		List<String[]> hashs = new ArrayList<>();
+    public static Iterator<String> withoutReflexivityAndWholeJson(String line) {
+		List<String> hashs = new ArrayList<>();
 		
-		JsonElement json = new JsonParser().parse(line);
-		JsonObject jsonObj = json.getAsJsonObject();
-		// JsonObject jsonObj = JsonParser.parseString(line).getAsJsonObject();
+		JsonObject jsonObj = new JsonParser().parse(line).getAsJsonObject();
 
 		JsonElement entities = jsonObj.get("entities");
 		if (entities != null && entities.isJsonObject()) {
@@ -56,12 +54,7 @@ public class JsonUtils {
 			JsonElement hashtags = (entities.getAsJsonObject()).get("hashtags");
 			if (hashtags != null) {
 				for (JsonElement hash : hashtags.getAsJsonArray()) {
-					String [] infos = new String[] {
-							hash.getAsJsonObject().get("text").getAsString(),
-							name.getAsString(),
-							id.getAsString()
-						};
-					hashs.add(infos);
+					hashs.add(hash.getAsJsonObject().get("text").getAsString());
 				}
 				return hashs.iterator();
 			}
@@ -70,10 +63,11 @@ public class JsonUtils {
     }
     
 
-    public static User getHashtagsFromUserInJSON(String requested_user_id, String line) {
+    public static Tuple2<String, User> getHashtagsFromUserInJSON(String requested_user_id, String line) {
 
 		User user_instance = null;
 		HashSet<String> hashs = new HashSet<>();
+		
 
 
 		JsonElement json = new JsonParser().parse(line);
@@ -109,7 +103,11 @@ public class JsonUtils {
 				user_instance.setGeo("");
 		}
 
-		return user_instance;
+		if(user_instance == null) {
+			return new Tuple2 <String, User> ("", null);
+		}
+
+		return new Tuple2 <String, User> (user_instance.getID(), user_instance);
 	}
 
 
@@ -120,9 +118,7 @@ public class JsonUtils {
 		}
 
 		
-		JsonElement json = new JsonParser().parse(line);
-		JsonObject jsonObj = json.getAsJsonObject();
-		// JsonObject jsonObj = JsonParser.parseString(line).getAsJsonObject();
+		JsonObject jsonObj = new JsonParser().parse(line).getAsJsonObject();
 
 
 		

@@ -24,7 +24,7 @@ public class User implements Serializable {
     public User(String id, Set<String> hashtags, int nb_tweets) {
         this.id = id;
         this.nb_tweets = nb_tweets;
-        
+
         this.hashtags = new HashSet<String>(hashtags);
         this.localisations = new ArrayList<String>();
     }
@@ -85,7 +85,6 @@ public class User implements Serializable {
             User user_obj = (User) obj;
 
             if(this.id.equals(user_obj.id)){
-
                 return true;
             }
         }
@@ -102,6 +101,13 @@ public class User implements Serializable {
         + "}";
 
         return output;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = id.hashCode() * nb_tweets * hashtags.hashCode() * localisations.hashCode(); 
+        
+        return hash;
     }
 
 }

@@ -1,20 +1,19 @@
 package bigdata.requests.users;
 
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.List;
+// import static bigdata.TPSpark.context;
+import static bigdata.TPSpark.file;
 
+import java.util.List;
+import java.util.Map;
 
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.function.Function2;
 
-import bigdata.data.parser.JsonUtils;
 import bigdata.data.User;
-
-
-// import static bigdata.TPSpark.context;
-import static bigdata.TPSpark.file;
+import bigdata.data.parser.JsonUtils;
+import scala.Tuple2;
 
 public class RequestUsers {
     
@@ -37,13 +36,23 @@ public class RequestUsers {
 
 
 		// Content
-		JavaRDD<User> user_hashtags = file.map(line -> JsonUtils.getHashtagsFromUserInJSON(user_id, line));
+		JavaRDD<Tuple2<String, User>> users = file.mapToPair(line -> JsonUtils.getHashtagsFromUserInJSON(user_id, line));//.reduceByKey((a, b) -> a + b);;
 		
-		if(user_hashtags == null) {
+		
+		if(users == null) {
 			System.err.println("[ERROR] Null dataset in UserUniqueHashtagsList@void, user probably don't have used any hashtags.");
 		}
 
-		List<User> data = user_hashtags.collect();
+		users.reduceByKey(new Function2<Tuple2<String, User>, Tuple2<String, User>, User>() {
+			public User call (Tuple2<String, User> a , Tuple2<String, User> b) {
+				if(a._1().equals(b._1()))	
+					a._2().setNb_tweets(a._2().getNb_tweets() + b._2().getNb_tweets());
+				return a._2();	
+			}
+		});
+
+		List<User> data = users.collect();
+
 
 		// Output
 		for(User u : data){
