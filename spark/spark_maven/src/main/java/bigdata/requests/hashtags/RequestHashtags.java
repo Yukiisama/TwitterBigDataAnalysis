@@ -13,7 +13,6 @@ import scala.Tuple2;
 
 // import static bigdata.TPSpark.context;
 import static bigdata.TPSpark.file;
-import static bigdata.TPSpark.files;
 public class RequestHashtags {
 
 	
