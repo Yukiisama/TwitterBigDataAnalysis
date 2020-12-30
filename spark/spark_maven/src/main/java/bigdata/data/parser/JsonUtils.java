@@ -28,7 +28,7 @@ public class JsonUtils {
 			"/raw_data/tweet_19_03_2020.nljson", "/raw_data/tweet_20_03_2020.nljson",
 			"/raw_data/tweet_21_03_2020.nljson" };
 
-	public static Iterator<String> withoutReflexivityAndWholeJson(String line) {
+	public static Iterator<String> getHashtagFromJson(String line) {
 		List<String> hashs = new ArrayList<>();
 		try {
 			JsonObject jsonObj = new JsonParser().parse(line).getAsJsonObject();

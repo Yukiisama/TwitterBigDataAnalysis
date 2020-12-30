@@ -45,7 +45,7 @@ public class RequestHashtags {
         
         long startTime = System.currentTimeMillis();
         List<Tuple2<String, Integer>> top = files
-                                            .flatMap(line -> JsonUtils.withoutReflexivityAndWholeJson(line))
+                                            .flatMap(line -> JsonUtils.getHashtagFromJson(line))
                                             .mapToPair(hash -> new Tuple2<>(hash, 1))
                                             .reduceByKey((a, b) -> a + b)
                                             .top(k, new HashtagComparator());
@@ -58,7 +58,7 @@ public class RequestHashtags {
         
         long startTime = System.currentTimeMillis();
         JavaPairRDD<String, Integer> res = ((allFiles) ? files : file)
-                                            .flatMap(line -> JsonUtils.withoutReflexivityAndWholeJson(line))
+                                            .flatMap(line -> JsonUtils.getHashtagFromJson(line))
                                             .mapToPair(hash -> new Tuple2<>(hash, 1))
                                             .reduceByKey((a, b) -> a + b);
         
