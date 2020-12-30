@@ -1,2 +1,3 @@
 bigdata/requests/users/RequestUsers$1.class
+bigdata/data/parser/JsonUserReader.class
 bigdata/requests/users/RequestUsers$2.class

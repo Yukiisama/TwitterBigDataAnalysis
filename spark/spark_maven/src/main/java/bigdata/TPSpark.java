@@ -1,21 +1,22 @@
 package bigdata;
 
-import java.util.ArrayList;
 
-import org.apache.hadoop.hdfs.web.JsonUtil;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 
-import bigdata.data.parser.JsonUtils;
+
 import bigdata.requests.EntryPoint;
 
 public class TPSpark {
 
 	private static SparkConf conf = null;
+
 	public static JavaRDD<String> file = null;
-	public static JavaSparkContext context = null;
 	public static JavaRDD<String> files = null;
+
+	public static JavaSparkContext context = null;
+
 	static {
 		conf = new SparkConf()
 				.setAppName("TP Spark")
@@ -27,6 +28,7 @@ public class TPSpark {
 		context.setLogLevel("ERROR");
 
 		file = context.textFile("/raw_data/tweet_01_03_2020_first10000.nljson");
+		files = context.textFile("/raw_data/tweet_01_03_2020_first10000.nljson");
 
 
 		// // int nb_of_workers = context.sc().getExecutorStorageStatus().length - 1;
@@ -42,7 +44,7 @@ public class TPSpark {
 		// 	s = s.concat("," + JsonUtils.data[i]);
 		// }
 		// file = context.textFile(s);
-		// // file = context.textFile("/raw_data/tweet_02_03_2020.nljson");
+		// file = context.textFile("/raw_data/tweet_05_03_2020.nljson");
 	}
 
 	
@@ -67,6 +69,7 @@ public class TPSpark {
 			e.printStackTrace();
 
 		} finally {
+
 			// Always close the Spark Context.
 			context.close();
 		}

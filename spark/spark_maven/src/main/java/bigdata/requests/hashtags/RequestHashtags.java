@@ -6,8 +6,12 @@ import java.util.List;
 
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.function.Function;
+import org.apache.spark.api.java.function.Function2;
 
+import bigdata.data.User;
 import bigdata.data.comparator.HashtagComparator;
+import bigdata.data.parser.JsonUserReader;
 import bigdata.data.parser.JsonUtils;
 import scala.Tuple2;
 
@@ -65,12 +69,28 @@ public class RequestHashtags {
         System.out.println(res.collectAsMap()); // A enlever après fais exploser la mémoire
         
         long endTime = System.currentTimeMillis();
-        System.out.println("That took without Reflexivity : (map + reduce + topK) " + (endTime - startTime) + " milliseconds");
+        System.out.println("That took without Reflexivity : (map + reduce) " + (endTime - startTime) + " milliseconds");
 
     }
 
-    public static void usersList () {
-        // TODO
+    public static void usersList (boolean allFiles) {
+        	
+    	long startTime = System.currentTimeMillis();
+    	
+    	JavaPairRDD<String, User> users = ((allFiles) ? files : file)
+    			                          .mapToPair(line -> JsonUserReader.readDataFromNLJSON(line))
+    			                          .filter( val ->  val._1() != "")
+    			                          .filter( val -> val._2()._hashtags().size() > 0)
+    									  .reduceByKey((user1, user2 ) -> user1);
+    	
+    	// Simplement enregister le set de clés (correspondants aux usernames) dans hbase 
+    	// i.e  users.keys()
+    	System.out.println(users.collectAsMap()); // A enlever après fais exploser la mémoire
+        
+    
+        long endTime = System.currentTimeMillis();
+        System.out.println("That took without Reflexivity : (map + reduce ) " + (endTime - startTime) + " milliseconds");
+    	
         
     }
     

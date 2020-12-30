@@ -8,14 +8,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.spark.api.java.JavaPairRDD;
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.Function;
+import org.apache.spark.api.java.function.Function2;
 
 import bigdata.data.User;
-import bigdata.data.parser.JsonUtils;
+import bigdata.data.parser.JsonUserReader;
 import scala.Tuple2;
-import java.util.HashSet;
 
 public class RequestUsers {
     
@@ -30,7 +28,7 @@ public class RequestUsers {
 
 
 		// Content
-		JavaPairRDD<String, User> tuple_users = file.mapToPair(line -> JsonUtils.getHashtagsFromUserInJSON(line))
+		JavaPairRDD<String, User> tuple_users = file.mapToPair(line -> JsonUserReader.readDataFromNLJSON(line))
 			.filter(new Function<Tuple2<String, User>, Boolean>() {
 				@Override
 				public Boolean call(Tuple2<String, User> val) throws Exception {
@@ -40,13 +38,20 @@ public class RequestUsers {
 		
 
 		if(tuple_users == null) {
-			System.err.println("[ERROR] Null dataset in UserUniqueHashtagsList@void, user probably don't have used any hashtags.");
+			System.err.println("[ERROR] Null dataset in @void, user probably doesn't have used any hashtags.");
 		}
 
 
-		JavaPairRDD<String,User> users = tuple_users.reduceByKey(new Function2<User, User, User>() {
+		JavaPairRDD<String, User> users = tuple_users.reduceByKey(new Function2<User, User, User>() {
 			public User call (User a, User b) {
 				a.setNbTweets(a._nbTweets() + b._nbTweets());
+				a.setReceivedFavs(a._received_favs() + b._received_favs());
+				a.setReceivedRTs(a._received_rts() + b._received_rts());
+
+				a.addGeo(b._geos());
+				a.addLangUsed(b._langs());
+				a.addPublicationSource(b._sources());
+				a.addDailyFrequencyData(b._frequencies());
 
 				return a;	
 			}
@@ -56,15 +61,13 @@ public class RequestUsers {
 
 
 		// Output
-		int counter = 0;
-		for(Tuple2<String, User> user : data){
-			if(user._2()._nbTweets() != 1)
-				System.out.println(user._2());
-			else
-				counter = counter + 1;
+		for(Tuple2<String, User> tuple : data) {
+			if(tuple._2()._nbTweets() > 1)
+			System.out.println(tuple._2() + ", ");
 		}
+		System.out.println("Total unique users: " + data.size() + " over " + tuple_users.collect().size() + ".");
 
-		System.out.println("There is " + counter + " users with a single messages on this dataset.");
+		
 		long endTime = System.currentTimeMillis();
 		System.out.println("That took without Reflexivity : (map + reduce + topK) " + (endTime - startTime) + " milliseconds");
 	}
@@ -73,35 +76,6 @@ public class RequestUsers {
 
 	public static void UserNumberOfTweets () {
 		
-	}
-
-
-	/**
-	 * 
-	 */
-	public static void TweetsPerLangagesAndTimestamp () {
-		
-		// Time calculation
-		long startTime = System.currentTimeMillis();
-
-
-
-		// Content
-		JavaPairRDD<String, String> tweets_per_langages_and_timestamp = file.mapToPair(line 
-				-> JsonUtils.getTweetLangageAndTimestamp(line));
-
-
-
-		if(tweets_per_langages_and_timestamp == null) {
-			System.err.println("[ERROR] Null dataset in UserUniqueHashtagsList@void, user probably don't have used any hashtags.");
-		}
-
-		Map<String, String> data = tweets_per_langages_and_timestamp.collectAsMap();
-
-		// Output
-		System.out.println(data);
-		long endTime = System.currentTimeMillis();
-		System.out.println("That took without Reflexivity : (map + reduce + topK) " + (endTime - startTime) + " milliseconds");
 	}
 
 
@@ -130,7 +104,7 @@ public class RequestUsers {
 	/**
 	 * OPTIONAL
 	 * 
-	 * Return the count of localisations where the user
+	 * Return the count of localisatioByns where the user
 	 * has been the most
 	 */
 	public static void UserGetMostTweetedPlace () {
