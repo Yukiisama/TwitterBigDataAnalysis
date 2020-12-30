@@ -2,6 +2,10 @@ package bigdata.data;
 
 import java.io.Serializable;
 import java.util.Set;
+import java.util.HashSet;
+import java.util.List;
+import java.util.ArrayList;
+
 
 
 public class User implements Serializable {
@@ -14,22 +18,27 @@ public class User implements Serializable {
     
     private int nb_tweets;
     private Set<String> hashtags;
+    private List<String> localisations;
     private String id;
 
     public User(String id, Set<String> hashtags, int nb_tweets) {
         this.id = id;
-        this.setHashtags(hashtags);
-        this.setNb_tweets(nb_tweets);
+        this.nb_tweets = nb_tweets;
+
+        this.hashtags = new HashSet<String>(hashtags);
+        this.localisations = new ArrayList<String>();
     }
+
     public User(String id, Set<String> hashtags) {
-        this(id, hashtags, 0);
+        this(id, hashtags, 1);
     }
 
     
     /**
      * @return the hashtags
      */
-    public Set<String> getHashtags() {
+    public Set<String> _hashtags() {
+
         return hashtags;
     }
 
@@ -43,23 +52,62 @@ public class User implements Serializable {
     /**
      * @return the nb_tweets
      */
-    public int getNb_tweets() {
+    public int _nbTweets() {
+
         return nb_tweets;
     }
 
     /**
      * @param nb_tweets the nb_tweets to set
      */
-    public void setNb_tweets(int nb_tweets) {
+    public void setNbTweets(int nb_tweets) {
         this.nb_tweets = nb_tweets;
     }
 
 
-    public void id(String id) {
+    public void setId(String id) {
         this.id = id;
     }    
 
-    public String getID() {
+    public String _id() {
+
         return id;
     }
+
+    public void setGeo(String localisations) {
+        this.localisations.add(localisations);
+    }
+
+
+    @Override
+    public boolean equals(Object obj){
+        if(obj instanceof User) {
+            User user_obj = (User) obj;
+
+            if(this.id.equals(user_obj.id)){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        String output = "{ User: " + this.id + ", "
+        + "Hashtags: {[" + this.hashtags + "]}" + ", " 
+        + "tweets_count:" + this.nb_tweets + ", "
+        + "geo: {[" + this.localisations + "]}" + ", "
+        + "}";
+
+        return output;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = id.hashCode() * nb_tweets * hashtags.hashCode() * localisations.hashCode(); 
+        
+        return hash;
+    }
+
 }
