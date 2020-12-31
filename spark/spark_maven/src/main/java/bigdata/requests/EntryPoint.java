@@ -42,23 +42,6 @@ public enum EntryPoint {
     },
     
 
-    HASHTAGS_APPARITIONS_COUNT {
-        @Override
-        public void apply (Object ... args) {
-        	if(args.length == 1) {
-                if(!(args[0] instanceof Boolean)) {
-                    throw new IllegalArgumentException("Invalid arguments for EntryPoint@HHASHTAGS_APPARITIONS_COUNT. Required argument(s) are: (Boolean).");
-                }
-            } else {
-                throw new IllegalArgumentException("Invalid number of arguments for EntryPoint@HASHTAGS_APPARITIONS_COUNT. Required argument(s) are: (Boolean).");
-            }
-
-            Boolean allFiles = (Boolean) args[0];
-            RequestHashtags.numberOfApparitions(allFiles);
-        }
-    },
-    
-
     HASHTAGS_USED_BY {
         @Override
         public void apply (Object ... args) {
