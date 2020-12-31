@@ -46,7 +46,7 @@ public class TPSpark {
 		// // file = context.textFile(JsonUtils.data[1]);
 		// file = context.textFile("/raw_data/tweet_05_03_2020.nljson");
 
-	
+	}
 	public static void main (String[] args) {
 
 		try {
