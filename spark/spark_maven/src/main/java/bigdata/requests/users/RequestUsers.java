@@ -1,13 +1,7 @@
 package bigdata.requests.users;
 
-
-// import static bigdata.TPSpark.context;
 import static bigdata.TPSpark.file;
 
-import java.util.List;
-
-import org.apache.hadoop.hbase.client.Put;
-import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.Function2;
@@ -67,17 +61,23 @@ public class RequestUsers {
 
 
 
+
 		/*
 		 *
 		 * Output inside HBase using RDD (opti)
 		 * 
 		 */
-		final JavaPairRDD<ImmutableBytesWritable, Put> hbaseRDD = users.mapToPair(row -> row._2.getPuts());
+		// final JavaPairRDD<ImmutableBytesWritable, Put> hbaseRDD = users.mapToPair(row -> row._2.getPuts());
 		// System.out.println("config:" + HBaseUser.INSTANCE().config);
 		// // List<Tuple2<ImmutableBytesWritable, Put>> data = hbaseRDD.take(10); // j'en prends que 10 pour pas exploser la mémoire mais
 		// hbaseRDD.saveAsNewAPIHadoopDataset(HBaseUser.INSTANCE().config);
 		// // hbaseRDD.unpersist();
 
+
+		/**
+		 * Output inside HBase using RDD (intermediate opti)
+		 */
+		users.foreach(tuple -> HBaseUser.INSTANCE().writeTable(tuple._2));
 
 
 		/*
@@ -85,10 +85,9 @@ public class RequestUsers {
 		 * Output inside HBase Using Data Structure (Not opti)
 		 * 
 		 */
-		List<Tuple2<String, User>> data = users.collect(); //explose la mémoire sur json entier
-		for(Tuple2<String, User> tuple : data) {
-			HBaseUser.INSTANCE().writeTable(tuple._2());
-		}
+		// List<Tuple2<String, User>> data = users.collect(); //explose la mémoire sur json entier
+		// for(Tuple2<String, User> tuple : data) {
+		// }
 		
 		long endTime = System.currentTimeMillis();
 		System.out.println("That took without Reflexivity : (map + reduce + HBase) " + (endTime - startTime) + " milliseconds");
