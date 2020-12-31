@@ -4,11 +4,7 @@ package bigdata.requests.users;
 // import static bigdata.TPSpark.context;
 import static bigdata.TPSpark.file;
 
-import java.util.List;
-import java.util.Map;
-
-import javax.ws.rs.PUT;
-
+import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.function.Function;
@@ -67,9 +63,9 @@ public class RequestUsers {
 
 
 		// Output inside stdout
-		for(Tuple2<String, User> tuple : users.sample(false, 1/1000)) {
-			System.out.println(tuple._2);
-		}
+		// for(Tuple2<String, User> tuple : users.sample(false, 1/1000)) {
+		// 	System.out.println(tuple._2);
+		// }
 		users.unpersist();
 
 
