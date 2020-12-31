@@ -20,6 +20,12 @@ public class TPSpark {
 
 	public static JavaSparkContext context = null;
 
+	public static  void openFiles(){
+		for (int i = 1; i < JsonUtils.data.length; i++) 
+			files.add(context.textFile(JsonUtils.data[i]));
+		// ATTENTION je clear files à la fin de la fonction EntryPoint.HASHTAGS_BEST_ALL_FILES_TOPK.apply(10);
+		// Il faudra les re-ouvrir dans les context (voir ligne 71 RequestsHashtags)
+	}
 
 	public static HBaseUser database_user = HBaseUser.INSTANCE();
 
@@ -27,7 +33,7 @@ public class TPSpark {
 		conf = new SparkConf()
 				.setAppName("TP Spark")
 				.set("spark.executor.instances", "20")
-			    .set("spark.executor.cores", "8");
+			    .set("spark.executor.cores", "4");
 
 		context = new JavaSparkContext(conf);
 		context.defaultParallelism();
@@ -35,25 +41,12 @@ public class TPSpark {
 
 
 		file = context.textFile("/raw_data/tweet_01_03_2020_first10000.nljson");
-
-		//file = context.textFile("/raw_data/tweet_01_03_2020_first10000.nljson");
-		// file = context.textFile("/raw_data/tweet_05_03_2020.nljson");
-		for (int i = 1; i < JsonUtils.data.length; i++) 
-			files.add(context.textFile(JsonUtils.data[i]));
-		// ATTENTION je clear files à la fin de la fonction EntryPoint.HASHTAGS_BEST_ALL_FILES_TOPK.apply(10);
-		// Il faudra les re-ouvrir dans les context (voir ligne 71 RequestsHashtags)
-		
-
-
-		// // int nb_of_workers = context.sc().getExecutorStorageStatus().length - 1;
-		
+	
 		// System.out.println("There is " + context.sc().statusTracker().getExecutorInfos().length + " Workers.");
-
 		// // file = context.textFile(JsonUtils.data[1]);
 		// file = context.textFile("/raw_data/tweet_05_03_2020.nljson");
-	}
 
-	
+	}
 	public static void main (String[] args) {
 
 		try {
@@ -92,17 +85,10 @@ public class TPSpark {
 		 */
 		System.out.println("a) K Hashtags les plus utilisés avec nombre d'apparition sur un jour:");
 		EntryPoint.HASHTAGS_DAILY_TOPK.apply(10);
-		System.out.println("b) K Hashtags les plus utilisés avec nombre d'apparition sur toutes les données: (commenté)");
+		System.out.println("b) K Hashtags les plus utilisés avec nombre d'apparition sur toutes les données:");
 		EntryPoint.HASHTAGS_BEST_ALL_FILES_TOPK.apply(10);
-
-		/**
-		 * TODO
-		 */
-		final Boolean allFiles = false; // Doit être fait sur tous les fichiers mais bon pour test.
-		System.out.println("c) Nombre d'apparitions d'un hashtag:");
-		EntryPoint.HASHTAGS_APPARITIONS_COUNT.apply(allFiles);
-
-
+		
+		final Boolean allFiles = true;
 		System.out.println("d) Utilisateurs ayant utilisé un Hashtag:");
 		EntryPoint.HASHTAGS_USED_BY.apply(allFiles);
 
