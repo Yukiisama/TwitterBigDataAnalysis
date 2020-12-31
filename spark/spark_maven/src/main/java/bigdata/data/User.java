@@ -11,9 +11,36 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.hadoop.hbase.client.Put;
+import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
+import org.apache.hadoop.hbase.util.Bytes;
+
+import scala.Tuple2;
+
+public class User  implements Serializable, IData {
+
+    /**
+     * Columns for the database (here, HBase). In case of modification, also see
+     * 
+     * @see User::getContents
+     */
+    private static final String[] __DATABASE_COLUMNS__ = new String[]{
+
+        "id",
+        "tweets_posted",
+        "received_favs",
+        "received_retweets",
+        "hashtags_used",
+        "localisations_history",    // Geolocalisation
+        "sources_history",          // Android, IPhone, ...
+        "daily_frequency",          // Number of tweets / Days
+        "used_langs"                // Count of langs used
+
+    };
 
 
-public class User implements Serializable {
+
+
 
     /**
      *
@@ -40,6 +67,8 @@ public class User implements Serializable {
      * Constructors
      */
     public User(String id, Set<String> hashtags, int nb_tweets) {
+        super();
+        
         this.id = id;
         this.nb_tweets = nb_tweets;
 
@@ -52,14 +81,91 @@ public class User implements Serializable {
 
         this.received_favs = 0;
         this.received_retweets = 0;
+
     }
 
     public User(String id, Set<String> hashtags) {
         this(id, hashtags, 1);
     }
 
-    
 
+    public static String[] getColumnsName() {
+        return __DATABASE_COLUMNS__;
+    }
+
+
+    /**
+     * Families are available in @see HBaseUser::familyName
+     */
+    public Put getContent() {
+        Put row = new Put(Bytes.toBytes(this.id));
+
+
+        /**
+         * Global data
+         */
+        row.add(
+            Bytes.toBytes("global"), // Family Name
+            Bytes.toBytes("tweets_posted"),  // column qualifier
+            Bytes.toBytes(this.nb_tweets)  // Value
+        );
+
+        row.add(
+            Bytes.toBytes("global"), // Family Name
+            Bytes.toBytes("received_favs"),  // column qualifier
+            Bytes.toBytes(this.received_favs)  // Value
+        );
+
+        row.add(
+            Bytes.toBytes("global"), // Family Name
+            Bytes.toBytes("received_retweets"),  // column qualifier
+            Bytes.toBytes(this.received_retweets)  // Value
+        );
+
+        /**
+         * Influence
+         */
+        row.add(
+            Bytes.toBytes("influence"), // Family Name
+            Bytes.toBytes("hashtags_used"),  // column qualifier
+            Bytes.toBytes(this.hashtags.toString())  // Value
+        );
+        row.add(
+            Bytes.toBytes("influence"), // Family Name
+            Bytes.toBytes("daily_frequency"),  // column qualifier
+            Bytes.toBytes(this.daily_frequencies.toString())  // Value
+        );
+        row.add(
+            Bytes.toBytes("influence"), // Family Name
+            Bytes.toBytes("used_langs"),  // column qualifier
+            Bytes.toBytes(this.used_lang.toString())  // Value
+        );
+        
+
+        /**
+         * Misc data
+         */
+        row.add(
+            Bytes.toBytes("misc"), // Family Name
+            Bytes.toBytes("localisations_history"),  // column qualifier
+            Bytes.toBytes(this.localisations.toString())  // Value
+        );
+        row.add(
+            Bytes.toBytes("misc"), // Family Name
+            Bytes.toBytes("sources_history"),  // column qualifier
+            Bytes.toBytes(this.source_history.toString())  // Value
+        );
+        
+
+        return row;
+    }
+
+    
+    public Tuple2<ImmutableBytesWritable, Put> getPuts() throws Exception {
+        Put put = this.getContent();
+
+        return new Tuple2<ImmutableBytesWritable, Put>(new ImmutableBytesWritable(), put);
+    }
     /**
      * Setters
      */

@@ -7,12 +7,13 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 
-import bigdata.data.parser.JsonUtils;
+import bigdata.infrastructure.database.runners.HBaseUser;
 import bigdata.requests.EntryPoint;
+import bigdata.data.parser.JsonUtils;
 
 public class TPSpark {
 
-	private static SparkConf conf = null;
+	public static SparkConf conf = null;
 
 	public static JavaRDD<String> file = null;
 	public static ArrayList<JavaRDD<String>> files = new ArrayList<>();
@@ -26,26 +27,24 @@ public class TPSpark {
 		// Il faudra les re-ouvrir dans les context (voir ligne 71 RequestsHashtags)
 	}
 
+	public static HBaseUser database_user = HBaseUser.INSTANCE();
+
 	static {
 		conf = new SparkConf()
 				.setAppName("TP Spark")
 				.set("spark.executor.instances", "20")
-			    .set("spark.executor.cores", "4");
+			    .set("spark.executor.cores", "8");
 
 		context = new JavaSparkContext(conf);
 		context.defaultParallelism();
 		context.setLogLevel("ERROR");
 
-		//file = context.textFile("/raw_data/tweet_01_03_2020_first10000.nljson");
-		file = context.textFile("/raw_data/tweet_05_03_2020.nljson");
 
-		// // int nb_of_workers = context.sc().getExecutorStorageStatus().length - 1;
-		
+		file = context.textFile("/raw_data/tweet_01_03_2020_first10000.nljson");
+	
 		// System.out.println("There is " + context.sc().statusTracker().getExecutorInfos().length + " Workers.");
-
 		// // file = context.textFile(JsonUtils.data[1]);
 		// file = context.textFile("/raw_data/tweet_05_03_2020.nljson");
-	}
 
 	
 	public static void main (String[] args) {
@@ -61,7 +60,7 @@ public class TPSpark {
 			// r.foreach(f -> System.out.println(f));
 
 
-			AnalysisHashtags();
+			// AnalysisHashtags();
 			AnalysisUser();
 
 		} catch (Exception e) {
