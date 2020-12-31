@@ -38,9 +38,6 @@ public class TPSpark {
 
 		//file = context.textFile("/raw_data/tweet_01_03_2020_first10000.nljson");
 		file = context.textFile("/raw_data/tweet_05_03_2020.nljson");
-		// ATTENTION je clear files à la fin de la fonction EntryPoint.HASHTAGS_BEST_ALL_FILES_TOPK.apply(10);
-		// Il faudra les re-ouvrir dans les context (voir ligne 71 RequestsHashtags)
-		
 
 		// // int nb_of_workers = context.sc().getExecutorStorageStatus().length - 1;
 		
