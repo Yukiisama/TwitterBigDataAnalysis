@@ -1,6 +1,8 @@
 package bigdata;
 
 
+import java.util.ArrayList;
+
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -13,7 +15,7 @@ public class TPSpark {
 	private static SparkConf conf = null;
 
 	public static JavaRDD<String> file = null;
-	public static JavaRDD<String> files = null;
+	public static ArrayList<JavaRDD<String>> files = new ArrayList<>();
 
 	public static JavaSparkContext context = null;
 
@@ -29,21 +31,17 @@ public class TPSpark {
 
 		//file = context.textFile("/raw_data/tweet_01_03_2020_first10000.nljson");
 		file = context.textFile("/raw_data/tweet_05_03_2020.nljson");
-
+		for (int i = 1; i < JsonUtils.data.length; i++) 
+			files.add(context.textFile(JsonUtils.data[i]));
+		// ATTENTION je clear files à la fin de la fonction EntryPoint.HASHTAGS_BEST_ALL_FILES_TOPK.apply(10);
+		// Il faudra les re-ouvrir dans les context (voir ligne 71 RequestsHashtags)
+		
 
 		// // int nb_of_workers = context.sc().getExecutorStorageStatus().length - 1;
 		
 		// System.out.println("There is " + context.sc().statusTracker().getExecutorInfos().length + " Workers.");
 
 		// // file = context.textFile(JsonUtils.data[1]);
-		//files = context.textFile(JsonUtils.data[5]);
-		
-		String s = JsonUtils.data[1];
-
-		for (int i = 2; i < JsonUtils.data.length; i++) {
-			s = s.concat("," + JsonUtils.data[i]);
-		}
-		files = context.textFile(s);
 		// file = context.textFile("/raw_data/tweet_05_03_2020.nljson");
 	}
 
@@ -87,7 +85,7 @@ public class TPSpark {
 		System.out.println("a) K Hashtags les plus utilisés avec nombre d'apparition sur un jour:");
 		EntryPoint.HASHTAGS_DAILY_TOPK.apply(10);
 		System.out.println("b) K Hashtags les plus utilisés avec nombre d'apparition sur toutes les données: (commenté)");
-		//EntryPoint.HASHTAGS_BEST_ALL_FILES_TOPK.apply(10);
+		EntryPoint.HASHTAGS_BEST_ALL_FILES_TOPK.apply(10);
 
 		/**
 		 * TODO

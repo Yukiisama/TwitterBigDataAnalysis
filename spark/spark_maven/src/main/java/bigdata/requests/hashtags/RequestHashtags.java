@@ -46,14 +46,30 @@ public class RequestHashtags {
             
             return;
         }
-        
+
         long startTime = System.currentTimeMillis();
-        List<Tuple2<String, Integer>> top = files
-                                            .flatMap(line -> JsonUtils.getHashtagFromJson(line))
-                                            .mapToPair(hash -> new Tuple2<>(hash, 1))
+        JavaPairRDD<String, Integer> unionFiles = files
+        										   .get(0)
+                                                   .flatMap(line -> JsonUtils.getHashtagFromJson(line))
+                                                   .mapToPair(hash -> new Tuple2<>(hash, 1))
+                                                   .reduceByKey((a, b) -> a + b);
+  
+        for (int i = 1; i < files.size(); i++) {
+            unionFiles = unionFiles.union(
+            		files
+            		.get(i)
+                    .flatMap(line -> JsonUtils.getHashtagFromJson(line))
+                    .mapToPair(hash -> new Tuple2<>(hash, 1))
+                    .reduceByKey((a, b) -> a + b)
+            		);
+        }
+        List<Tuple2<String, Integer>> top = unionFiles
                                             .reduceByKey((a, b) -> a + b)
                                             .top(k, new HashtagComparator());
         System.out.println(top);
+        // On finit le travail
+        unionFiles.unpersist(); // pas sur que ça ait un effet mais on sait jamais
+        files.clear();
         long endTime = System.currentTimeMillis();
         System.out.println("That took without Reflexivity : (map + reduce + topK) " + (endTime - startTime) + " milliseconds");
     }
@@ -61,7 +77,7 @@ public class RequestHashtags {
     public static void numberOfApparitions (boolean allFiles) {
         
         long startTime = System.currentTimeMillis();
-        JavaPairRDD<String, Integer> res = ((allFiles) ? files : file)
+        JavaPairRDD<String, Integer> res = 	file	//((allFiles) ? files : file)
                                             .flatMap(line -> JsonUtils.getHashtagFromJson(line))
                                             .mapToPair(hash -> new Tuple2<>(hash, 1))
                                             .reduceByKey((a, b) -> a + b);
@@ -77,7 +93,7 @@ public class RequestHashtags {
         	
     	long startTime = System.currentTimeMillis();
     	
-    	JavaPairRDD<String, User> users = ((allFiles) ? files : file)
+    	JavaPairRDD<String, User> users = file//((allFiles) ? files : file)
     			                          .mapToPair(line -> JsonUserReader.readDataFromNLJSON(line))
     			                          .filter( val ->  val._1() != "")
     			                          .filter( val -> val._2()._hashtags().size() > 0)
