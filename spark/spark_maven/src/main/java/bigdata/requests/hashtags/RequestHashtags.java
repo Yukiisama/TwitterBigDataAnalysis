@@ -66,8 +66,8 @@ public class RequestHashtags {
                                             .mapToPair(hash -> new Tuple2<>(hash, 1))
                                             .reduceByKey((a, b) -> a + b);
         
-        System.out.println(res.collectAsMap()); // A enlever après fais exploser la mémoire
-        
+        //System.out.println(res.collectAsMap()); // A enlever après fais exploser la mémoire
+        res.take(10).forEach(f -> System.out.println(f));
         long endTime = System.currentTimeMillis();
         System.out.println("That took without Reflexivity : (map + reduce) " + (endTime - startTime) + " milliseconds");
 
@@ -85,8 +85,8 @@ public class RequestHashtags {
     	
     	// Simplement enregister le set de clés (correspondants aux usernames) dans hbase 
     	// i.e  users.keys()
-    	System.out.println(users.collectAsMap()); // A enlever après fais exploser la mémoire
-        
+    	//System.out.println(users.collectAsMap()); // A enlever après fais exploser la mémoire
+        users.take(10).forEach(f -> System.out.println(f));
     
         long endTime = System.currentTimeMillis();
         System.out.println("That took without Reflexivity : (map + reduce ) " + (endTime - startTime) + " milliseconds");

@@ -5,7 +5,7 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 
-
+import bigdata.data.parser.JsonUtils;
 import bigdata.requests.EntryPoint;
 
 public class TPSpark {
@@ -20,15 +20,15 @@ public class TPSpark {
 	static {
 		conf = new SparkConf()
 				.setAppName("TP Spark")
-				.set("spark.executor.instances", "5")
-			    .set("spark.executor.cores", "2");
+				.set("spark.executor.instances", "20")
+			    .set("spark.executor.cores", "4");
 
 		context = new JavaSparkContext(conf);
 		context.defaultParallelism();
 		context.setLogLevel("ERROR");
 
-		file = context.textFile("/raw_data/tweet_01_03_2020_first10000.nljson");
-		files = context.textFile("/raw_data/tweet_01_03_2020_first10000.nljson");
+		//file = context.textFile("/raw_data/tweet_01_03_2020_first10000.nljson");
+		file = context.textFile("/raw_data/tweet_05_03_2020.nljson");
 
 
 		// // int nb_of_workers = context.sc().getExecutorStorageStatus().length - 1;
@@ -36,14 +36,14 @@ public class TPSpark {
 		// System.out.println("There is " + context.sc().statusTracker().getExecutorInfos().length + " Workers.");
 
 		// // file = context.textFile(JsonUtils.data[1]);
-		// file = context.textFile(JsonUtils.data[5]);
+		//files = context.textFile(JsonUtils.data[5]);
 		
-		// String s = JsonUtils.data[1];
+		String s = JsonUtils.data[1];
 
-		// for (int i = 2; i < JsonUtils.data.length; i++) {
-		// 	s = s.concat("," + JsonUtils.data[i]);
-		// }
-		// file = context.textFile(s);
+		for (int i = 2; i < JsonUtils.data.length; i++) {
+			s = s.concat("," + JsonUtils.data[i]);
+		}
+		files = context.textFile(s);
 		// file = context.textFile("/raw_data/tweet_05_03_2020.nljson");
 	}
 

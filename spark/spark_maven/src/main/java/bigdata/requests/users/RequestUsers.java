@@ -57,15 +57,17 @@ public class RequestUsers {
 			}
 		});
 
-		List<Tuple2<String, User>> data = users.collect();
+		//List<Tuple2<String, User>> data = users.collect(); //explose la mémoire sur json entier
 
+		List<Tuple2<String, User>> data = users.take(10); // j'en prends que 10 pour pas exploser la mémoire mais
+														  // faudra écrire tout users dans hbase
 
 		// Output
 		for(Tuple2<String, User> tuple : data) {
 			if(tuple._2()._nbTweets() > 1)
 			System.out.println(tuple._2() + ", ");
 		}
-		System.out.println("Total unique users: " + data.size() + " over " + tuple_users.collect().size() + ".");
+		System.out.println("Total unique users: " + data.size() + " over " + tuple_users.count() + ".");
 
 		
 		long endTime = System.currentTimeMillis();
