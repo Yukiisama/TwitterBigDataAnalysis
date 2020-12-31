@@ -25,7 +25,7 @@ public class User  implements Serializable, IData {
      * @see User::getContents
      */
     private static final String[] __DATABASE_COLUMNS__ = new String[]{
-
+        "uuid",
         "id",
         "tweets_posted",
         "received_favs",
@@ -52,6 +52,7 @@ public class User  implements Serializable, IData {
     private int received_favs;
     private int received_retweets;
 
+    private String UUID;
     
     private String id;
 
@@ -66,8 +67,9 @@ public class User  implements Serializable, IData {
     /**
      * Constructors
      */
-    public User(String id, Set<String> hashtags, int nb_tweets) {
+    public User(String UUID, String id, Set<String> hashtags, int nb_tweets) {
         super();
+        this.UUID = UUID;
         
         this.id = id;
         this.nb_tweets = nb_tweets;
@@ -84,8 +86,8 @@ public class User  implements Serializable, IData {
 
     }
 
-    public User(String id, Set<String> hashtags) {
-        this(id, hashtags, 1);
+    public User(String UUID, String id, Set<String> hashtags) {
+        this(UUID, id, hashtags, 1);
     }
 
 
@@ -98,12 +100,18 @@ public class User  implements Serializable, IData {
      * Families are available in @see HBaseUser::familyName
      */
     public Put getContent() {
-        Put row = new Put(Bytes.toBytes(this.id));
+        Put row = new Put(Bytes.toBytes(this.UUID));    // Row Unique ID
 
 
         /**
          * Global data
          */
+        row.add(
+            Bytes.toBytes("global"), // Family Name
+            Bytes.toBytes("id"),  // column qualifier
+            Bytes.toBytes(this.id)  // Value
+        );
+
         row.add(
             Bytes.toBytes("global"), // Family Name
             Bytes.toBytes("tweets_posted"),  // column qualifier

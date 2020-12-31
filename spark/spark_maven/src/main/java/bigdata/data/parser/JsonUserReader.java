@@ -21,7 +21,8 @@ public class JsonUserReader {
 		
 		// String user_UUID = "";
 		String username = "";
-		User user_instance = new User(username, new HashSet<String>());
+		String user_UUID ="";
+		User user_instance = new User(user_UUID, username, new HashSet<String>());
 
 
 		try {
@@ -39,9 +40,9 @@ public class JsonUserReader {
 			
 			HashSet<String> hashtags = new HashSet<String>(JsonUserReader.getUniqueHashtagsList(json.getAsJsonObject()));
 			username = JsonUserReader.getUsername(json.getAsJsonObject());
+			user_UUID = JsonUserReader.getUserUUID(json.getAsJsonObject());
 
-
-			user_instance = new User(username, hashtags);
+			user_instance = new User(user_UUID, username, hashtags);
 			user_instance.setReceivedFavs(JsonUserReader.getFavoriteCount(json.getAsJsonObject()));
 			user_instance.setReceivedRTs(JsonUserReader.getRetweetCount(json.getAsJsonObject()));
 			user_instance.addPublicationSource(JsonUserReader.getTweetSource(json.getAsJsonObject()));
@@ -107,6 +108,9 @@ public class JsonUserReader {
 
 		return res;
 	}
+
+
+	
 	private static String getUserUUID (JsonObject jsonObj) {
 		String res = "";
 

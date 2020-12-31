@@ -73,6 +73,9 @@ public class HBaseUser extends SparkToDatabase {
         Put value = user.getContent();
 
         try {
+            if(value == null || user == null || table == null) {
+                return;
+            }
             table.put(value);
         } catch (IllegalArgumentException | IOException e) {
             e.printStackTrace();

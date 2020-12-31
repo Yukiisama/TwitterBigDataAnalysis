@@ -1,6 +1,7 @@
 package bigdata.requests.users;
 
-import static bigdata.TPSpark.file;
+import static bigdata.TPSpark.files;
+import static bigdata.TPSpark.openFiles;
 
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.function.Function;
@@ -22,15 +23,30 @@ public class RequestUsers {
 		long startTime = System.currentTimeMillis();
 
 
-
 		// Content
-		JavaPairRDD<String, User> tuple_users = file.mapToPair(line -> JsonUserReader.readDataFromNLJSON(line))
-			.filter(new Function<Tuple2<String, User>, Boolean>() {
-				@Override
-				public Boolean call(Tuple2<String, User> val) throws Exception {
-					return val._1() != "";
-				}
-			});//.reduceByKey((a, b) -> a + b);;
+		/**
+		 * Multiple Files
+		 */
+		openFiles();
+
+		JavaPairRDD<String, User> tuple_users = files.get(0).mapToPair(line -> JsonUserReader.readDataFromNLJSON(line))
+		.filter(new Function<Tuple2<String, User>, Boolean>() {
+			@Override
+			public Boolean call(Tuple2<String, User> val) throws Exception {
+				return val._1() != "";
+			}
+		});
+
+		/**
+		 * Single File
+		 */
+		// JavaPairRDD<String, User> tuple_users = file.mapToPair(line -> JsonUserReader.readDataFromNLJSON(line))
+		// 	.filter(new Function<Tuple2<String, User>, Boolean>() {
+		// 		@Override
+		// 		public Boolean call(Tuple2<String, User> val) throws Exception {
+		// 			return val._1() != "";
+		// 		}
+		// 	});
 		
 
 		if(tuple_users == null) {
@@ -38,6 +54,10 @@ public class RequestUsers {
 		}
 
 
+
+		/**
+		 * Reduce and merge data
+		 */
 		JavaPairRDD<String, User> users = tuple_users.reduceByKey(new Function2<User, User, User>() {
 			public User call (User a, User b) {
 				a.setNbTweets(a._nbTweets() + b._nbTweets());
