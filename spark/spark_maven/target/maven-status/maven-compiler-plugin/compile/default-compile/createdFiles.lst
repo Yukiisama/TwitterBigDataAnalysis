@@ -8,6 +8,7 @@ bigdata/data/parser/JsonUserReader.class
 bigdata/data/parser/JsonUtils.class
 bigdata/requests/EntryPoint$1.class
 bigdata/requests/users/RequestUsers.class
+bigdata/data/IData.class
 bigdata/infrastructure/database/SparkToDatabase.class
 bigdata/requests/EntryPoint$5.class
 bigdata/infrastructure/database/runners/HBaseUser.class

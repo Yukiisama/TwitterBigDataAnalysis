@@ -18,47 +18,52 @@ import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
+import bigdata.data.User;
+
 public abstract class SparkToDatabase extends Configured implements Tool {
 
-    protected Configuration config = null;
-    private String tableName;
 
+    private final String[] familyNames;
+    private static final byte[] TABLE_PREFIX = Bytes.toBytes("ape-jma_");
 
-    private static final byte[] FAMILY = Bytes.toBytes("AAA");
-    private static final byte[] ROW    = Bytes.toBytes("BBB");
-    private static final byte[] TABLE_NAME = Bytes.toBytes("CCC");
-    public SparkToDatabase (String tableName, String[] args) {
-        this.tableName = tableName;
+    private Configuration config = null;
+    private Connection connection;
+    private static byte[] TABLE_NAME;
+
+    private static String[] COLUMN_NAME;
+
+    protected Table table;
+    public SparkToDatabase (String tableName, String[] family, String[] columnsName) {
+        this.familyNames = family;
         try{
-
-            // /espace/Auber_PLE-203/hbase/conf/hbase-site.xml
             Configuration config = HBaseConfiguration.create();
             config.addResource(new Path("/espace/Auber_PLE-203/hbase/conf/hbase-site.xml"));
             config.addResource(new Path("/espace/Auber_PLE-203/hbase/conf/core-site.xml"));
-            // config.clear();
-            // config.set("hbase.zookeeper.quorum", "10.0.203.4");
-            // config.set("hbase.zookeeper.property.clientPort", "2181");
-            // config.set("hbase.master.info.port", "60000");
-             
 
+            COLUMN_NAME = columnsName;
+            TABLE_NAME = com.google.common.primitives.Bytes.concat(TABLE_PREFIX, Bytes.toBytes(tableName));
 
-            ToolRunner.run(HBaseConfiguration.create(), this, args);
+            ToolRunner.run(HBaseConfiguration.create(), this, new String[0]);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-    public SparkToDatabase (String tableName) {
-        this(tableName, new String[0]);
-    }
+
+
 
 
 
     public int run(String[] args) throws Exception {
-        Connection connection = ConnectionFactory.createConnection(getConf());
-        createTable(connection);
-        Table table = connection.getTable(TableName.valueOf(tableName));
-        Put put = new Put(Bytes.toBytes("KEY"));
-        table.put(put);
+        this.connection = ConnectionFactory.createConnection(getConf());
+        createTable(this.connection);
+        table = this.connection.getTable(TableName.valueOf(TABLE_NAME));
+
+        // Init rows
+        for(String key : COLUMN_NAME){
+            Put put = new Put(Bytes.toBytes(key));
+            table.put(put);
+        }
+
         return 0;
     }
 
@@ -69,6 +74,7 @@ public abstract class SparkToDatabase extends Configured implements Tool {
             admin.disableTable(table.getTableName());
             admin.deleteTable(table.getTableName());
         }
+        
         admin.createTable(table);
     }
 
@@ -76,14 +82,22 @@ public abstract class SparkToDatabase extends Configured implements Tool {
         try {
             final Admin admin = connect.getAdmin(); 
             HTableDescriptor tableDescriptor = new HTableDescriptor(TableName.valueOf(TABLE_NAME));
-            HColumnDescriptor famLoc = new HColumnDescriptor(FAMILY); 
-            //famLoc.set...
-            tableDescriptor.addFamily(famLoc);
+
+
+            for(String familyName : this.familyNames){
+                HColumnDescriptor famLoc = new HColumnDescriptor(familyName);
+                
+                tableDescriptor.addFamily(famLoc);
+            }
+
             createOrOverwrite(admin, tableDescriptor);
+
+
             admin.close();
         } catch (Exception e) {
             e.printStackTrace();
-            throw new IOException("Unable to create Table: " + this.tableName);
+            
+            throw new IOException("Unable to create Table: " + TABLE_NAME.toString());
         }
     }
 
@@ -93,7 +107,7 @@ public abstract class SparkToDatabase extends Configured implements Tool {
 
     public abstract void readTableJava(Configuration conf, String mode);
     
-    public abstract void writeTable(Configuration conf, String mode);
+    public abstract void writeTable(User user);
     
-    public abstract void writeTableJava(Configuration conf, String mode);
+    public abstract void writeTableJava(User user);
 }

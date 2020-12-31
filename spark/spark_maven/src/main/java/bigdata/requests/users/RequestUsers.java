@@ -13,6 +13,7 @@ import org.apache.spark.api.java.function.Function2;
 
 import bigdata.data.User;
 import bigdata.data.parser.JsonUserReader;
+import bigdata.infrastructure.database.runners.HBaseUser;
 import scala.Tuple2;
 
 public class RequestUsers {
@@ -57,16 +58,15 @@ public class RequestUsers {
 			}
 		});
 
-		List<Tuple2<String, User>> data = users.collect();
+		List<Tuple2<String, User>> data = users.collect(); //explose la mémoire sur json entier
 
+		// List<Tuple2<String, User>> data = users.take(10); // j'en prends que 10 pour pas exploser la mémoire mais
+		// 												  // faudra écrire tout users dans hbase
 
-		// Output
+		// Output inside HBase
 		for(Tuple2<String, User> tuple : data) {
-			if(tuple._2()._nbTweets() > 1)
-			System.out.println(tuple._2() + ", ");
+			HBaseUser.INSTANCE().writeTable(tuple._2());
 		}
-		System.out.println("Total unique users: " + data.size() + " over " + tuple_users.collect().size() + ".");
-
 		
 		long endTime = System.currentTimeMillis();
 		System.out.println("That took without Reflexivity : (map + reduce + topK) " + (endTime - startTime) + " milliseconds");

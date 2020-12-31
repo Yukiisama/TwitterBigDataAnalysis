@@ -1,17 +1,15 @@
 package bigdata.data.parser;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
+
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import bigdata.data.User;
-import scala.Tuple2;
+
 
 public class JsonUtils {
 
@@ -35,9 +33,6 @@ public class JsonUtils {
 
 			JsonElement entities = jsonObj.get("entities");
 			if (entities != null && entities.isJsonObject()) {
-				// JsonElement user = jsonObj.get("user");
-				// JsonElement name = user.getAsJsonObject().get("name");
-				// JsonElement id = user.getAsJsonObject().get("id_str");
 				JsonElement hashtags = (entities.getAsJsonObject()).get("hashtags");
 				if (hashtags != null) {
 					for (JsonElement hash : hashtags.getAsJsonArray()) {
@@ -51,5 +46,4 @@ public class JsonUtils {
 		}
 		return hashs.iterator();
 	}
-
 }
