@@ -23,7 +23,6 @@ public class User  implements Serializable, IData {
      * Columns for the database (here, HBase). In case of modification, also see
      * 
      * @see User::getContents
-     * @see
      */
     private static final String[] __DATABASE_COLUMNS__ = new String[]{
 

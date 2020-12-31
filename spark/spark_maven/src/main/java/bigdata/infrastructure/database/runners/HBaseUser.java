@@ -30,6 +30,8 @@ public class HBaseUser extends SparkToDatabase {
     public static HBaseUser INSTANCE() {
         if (__instance__ == null) {
             __instance__ = new HBaseUser();
+
+
         }
 
         return __instance__;

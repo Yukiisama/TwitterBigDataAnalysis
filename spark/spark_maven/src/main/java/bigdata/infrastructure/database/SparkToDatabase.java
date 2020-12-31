@@ -15,9 +15,14 @@ import org.apache.hadoop.hbase.client.ConnectionFactory;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Table;
 import org.apache.hadoop.hbase.util.Bytes;
+import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
+import org.apache.hadoop.hbase.mapreduce.TableOutputFormat;
+import org.apache.hadoop.hbase.mapreduce.TableInputFormat;
+
+import bigdata.TPSpark;
 import bigdata.data.User;
 
 public abstract class SparkToDatabase extends Configured implements Tool {
@@ -26,22 +31,50 @@ public abstract class SparkToDatabase extends Configured implements Tool {
     private final String[] familyNames;
     private static final byte[] TABLE_PREFIX = Bytes.toBytes("ape-jma_");
 
-    private Configuration config = null;
+    public static Configuration config = HBaseConfiguration.create();
     private Connection connection;
-    private static byte[] TABLE_NAME;
+    private byte[] TABLE_NAME;
+    private String[] COLUMN_NAME;
 
-    private static String[] COLUMN_NAME;
 
     protected Table table;
+
+    public Job APIJobConfiguration;
+
+    static {
+        config.addResource(new Path("/espace/Auber_PLE-203/hbase/conf/hbase-site.xml"));
+        config.addResource(new Path("/espace/Auber_PLE-203/hbase/conf/hbase-env.xml"));
+        config.addResource(new Path("/espace/Auber_PLE-203/hadoop/etc/hadoop/core-site.xml"));
+        config.set("mapreduce.outputformat.class", "org.apache.hadoop.hbase.mapreduce.TableOutputFormat");
+
+        config.set(TableInputFormat.INPUT_TABLE, "dataset");
+    }
+
     public SparkToDatabase (String tableName, String[] family, String[] columnsName) {
         this.familyNames = family;
         try{
-            Configuration config = HBaseConfiguration.create();
-            config.addResource(new Path("/espace/Auber_PLE-203/hbase/conf/hbase-site.xml"));
-            config.addResource(new Path("/espace/Auber_PLE-203/hbase/conf/core-site.xml"));
-
+            
+            
             COLUMN_NAME = columnsName;
             TABLE_NAME = com.google.common.primitives.Bytes.concat(TABLE_PREFIX, Bytes.toBytes(tableName));
+
+            this.config.set(TableOutputFormat.OUTPUT_TABLE, Bytes.toString(TABLE_NAME));
+
+            APIJobConfiguration = Job.getInstance(config);
+            APIJobConfiguration.setOutputFormatClass(TableOutputFormat.class);
+
+            // config.set(TableInputFormat.INPUT_TABLE, Bytes.toString(TABLE_NAME));
+            
+
+  /**
+   * Get an RDD for a given Hadoop file with an arbitrary new API InputFormat
+   * and extra configuration options to pass to the input format.
+   *
+   * '''Note:''' Because Hadoop's RecordReader class re-uses the same Writable object for each
+   * record, directly caching the returned RDD will create many references to the same object.
+   * If you plan to directly cache Hadoop writable objects, you should first copy them using
+   * a `map` function.
+   */
 
             ToolRunner.run(HBaseConfiguration.create(), this, new String[0]);
         } catch (Exception e) {
