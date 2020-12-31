@@ -159,7 +159,12 @@ public class User  implements Serializable, IData {
         return row;
     }
 
+    
+    public Tuple2<ImmutableBytesWritable, Put> getPuts() throws Exception {
+        Put put = this.getContent();
 
+        return new Tuple2<ImmutableBytesWritable, Put>(new ImmutableBytesWritable(), put);
+    }
     /**
      * Setters
      */

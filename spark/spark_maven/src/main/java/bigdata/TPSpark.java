@@ -67,7 +67,7 @@ public class TPSpark {
 			// r.foreach(f -> System.out.println(f));
 
 
-			// AnalysisHashtags();
+			AnalysisHashtags();
 			AnalysisUser();
 
 		} catch (Exception e) {
