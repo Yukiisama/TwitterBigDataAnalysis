@@ -3,7 +3,6 @@ package bigdata.infrastructure.database.runners;
 import java.io.IOException;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.spark.SparkContext;
 
@@ -72,6 +71,18 @@ public class HBaseUser extends SparkToDatabase {
     @Override
     public void writeTable(User user) {
         Put value = user.getContent();
+
+        try {
+            table.put(value);
+        } catch (IllegalArgumentException | IOException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+
+    public void writeTable(Put value) {
 
         try {
             table.put(value);
