@@ -12,6 +12,7 @@ import com.google.gson.JsonParser;
 
 import bigdata.data.User;
 import scala.Tuple2;
+import scala.Tuple3;
 
 
 public class JsonUserReader {
@@ -59,6 +60,7 @@ public class JsonUserReader {
 			return new Tuple2 <String, User> (username, user_instance);
 		}
 	}
+	
 
 	private static Set<String> getUniqueHashtagsList(JsonObject jsonObj) {
 		HashSet<String> hashs = new HashSet<>();
