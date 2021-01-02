@@ -16,7 +16,7 @@ import bigdata.data.parser.JsonUtils;
 import scala.Tuple2;
 import scala.Tuple3;
 
-// import static bigdata.TPSpark.context;
+import static bigdata.TPSpark.context;
 import static bigdata.TPSpark.file;
 import static bigdata.TPSpark.files;
 import static bigdata.TPSpark.openFiles;
@@ -73,19 +73,33 @@ public class RequestInfluenceurs {
         }
         
         //users.take(10).forEach(f -> System.out.println(f));
-        System.out.println("VUE SIMPLIFIE");
+        /*System.out.println("VUE SIMPLIFIE");
         users.take(100).forEach(f ->{
             System.out.println();
             System.out.print(f._1 + " : [");
             f._2().forEach(u -> System.out.print(u._id() + ", "));
             System.out.print("]");
-        });
-        
+        });*/
+        // users -> question a) à enregistrer dans hbase
         if (topK) {
             System.out.println();
             System.out.println(" b) Donner k triplets de hashtags les plus utilisés");
             List<Tuple2<Tuple3<String,String,String>, Integer>> top = mapredTopKTripleHashtag.top(k, new TripleHashtagComparator());  
+            // question ) b à top à enregistrer dans hbase
             System.out.println(top);
+            // Question c) je pars du principe que c'est sur le topk
+            System.out.println("QUESTION C");
+            (users.join(context.parallelizePairs(top)))
+            .unpersist()
+            .flatMap(val -> val._2._1().iterator())
+            .mapToPair(val -> {
+            	return new Tuple2<String, Integer>(val._id(), val._nbTweets());
+            })
+            .reduceByKey((a, b) -> a + b)
+            .top(k, new HashtagComparator())
+            .forEach(f -> System.out.println(f));
+            
+            
         }
         
         if (allFiles) {

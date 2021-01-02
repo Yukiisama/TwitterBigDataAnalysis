@@ -35,7 +35,8 @@ public class TPSpark {
                 .setAppName("TP Spark")
                 .set("spark.executor.instances", "20")
                 .set("spark.executor.cores", "4")
-                .set("Spark.shuffle.memoryFraction", "0.4");
+                .set("spark.shuffle.memoryFraction", "0.8")
+        		.set("spark.files.maxPartitionBytes", "64m");
 
         context = new JavaSparkContext(conf);
         context.defaultParallelism();
@@ -62,7 +63,7 @@ public class TPSpark {
             // r.foreach(f -> System.out.println(f));
 
 
-            // AnalysisHashtags();
+            //AnalysisHashtags();
             //AnalysisUser();
             AnalysisInfluencer();
         } catch (Exception e) {
@@ -129,7 +130,7 @@ public class TPSpark {
     
     private static void AnalysisInfluencer() {
         System.out.println("a) Récupérer tous les triplets de hashtags ainsi que les utilisateurs qui les ont utilisés");
-        // Question b faites en même temps;
-        RequestInfluenceurs.TripleHashtag(false, true, 10);
+        // Question b et c faites en même temps;
+        RequestInfluenceurs.TripleHashtag(true, true, 10000);
     }
 }
