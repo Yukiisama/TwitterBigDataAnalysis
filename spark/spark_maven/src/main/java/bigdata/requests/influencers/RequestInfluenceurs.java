@@ -73,13 +73,13 @@ public class RequestInfluenceurs {
         }
         
         //users.take(10).forEach(f -> System.out.println(f));
-        /*System.out.println("VUE SIMPLIFIE");
+        System.out.println("VUE SIMPLIFIE");
         users.take(100).forEach(f ->{
             System.out.println();
             System.out.print(f._1 + " : [");
             f._2().forEach(u -> System.out.print(u._id() + ", "));
             System.out.print("]");
-        });*/
+        });
         // users -> question a) à enregistrer dans hbase
         if (topK) {
             System.out.println();
