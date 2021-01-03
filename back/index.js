@@ -13,7 +13,7 @@ const path = require('path');
  
 
 
-app.use(express.json());
+
 
 //Set view engine to ejs
 app.set("view engine", "ejs");
@@ -27,6 +27,10 @@ app.use(express.static(path.join(__dirname, 'views')));
 //Use body-parser
 app.use(bodyParser.urlencoded({ extended: false })); 
 
+app.use(express.json());
+// app.use(bodyParser);
+
+
 app.get("/", (req, res) => res.render("index"));
 app.get("/example", Controller.example);
 app.get("/hashtag", HashtagController.example);
@@ -34,6 +38,11 @@ app.get("/hashtag", HashtagController.example);
 
 app.get("/user", UserController._callback);
 
+//alexandradss8
+app.post("/user/", function (req, res) {
+    UserController._callback(req, res);
+
+});
 app.listen(PORT, () => {
     console.log(`Projet ple is running on port ${PORT}`);
 });

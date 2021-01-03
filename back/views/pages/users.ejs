@@ -136,12 +136,19 @@
                         </div>
                         <div class="sidebar-search">
                             <div class="input-group custom-search-form">
-                                <input type="text" class="form-control" placeholder="Search...">
-                                <span class="input-group-btn">
-                                    <button class="btn btn-primary" type="button">
-                                        <i class="fa fa-search"></i>
-                                    </button>
-                            </span>
+                                <form action="/user/" method="POST">
+                                    <input 
+                                        type="text" 
+                                        id="search" 
+                                        name="search"
+                                        value="a name" 
+                                        class="form-control" 
+                                        placeholder="Search...">
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-primary" type="submit" href="/user/">
+                                        </button>
+                                    </span>
+                                </form>
                             </div>
                         </div>
                         <!-- /.col-lg-12 -->
@@ -762,19 +769,23 @@
         <!-- CHARTS -->
         <!-- Lang donut -->
         <script> 
-            var value = "<%= langs %>";
+            var value = "<%= langs %>".replace(/&#34;/g,'"');
             
-            console.log("Value ejs:");
-            Object.keys(value).forEach(function(key) {
+            console.log("Value ejs:", value);
+            var data = JSON.parse(value);
+            console.log("Value ejs:", data);
+            /*
+             Object.keys(value).forEach(function(key) {
                 // console.log(key);
                 console.log(value[key]);
-            });
+            }); 
+            */
             console.log("Value Length ejs:" , value.length);
 
 
             Morris.Donut({
                 element: 'morris-donut-chart',
-                data: value,
+                data: data,
                 resize: true
             });
 

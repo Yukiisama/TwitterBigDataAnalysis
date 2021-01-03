@@ -16,6 +16,7 @@
     "express": "^4.17.1",
     "hbase": "^0.6.1",
     "new-line": "*",
-    "nodemon": "^2.0.6"
+    "nodemon": "^2.0.6",
+    "language-tags": "*"
   }
 }
