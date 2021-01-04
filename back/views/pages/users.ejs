@@ -53,7 +53,7 @@
                 </button>
 
                 <ul class="nav navbar-nav navbar-left navbar-top-links">
-                    <li><a href="#"><i class="fa fa-home fa-fw"></i> Website</a></li>
+                    <li><a href="#"><i class="fa fa-home fa-fw"></i> Website</a></li>    
                 </ul>
 
                 <!-- <ul class="nav navbar-right navbar-top-links">
@@ -774,16 +774,8 @@
         <script> 
             var value = "<%= langs %>".replace(/&#34;/g,'"');
             
-            console.log("Value ejs:", value);
             var data = JSON.parse(value);
             console.log("Value ejs:", data);
-            /*
-             Object.keys(value).forEach(function(key) {
-                // console.log(key);
-                console.log(value[key]);
-            }); 
-            */
-            console.log("Value Length ejs:" , value.length);
 
 
             Morris.Donut({
@@ -795,9 +787,6 @@
         </script>
 
         <!-- Frequency Hours -->
-
-
-        <!-- Frequency Graph -->
         <script>
 
             var value = "<%= frequencies %>".replace(/&#34;/g,'"');
@@ -818,5 +807,8 @@
             });
             
         </script>
+
+
+        <!-- Frequency Graph -->
     </body>
 </html>

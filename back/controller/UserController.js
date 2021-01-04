@@ -15,13 +15,13 @@ class UserController {
 
 
     async user(req, res) {
-        console.log("ID: " + req.body.search);
+        // console.log("ID: " + req.body.search);
 
 
         const response = await this.service.user(req.body.search)
         var data = this.parseInputResponse(response);
 
-        console.log("Data: " + JSON.stringify(data));
+        // console.log("Data: " + JSON.stringify(data));
 
         try{
             let name = data[0].$;
@@ -43,7 +43,7 @@ class UserController {
                 .split(","));
                 
 
-            console.log("Dates: " + JSON.stringify(daily_frequencies));
+            // console.log("Dates: " + JSON.stringify(daily_frequencies));
             // console.log(JSON.stringify(langs));
 
 
@@ -74,15 +74,12 @@ class UserController {
         raw = raw.replace("'$'", '"value"');
         raw = raw.replace("'", '"');
 
-        // console.log(raw);
         return JSON.parse(raw);
     }
-
-
-
     // Remove trailing [ and ]
     // /(^\[ | \]$)/ig 
     // [[][[:blank:]]*[{] ((column|timestamp|$): ('*'[a-z]*:[a-z]*|[0-9]*)',[[:cntrl:]]*[[:blank:]]*)*
+
 
 
     getLangs(raw_lang) {
@@ -127,10 +124,7 @@ class UserController {
 
 
     getDateStatistics(raw_dates) {
-
-        let dates = raw_dates; 
-        console.log("Reading: " + dates);
-
+        let dates = raw_dates;
         let parsed_dates = {};
             
         for( let i = 0; i < 24; i++ ) {
@@ -138,7 +132,6 @@ class UserController {
 
                 let date = dates[i];
                 let tmp = date.split("=");
-                console.log("Reading Splitted: " + tmp);
     
                 parsed_dates[i + "h"] = tmp[1];
 
@@ -151,9 +144,6 @@ class UserController {
 
 
         dates = {};
-        // for( let i = 0; i < parsed_langs.length; i++ ) {
-        //     langs[k] = {label : k, value: parsed_langs[k]}
-        // }
 
         return dates = Object.keys(parsed_dates).map(function(k) {
             return {
