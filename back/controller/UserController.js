@@ -33,14 +33,11 @@ class UserController {
                 .replace("}", '')
                 .split(","));
             let hashtags = data[5].$;
+            console.log("Raw Values: " + data[6].$);
 
             let history_localisation = data[7].$;
             let history_sources = data[8].$;
-            let langs = this.getLangs(data[6].$
-                .replace('{', "")
-                .replace("}", '')
-                .replace(" ", '')
-                .split(","));
+            let langs = this.getLangs(data[6].$);
                 
 
             // console.log("Dates: " + JSON.stringify(daily_frequencies));
@@ -83,12 +80,17 @@ class UserController {
 
 
     getLangs(raw_lang) {
-        let langs = raw_lang;
+        let langs = raw_lang
+            .replace('{', "")
+            .replace("}", '')
+            .split(", ");
 
         let parsed_langs = {};
+        console.log("Values: " + langs);
             
         for( let i = 0; i < langs.length; i++ ) {
             let lang = langs[i];
+            console.log("Value: " + lang);
             let tmp = lang.split("=");
 
             parsed_langs[langs[i].substring(0,2)] = tmp[1];
@@ -96,11 +98,9 @@ class UserController {
 
 
         langs = {};
-        // for( let i = 0; i < parsed_langs.length; i++ ) {
-        //     langs[k] = {label : k, value: parsed_langs[k]}
-        // }
 
         return langs = Object.keys(parsed_langs).map(function(k) {
+
             let name = "Inconnu.";
             try{
                 name = tags.language(k).descriptions();
@@ -110,8 +110,12 @@ class UserController {
 
             if(!name.length == 0) {
                 name = name[0];
+                if(k.includes("fr")){
+                    name = "Français";
+                }
             }
 
+            
 
             return {
                 label: name,
@@ -144,7 +148,6 @@ class UserController {
 
 
         dates = {};
-
         return dates = Object.keys(parsed_dates).map(function(k) {
             return {
                 label: k,
