@@ -18,18 +18,20 @@ class UserController {
         console.log("ID: " + req.body.search);
 
 
-        const response = await this.service.user(req.body.search);
-        
-        // console.log("Requête: "  +  JSON.stringify(req.query));
+        const response = await this.service.user(req.body.search)
         var data = this.parseInputResponse(response);
-        console.log("Data: " + data);
+
+        console.log("Data: " + JSON.stringify(data));
 
         try{
             let name = data[0].$;
             let received_favs = data[1].$;
             let received_rts = data[2].$;
             let tweets_posted = data[3].$;
-            let daily_frequencies = data[4].$;
+            let daily_frequencies = this.getDateStatistics(data[4].$
+                .replace('{', "")
+                .replace("}", '')
+                .split(","));
             let hashtags = data[5].$;
 
             let history_localisation = data[7].$;
@@ -39,10 +41,10 @@ class UserController {
                 .replace("}", '')
                 .replace(" ", '')
                 .split(","));
-            
+                
 
-
-            console.log(JSON.stringify(langs));
+            console.log("Dates: " + JSON.stringify(daily_frequencies));
+            // console.log(JSON.stringify(langs));
 
 
             return res.render("pages/users", {
@@ -50,7 +52,7 @@ class UserController {
                 favs : received_favs,
                 rts: received_rts,
                 tweets: tweets_posted,
-                frequencies: daily_frequencies,
+                frequencies: JSON.stringify(daily_frequencies),
                 hashtags: hashtags,
                 langs: JSON.stringify(langs),
                 localisations: history_localisation,
@@ -120,6 +122,45 @@ class UserController {
             };
         });
         
+    }
+
+
+
+    getDateStatistics(raw_dates) {
+
+        let dates = raw_dates; 
+        console.log("Reading: " + dates);
+
+        let parsed_dates = {};
+            
+        for( let i = 0; i < 24; i++ ) {
+            if(!(dates[i] === undefined)) {
+
+                let date = dates[i];
+                let tmp = date.split("=");
+                console.log("Reading Splitted: " + tmp);
+    
+                parsed_dates[i + "h"] = tmp[1];
+
+            } else {
+                parsed_dates[i + "h"] = 0;
+            }
+
+
+        }
+
+
+        dates = {};
+        // for( let i = 0; i < parsed_langs.length; i++ ) {
+        //     langs[k] = {label : k, value: parsed_langs[k]}
+        // }
+
+        return dates = Object.keys(parsed_dates).map(function(k) {
+            return {
+                label: k,
+                value: parsed_dates[k]
+            };
+        });
     }
 
 }
