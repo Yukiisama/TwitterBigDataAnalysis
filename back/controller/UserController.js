@@ -42,7 +42,7 @@ class UserController {
             
 
 
-            // console.log(langs);
+            console.log(JSON.stringify(langs));
 
 
             return res.render("pages/users", {
@@ -66,8 +66,6 @@ class UserController {
 
 
     parseInputResponse(response) {
-
-
         const regex_replace_$ = /('\$')/gi;
 
         let raw = JSON.stringify(response.data);
@@ -103,7 +101,7 @@ class UserController {
         //     langs[k] = {label : k, value: parsed_langs[k]}
         // }
 
-        langs = Object.keys(parsed_langs).map(function(k) {
+        return langs = Object.keys(parsed_langs).map(function(k) {
             let name = "Inconnu.";
             try{
                 name = tags.language(k).descriptions();
@@ -115,9 +113,10 @@ class UserController {
                 name = name[0];
             }
 
+
             return {
-            label: name,
-            value: parsed_langs[k]
+                label: name,
+                value: parsed_langs[k]
             };
         });
         
