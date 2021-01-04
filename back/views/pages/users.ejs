@@ -242,10 +242,23 @@
                                         <div class="col-xs-3">
                                             <i class="fa fa-hashtag fa-5x"></i>
                                         </div>
+
+
+                                        <%  var hashtag = JSON.parse(hashtags.replace(/&#34;/g,'"') )   %>
+                                        <%  var hashtagsSum = 0;                            %>
+                                        <%  for (var i = 0; i < hashtag.length; i++) {      %>
+                                        <%     hashtagsSum += parseInt(hashtag[i].value);   %>
+                                        <%  }                                               %>
+
+                                        <script>
+                                            console.log("Hashtags: " + "<%= JSON.stringify(hashtag) %>");
+                                        </script>
+
                                         <div class="col-xs-9 text-right">
-                                            <div class="huge"><%- hashtags.length %></div>
-                                            <div>participation à des Hashtags</div>
+                                            <div class="huge"><%- hashtagsSum %></div>
+                                            <div><%- hashtag.length %> Uniques</div>
                                         </div>
+
                                     </div>
                                 </div>
                             </div>
@@ -552,42 +565,26 @@
                         <div class="col-lg-4">
                             <div class="panel panel-default">
                                 <div class="panel-heading">
-                                    <i class="fa fa-fw fa-hashtag"></i>
-                                    <i class="fa fa-fw fa-sort-numeric-down"></i> 
+                                    <i class="fa fa-fw fa-list-ol"></i>
                                     Top Hashtag
                                 </div>
                                 <!-- /.panel-heading -->
                                 <div class="panel-body">
                                     <div class="list-group">
-                                        <a href="#" class="list-group-item">
-                                            <i class="fa fa-comment fa-fw"></i> #BTS
-                                                <span class="pull-right text-muted small"><em>4 minutes ago</em>
+
+                                        <% for (var i = 0; i < hashtag.length && i < 10; i++) { %>
+                                            <a href="#" class="list-group-item">
+                                                <i class="fa fa-hashtag fa-fw"></i><%= hashtag[i].label %>
+
+                                                <span class="pull-right text-muted small"><em><%= hashtag[i].value %> Utilisations</em>
                                                 </span>
-                                        </a>
-                                        <a href="#" class="list-group-item">
-                                            <i class="fa fa-twitter fa-fw"></i> #PutainDeCoreens
-                                                <span class="pull-right text-muted small"><em>12 minutes ago</em>
-                                                </span>
-                                        </a>
-                                        <a href="#" class="list-group-item">
-                                            <i class="fa fa-envelope fa-fw"></i> #LeCocoC'estPasBon
-                                                <span class="pull-right text-muted small"><em>27 minutes ago</em>
-                                                </span>
-                                        </a>
-                                        <a href="#" class="list-group-item">
-                                            <i class="fa fa-tasks fa-fw"></i> #QueensGambit
-                                                <span class="pull-right text-muted small"><em>43 minutes ago</em>
-                                                </span>
-                                        </a>
-                                        <a href="#" class="list-group-item">
-                                            <i class="fa fa-upload fa-fw"></i> #Ok.
-                                                <span class="pull-right text-muted small"><em>11:32 AM</em>
-                                                </span>
-                                        </a>
+                                            </a>
+                                        <% } %>
+
 
                                     </div>
                                     <!-- /.list-group -->
-                                    <a href="#" class="btn btn-default btn-block">View All Alerts</a>
+                                    <!-- <a href="#" class="btn btn-default btn-block">View All Alerts</a> -->
                                 </div>
                                 <!-- /.panel-body -->
                             </div>

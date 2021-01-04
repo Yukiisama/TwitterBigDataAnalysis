@@ -73,7 +73,7 @@ class Service {
         // console.log("Params: " + JSON.stringify(params));
         try {
             // data =  this.getUserDataFromHBase(params, function () {
-                data =  this.getUserDataFromHBase("999943257583964160", function () {
+                data =  this.getUserDataFromHBase("/r/reddevils", function () {
                     let end = Date.now()
                 console.log(`User HBase Parsing Time: ${end - start} ms`);
             });

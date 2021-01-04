@@ -21,18 +21,15 @@ class UserController {
         const response = await this.service.user(req.body.search)
         var data = this.parseInputResponse(response);
 
-        // console.log("Data: " + JSON.stringify(data));
+        console.log("Data: " + JSON.stringify(data));
 
         try{
             let name = data[0].$;
             let received_favs = data[1].$;
             let received_rts = data[2].$;
             let tweets_posted = data[3].$;
-            let daily_frequencies = this.getDateStatistics(data[4].$
-                .replace('{', "")
-                .replace("}", '')
-                .split(","));
-            let hashtags = data[5].$;
+            let daily_frequencies = this.getDateStatistics(data[4].$);
+            let hashtags = this.getHashtags(data[5].$);
             console.log("Raw Values: " + data[6].$);
 
             let history_localisation = data[7].$;
@@ -50,7 +47,7 @@ class UserController {
                 rts: received_rts,
                 tweets: tweets_posted,
                 frequencies: JSON.stringify(daily_frequencies),
-                hashtags: hashtags,
+                hashtags: JSON.stringify(hashtags),
                 langs: JSON.stringify(langs),
                 localisations: history_localisation,
                 sources: history_sources
@@ -86,11 +83,9 @@ class UserController {
             .split(", ");
 
         let parsed_langs = {};
-        console.log("Values: " + langs);
             
         for( let i = 0; i < langs.length; i++ ) {
             let lang = langs[i];
-            console.log("Value: " + lang);
             let tmp = lang.split("=");
 
             parsed_langs[langs[i].substring(0,2)] = tmp[1];
@@ -126,9 +121,44 @@ class UserController {
     }
 
 
+    getHashtags(raw_hashtags) {
+        let hashtags = raw_hashtags
+            .replace('{', "")
+            .replace("}", '')
+            .split(", ");
+
+        let parsed_hashtags = {};
+
+            
+        for( let i = 0; i < hashtags.length; i++ ) {
+
+            console.log("Value raw: " + hashtags[i]);
+            let hashtag = hashtags[i];
+            let tmp = hashtag.split("=");
+            parsed_hashtags[tmp[0]] = tmp[1];
+
+        }
+
+
+        hashtags = {};
+        hashtags = Object.keys(parsed_hashtags).map(function(k) {
+            return {
+                label: k,
+                value: parsed_hashtags[k]
+            };
+        }).sort((a, b) => (a.value < b.value) ? 1 : -1);
+
+        return hashtags;
+        
+    }
+
+
 
     getDateStatistics(raw_dates) {
-        let dates = raw_dates;
+        let dates = raw_dates
+            .replace('{', "")
+            .replace("}", '')
+            .split(",");
         let parsed_dates = {};
             
         for( let i = 0; i < 24; i++ ) {
