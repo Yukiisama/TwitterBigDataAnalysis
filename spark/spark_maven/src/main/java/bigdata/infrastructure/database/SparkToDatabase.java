@@ -104,11 +104,14 @@ public abstract class SparkToDatabase extends Configured implements Tool {
 
     public void createOrOverwrite(Admin admin, HTableDescriptor table) throws Exception {
         if (admin.tableExists(table.getTableName())) {
-            admin.disableTable(table.getTableName());
+            if(admin.isTableEnabled(table.getTableName()))
+                admin.disableTable(table.getTableName());
             admin.deleteTable(table.getTableName());
         }
         
         admin.createTable(table);
+        if(admin.isTableDisabled(table.getTableName()))
+        admin.enableTable(table.getTableName());
     }
 
     public void createTable(Connection connect) throws Exception {

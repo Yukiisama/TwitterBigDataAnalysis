@@ -4,6 +4,8 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.Set;
 
 import com.google.gson.JsonElement;
@@ -22,7 +24,7 @@ public class JsonUserReader {
 		// String user_UUID = "";
 		String username = "";
 		String user_UUID ="";
-		User user_instance = new User(user_UUID, username, new HashSet<String>());
+		User user_instance = new User(user_UUID, username, new HashMap<String, Integer>());
 
 
 		try {
@@ -38,7 +40,7 @@ public class JsonUserReader {
 			// JsonObject jsonObj = JsonParser.parseString(line).getAsJsonObject();
 
 			
-			HashSet<String> hashtags = new HashSet<String>(JsonUserReader.getUniqueHashtagsList(json.getAsJsonObject()));
+			HashMap<String, Integer> hashtags = new HashMap<String, Integer>(JsonUserReader.getHashtagsList(json.getAsJsonObject()));
 			username = JsonUserReader.getUsername(json.getAsJsonObject());
 			user_UUID = JsonUserReader.getUserUUID(json.getAsJsonObject());
 
@@ -60,6 +62,7 @@ public class JsonUserReader {
 		}
 	}
 
+	@Deprecated
 	private static Set<String> getUniqueHashtagsList(JsonObject jsonObj) {
 		HashSet<String> hashs = new HashSet<>();
 
@@ -79,6 +82,33 @@ public class JsonUserReader {
 
 				for (JsonElement hash : hashtags.getAsJsonArray()) {
 					hashs.add(hash.getAsJsonObject().get("text").getAsString());
+				}
+
+			}
+		}
+
+		return hashs;
+	}
+
+	private static Map<String, Integer> getHashtagsList(JsonObject jsonObj) {
+		HashMap<String, Integer> hashs = new HashMap<>();
+
+		// Fail-safe
+		if(jsonObj == null) {
+			return hashs;
+		}
+
+
+		JsonElement entities = jsonObj.get("entities");
+
+		if (entities != null && entities.isJsonObject()) {
+
+			JsonElement hashtags = (entities.getAsJsonObject()).get("hashtags");
+
+			if (hashtags != null) {
+
+				for (JsonElement hash : hashtags.getAsJsonArray()) {
+					hashs.put(hash.getAsJsonObject().get("text").getAsString(), 1);
 				}
 
 			}
@@ -122,7 +152,7 @@ public class JsonUserReader {
 			return res;
 		}
 
-		JsonElement username = user.getAsJsonObject().get("id_str");
+		JsonElement username = user.getAsJsonObject().get("id");
 
 
 		res = username.getAsString();
@@ -171,11 +201,13 @@ public class JsonUserReader {
 		Date d = new Date(stamp.getTime());
 
 		Calendar cal = Calendar.getInstance();
-		cal.setTime(d);
-		cal.set(Calendar.HOUR_OF_DAY, 0);
-		cal.set(Calendar.MINUTE, 0);
-		cal.set(Calendar.SECOND, 0);
-		cal.set(Calendar.MILLISECOND, 0);
+		// cal.setTime(d);
+		// cal.set(Calendar.HOUR_OF_DAY, 0);
+		// cal.set(Calendar.MINUTE, 0);
+		// cal.set(Calendar.SECOND, 0);
+		// cal.set(Calendar.MILLISECOND, 0);
+
+		cal.set(Calendar.HOUR_OF_DAY, d.getHours());
 
 		Date res = cal.getTime();
 
