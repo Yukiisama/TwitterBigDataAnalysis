@@ -37,6 +37,9 @@ public class RequestHashtags {
         List<Tuple2<String, Integer>> top = r.top(k, new HashtagComparator());
         System.out.println(top);
         long endTime = System.currentTimeMillis();
+        
+        r.unpersist();
+        top.clear();
         System.out.println("That took without Reflexivity : (map + reduce + topK) " + (endTime - startTime) + " milliseconds");
     }
 
@@ -62,7 +65,7 @@ public class RequestHashtags {
                     .flatMap(line -> JsonUtils.getHashtagFromJson(line))
                     .mapToPair(hash -> new Tuple2<>(hash, 1))
                     .reduceByKey((a, b) -> a + b)
-                    );
+                    ).unpersist();
         }
 
         unionFiles = unionFiles.reduceByKey((a, b) -> a + b);
@@ -80,7 +83,6 @@ public class RequestHashtags {
         // On finit le travail
         unionFiles.unpersist(); // pas sur que ça ait un effet mais on sait jamais
         files.clear();
-
         long endTime = System.currentTimeMillis();
         System.out.println("That took without Reflexivity : (map + reduce + topK) " + (endTime - startTime) + " milliseconds");
     }
@@ -109,7 +111,7 @@ public class RequestHashtags {
                         .filter( val ->  val._1() != "")
                         .filter( val -> val._2()._hashtags().size() > 0)
                         .reduceByKey((user1, user2 ) -> user1)
-                        );
+                        ).unpersist();
             }   
             users = users.reduceByKey((user1, user2 ) -> user1);
         }
@@ -127,9 +129,9 @@ public class RequestHashtags {
         users.take(10).forEach(f -> System.out.println(f));
         if (allFiles) {
             // On finit le travail
-            users.unpersist(); // pas sur que ça ait un effet mais on sait jamais
             files.clear();
         }
+        users.unpersist(); // pas sur que ça ait un effet mais on sait jamais
             
         long endTime = System.currentTimeMillis();
         System.out.println("That took without Reflexivity : (map + reduce ) " + (endTime - startTime) + " milliseconds");
