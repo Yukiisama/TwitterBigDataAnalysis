@@ -1,5 +1,6 @@
 package bigdata.requests.users;
 
+// import static bigdata.TPSpark.file;
 import static bigdata.TPSpark.files;
 import static bigdata.TPSpark.openFiles;
 
@@ -66,6 +67,7 @@ public class RequestUsers {
 
 				a.addGeo(b._geos());
 				a.addLangUsed(b._langs());
+				a.addHashtagsUsed(b._hashtags());
 				a.addPublicationSource(b._sources());
 				a.addDailyFrequencyData(b._frequencies());
 

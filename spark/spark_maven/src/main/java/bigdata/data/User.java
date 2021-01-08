@@ -2,10 +2,12 @@ package bigdata.data;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -56,29 +58,29 @@ public class User  implements Serializable, IData {
     
     private String id;
 
-    private Set<String> hashtags;   // Uniques values
+    private HashMap<String, Integer> hashtags;   // Uniques values
 
     private List<String> localisations; // Non Unique values
 
     private List<String> source_history;
-    private HashMap<Date, Integer> daily_frequencies;
+    private HashMap<Integer, Integer> daily_frequencies;
     private HashMap<String, Integer> used_lang;
 
     /**
      * Constructors
      */
-    public User(String UUID, String id, Set<String> hashtags, int nb_tweets) {
+    public User(String UUID, String id, Map<String, Integer> hashtags, int nb_tweets) {
         super();
         this.UUID = UUID;
         
         this.id = id;
         this.nb_tweets = nb_tweets;
 
-        this.hashtags = new HashSet<String>(hashtags);
+        this.hashtags = new HashMap<String, Integer>(hashtags);
         this.localisations = new ArrayList<String>();
         this.source_history = new ArrayList<String>();
 
-        this.daily_frequencies = new HashMap<Date, Integer>();
+        this.daily_frequencies = new HashMap<Integer, Integer>();
         this.used_lang = new HashMap<String, Integer>();
 
         this.received_favs = 0;
@@ -86,7 +88,7 @@ public class User  implements Serializable, IData {
 
     }
 
-    public User(String UUID, String id, Set<String> hashtags) {
+    public User(String UUID, String id, Map<String, Integer> hashtags) {
         this(UUID, id, hashtags, 1);
     }
 
@@ -100,7 +102,8 @@ public class User  implements Serializable, IData {
      * Families are available in @see HBaseUser::familyName
      */
     public Put getContent() {
-        Put row = new Put(Bytes.toBytes(this.UUID));    // Row Unique ID
+        // Put row = new Put(Bytes.toBytes(this.UUID));    // Row Unique ID
+        Put row = new Put(Bytes.toBytes(this.id.toString()));    // Row Unique ID
 
 
         /**
@@ -109,25 +112,25 @@ public class User  implements Serializable, IData {
         row.add(
             Bytes.toBytes("global"), // Family Name
             Bytes.toBytes("id"),  // column qualifier
-            Bytes.toBytes(this.id)  // Value
+            Bytes.toBytes(this.id.toString())  // Value
         );
 
         row.add(
             Bytes.toBytes("global"), // Family Name
             Bytes.toBytes("tweets_posted"),  // column qualifier
-            Bytes.toBytes(this.nb_tweets)  // Value
+            Bytes.toBytes(Integer.toString(this.nb_tweets))  // Value
         );
 
         row.add(
             Bytes.toBytes("global"), // Family Name
             Bytes.toBytes("received_favs"),  // column qualifier
-            Bytes.toBytes(this.received_favs)  // Value
+            Bytes.toBytes(Integer.toString(this.received_favs))  // Value
         );
 
         row.add(
             Bytes.toBytes("global"), // Family Name
             Bytes.toBytes("received_retweets"),  // column qualifier
-            Bytes.toBytes(this.received_retweets)  // Value
+            Bytes.toBytes(Integer.toString(this.received_retweets))  // Value
         );
 
         /**
@@ -182,7 +185,7 @@ public class User  implements Serializable, IData {
     /**
      * @param hashtags the hashtags to set
      */
-    public void setHashtags(Set<String> hashtags) {
+    public void setHashtags(HashMap<String, Integer> hashtags) {
         this.hashtags = hashtags;
     }
 
@@ -250,25 +253,45 @@ public class User  implements Serializable, IData {
         }
     }
 
+    public void addHashtagsUsed(String hashtag) {
+        if(this.used_lang.containsKey(hashtag)) {
+            this.used_lang.put(hashtag, this.daily_frequencies.get(hashtag) + 1);
+        } else {
+            this.used_lang.put(hashtag, 1);
+        }
+    }
+    public void addHashtagsUsed(HashMap<String, Integer> hashtags_input) {
+        for (Map.Entry<String, Integer> entry : hashtags_input.entrySet()) {
+            String hashtag = entry.getKey();
+            if(this.hashtags.containsKey(hashtag)) {
+                this.hashtags.put(hashtag, this.hashtags.get(hashtag) + entry.getValue());
+            } else {
+                this.hashtags.put(hashtag, 1);
+            }
+        }
+    }
+
 
 
 
     public void addDailyFrequencyData(Date date) {
-        if(this.daily_frequencies.containsKey(date)) {
-            this.daily_frequencies.put(date, this.daily_frequencies.get(date) + 1);
+        Calendar cal = GregorianCalendar.getInstance();
+        cal.setTime(date);
+
+        if(this.daily_frequencies.containsKey(cal.get(Calendar.HOUR))) {
+            this.daily_frequencies.put(cal.get(Calendar.HOUR), this.daily_frequencies.get(cal.get(Calendar.HOUR)) + 1);
         } else {
-            this.daily_frequencies.put(date, 1);
+            this.daily_frequencies.put(cal.get(Calendar.HOUR), 1);
         }
     }
-    public void addDailyFrequencyData(HashMap<Date, Integer> frequencies) {
-        
+    public void addDailyFrequencyData(HashMap<Integer, Integer> frequencies) {
+        for (Map.Entry<Integer, Integer> entry : frequencies.entrySet()) {
+            int key = entry.getKey();
 
-        for (Map.Entry<Date, Integer> entry : frequencies.entrySet()) {
-            Date date = entry.getKey();
-            if(this.daily_frequencies.containsKey(date)) {
-                this.daily_frequencies.put(date, this.daily_frequencies.get(date) + entry.getValue());
+            if(this.daily_frequencies.containsKey(key)) {
+                this.daily_frequencies.put(key, this.daily_frequencies.get(key) + entry.getValue());
             } else {
-                this.daily_frequencies.put(date, 1);
+                this.daily_frequencies.put(key, 1);
             }
         }
     }
@@ -298,7 +321,7 @@ public class User  implements Serializable, IData {
         return this.used_lang;
     }
 
-    public HashMap<Date, Integer> _frequencies() {
+    public HashMap<Integer, Integer> _frequencies() {
         return this.daily_frequencies;
     }
 
@@ -318,7 +341,7 @@ public class User  implements Serializable, IData {
     /**
      * @return the hashtags
      */
-    public Set<String> _hashtags() {
+    public HashMap<String, Integer> _hashtags() {
 
         return hashtags;
     }
@@ -329,7 +352,7 @@ public class User  implements Serializable, IData {
         if(obj instanceof User) {
             User user_obj = (User) obj;
 
-            if(this.id.equals(user_obj.id)){
+            if(this.UUID.equals(user_obj.UUID)){
                 return true;
             }
         }
@@ -357,7 +380,7 @@ public class User  implements Serializable, IData {
 
     @Override
     public int hashCode() {
-        int hash = id.hashCode() 
+        int hash = UUID.hashCode() 
             * localisations.hashCode()
             * hashtags.hashCode() 
             * localisations.hashCode() 
