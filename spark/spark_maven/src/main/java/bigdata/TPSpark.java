@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-
 import bigdata.infrastructure.database.runners.HBaseUser;
+import bigdata.infrastructure.database.runners.HBaseTopKHashtag;
 import bigdata.requests.EntryPoint;
 import bigdata.requests.influencers.RequestInfluenceurs;
 import bigdata.data.parser.JsonUtils;
@@ -62,9 +62,9 @@ public class TPSpark {
             // r.foreach(f -> System.out.println(f));
 
 
-            //AnalysisHashtags();
+            AnalysisHashtags();
             //AnalysisUser();
-            AnalysisInfluencer();
+            //AnalysisInfluencer();
         } catch (Exception e) {
 
             e.printStackTrace();
@@ -86,14 +86,14 @@ public class TPSpark {
          * DONE
          */
         System.out.println("a) K Hashtags les plus utilisés avec nombre d'apparition sur un jour:");
-        EntryPoint.HASHTAGS_DAILY_TOPK.apply(10);
+        EntryPoint.HASHTAGS_DAILY_TOPK.apply(10000);
         System.out.println("b) K Hashtags les plus utilisés avec nombre d'apparition sur toutes les données:");
         // Question c en même temps
-        EntryPoint.HASHTAGS_BEST_ALL_FILES_TOPK.apply(10);
+        //EntryPoint.HASHTAGS_BEST_ALL_FILES_TOPK.apply(10);
         
         final Boolean allFiles = true;
         System.out.println("d) Utilisateurs ayant utilisé un Hashtag:");
-        EntryPoint.HASHTAGS_USED_BY.apply(allFiles);
+        //EntryPoint.HASHTAGS_USED_BY.apply(allFiles);
 
         /**
          * Optional
@@ -130,6 +130,6 @@ public class TPSpark {
     private static void AnalysisInfluencer() {
         System.out.println("a) Récupérer tous les triplets de hashtags ainsi que les utilisateurs qui les ont utilisés");
         // Question b et c faites en même temps;
-        RequestInfluenceurs.TripleHashtag(false, true, 10000);
+        //RequestInfluenceurs.TripleHashtag(false, true, 10000);
     }
 }

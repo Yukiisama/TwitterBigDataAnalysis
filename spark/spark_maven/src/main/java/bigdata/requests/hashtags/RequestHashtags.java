@@ -13,6 +13,8 @@ import bigdata.data.User;
 import bigdata.data.comparator.HashtagComparator;
 import bigdata.data.parser.JsonUserReader;
 import bigdata.data.parser.JsonUtils;
+import bigdata.infrastructure.database.runners.HBaseUser;
+import bigdata.infrastructure.database.runners.HBaseTopKHashtag;
 import scala.Tuple2;
 
 // import static bigdata.TPSpark.context;
@@ -37,7 +39,9 @@ public class RequestHashtags {
         List<Tuple2<String, Integer>> top = r.top(k, new HashtagComparator());
         System.out.println(top);
         long endTime = System.currentTimeMillis();
-        
+        // Ici enregister Hbase
+        //
+        top.forEach(tuple -> HBaseTopKHashtag.INSTANCE().writeTable(tuple));
         r.unpersist();
         top.clear();
         System.out.println("That took without Reflexivity : (map + reduce + topK) " + (endTime - startTime) + " milliseconds");
@@ -73,10 +77,10 @@ public class RequestHashtags {
         List<Tuple2<String, Integer>> top = unionFiles
                                             .top(k, new HashtagComparator());
         System.out.println(top);
-
-
+       
         // Ici enregister Hbase
         //
+        //top.forEach(tuple -> HBaseTopKHashtag.INSTANCE().writeTable(tuple));
         System.out.println("c) Nombre d'apparitions d'un hashtag:");
         unionFiles.take(10).forEach(f -> System.out.println(f));
 
