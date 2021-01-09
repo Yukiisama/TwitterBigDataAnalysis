@@ -24,7 +24,7 @@ import static bigdata.TPSpark.openFiles;
 public class RequestHashtags {
 
     
-
+	public static HBaseTopKHashtag hbaseTopk = HBaseTopKHashtag.INSTANCE();
     public static void mostUsedHashtags (int k) {
         if (k < 1 || k > 10000 ) {
             System.err.println("[ERROR] Invalid range in mostUsedHashtags@void, valid value is between 1 and 10000.");
@@ -41,9 +41,9 @@ public class RequestHashtags {
         long endTime = System.currentTimeMillis();
         // Ici enregister Hbase
         //
-        top.forEach(tuple -> HBaseTopKHashtag.INSTANCE().writeTable(tuple));
+        top.forEach(tuple -> hbaseTopk.writeTable(tuple));
         r.unpersist();
-        top.clear();
+        //top.clear();
         System.out.println("That took without Reflexivity : (map + reduce + topK) " + (endTime - startTime) + " milliseconds");
     }
 

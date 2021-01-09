@@ -16,9 +16,7 @@ public class HBaseTopKHashtag extends SparkToDatabase {
 	private static int pos = 0;
     private static final String tableName = "topKHashtag";
     private static final String[] familyName = new String[]{
-        "global",
-        "influence",
-        "misc"
+        "global"
     };
 
 
@@ -75,7 +73,6 @@ public class HBaseTopKHashtag extends SparkToDatabase {
         // rip
     }
     public void writeTable(Tuple2<String, Integer> data) {
- 
         Put value = new Put(Bytes.toBytes(Integer.toString(pos))); 
         value.add(
                 Bytes.toBytes("global"), // Family Name

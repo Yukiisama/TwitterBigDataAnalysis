@@ -28,7 +28,7 @@ public class TPSpark {
         // Il faudra les re-ouvrir dans les context (voir ligne 71 RequestsHashtags)
     }
 
-    public static HBaseUser database_user = HBaseUser.INSTANCE();
+    //public static HBaseUser database_user = HBaseUser.INSTANCE();
 
     static {
         conf = new SparkConf()

@@ -93,11 +93,11 @@ public abstract class SparkToDatabase extends Configured implements Tool {
         table = this.connection.getTable(TableName.valueOf(TABLE_NAME));
 
         // Init rows
-        System.out.println(COLUMN_NAME[0] + COLUMN_NAME[1]);
+        /*System.out.println(COLUMN_NAME[0] + COLUMN_NAME[1]);
         for(String key : COLUMN_NAME){
             Put put = new Put(Bytes.toBytes(key));
             table.put(put);
-        }
+        }*/
 
         return 0;
     }
@@ -122,7 +122,7 @@ public abstract class SparkToDatabase extends Configured implements Tool {
             HTableDescriptor tableDescriptor = new HTableDescriptor(TableName.valueOf(TABLE_NAME));
 
 
-            for(String familyName : this.familyNames){
+           for(String familyName : this.familyNames){
                 HColumnDescriptor famLoc = new HColumnDescriptor(familyName);
                 
                 tableDescriptor.addFamily(famLoc);
