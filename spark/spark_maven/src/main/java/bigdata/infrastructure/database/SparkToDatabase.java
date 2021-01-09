@@ -24,6 +24,7 @@ import org.apache.hadoop.hbase.mapreduce.TableInputFormat;
 
 import bigdata.TPSpark;
 import bigdata.data.User;
+import scala.Tuple2;
 
 public abstract class SparkToDatabase extends Configured implements Tool {
 
@@ -63,7 +64,7 @@ public abstract class SparkToDatabase extends Configured implements Tool {
             APIJobConfiguration = Job.getInstance(config);
             APIJobConfiguration.setOutputFormatClass(TableOutputFormat.class);
 
-            // config.set(TableInputFormat.INPUT_TABLE, Bytes.toString(TABLE_NAME));
+            //config.set(TableInputFormat.INPUT_TABLE, Bytes.toString(TABLE_NAME));
             
 
   /**
@@ -92,6 +93,7 @@ public abstract class SparkToDatabase extends Configured implements Tool {
         table = this.connection.getTable(TableName.valueOf(TABLE_NAME));
 
         // Init rows
+        System.out.println(COLUMN_NAME[0] + COLUMN_NAME[1]);
         for(String key : COLUMN_NAME){
             Put put = new Put(Bytes.toBytes(key));
             table.put(put);
@@ -126,7 +128,7 @@ public abstract class SparkToDatabase extends Configured implements Tool {
                 tableDescriptor.addFamily(famLoc);
             }
 
-            createOrOverwrite(admin, tableDescriptor);
+            //createOrOverwrite(admin, tableDescriptor);
 
 
             admin.close();
@@ -144,6 +146,6 @@ public abstract class SparkToDatabase extends Configured implements Tool {
     public abstract void readTableJava(Configuration conf, String mode);
     
     public abstract void writeTable(User user);
-    
+   
     public abstract void writeTableJava(User user);
 }

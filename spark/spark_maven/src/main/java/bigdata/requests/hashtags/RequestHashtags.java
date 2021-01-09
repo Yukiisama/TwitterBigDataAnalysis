@@ -13,6 +13,8 @@ import bigdata.data.User;
 import bigdata.data.comparator.HashtagComparator;
 import bigdata.data.parser.JsonUserReader;
 import bigdata.data.parser.JsonUtils;
+import bigdata.infrastructure.database.runners.HBaseUser;
+import bigdata.infrastructure.database.runners.HBaseTopKHashtag;
 import scala.Tuple2;
 
 // import static bigdata.TPSpark.context;
@@ -37,6 +39,11 @@ public class RequestHashtags {
         List<Tuple2<String, Integer>> top = r.top(k, new HashtagComparator());
         System.out.println(top);
         long endTime = System.currentTimeMillis();
+        // Ici enregister Hbase
+        //
+        top.forEach(tuple -> HBaseTopKHashtag.INSTANCE().writeTable(tuple));
+        r.unpersist();
+        top.clear();
         System.out.println("That took without Reflexivity : (map + reduce + topK) " + (endTime - startTime) + " milliseconds");
     }
 
@@ -50,19 +57,19 @@ public class RequestHashtags {
         openFiles();
         long startTime = System.currentTimeMillis();
         JavaPairRDD<String, Integer> unionFiles = files
-        										.get(0)
+                                                .get(0)
                                                 .flatMap(line -> JsonUtils.getHashtagFromJson(line))
                                                 .mapToPair(hash -> new Tuple2<>(hash, 1))
                                                 .reduceByKey((a, b) -> a + b);
   
         for (int i = 1; i < files.size(); i++) {
             unionFiles = unionFiles.union(
-            		files
-            		.get(i)
+                    files
+                    .get(i)
                     .flatMap(line -> JsonUtils.getHashtagFromJson(line))
                     .mapToPair(hash -> new Tuple2<>(hash, 1))
                     .reduceByKey((a, b) -> a + b)
-            		);
+                    ).unpersist();
         }
 
         unionFiles = unionFiles.reduceByKey((a, b) -> a + b);
@@ -70,70 +77,69 @@ public class RequestHashtags {
         List<Tuple2<String, Integer>> top = unionFiles
                                             .top(k, new HashtagComparator());
         System.out.println(top);
-
-
+       
         // Ici enregister Hbase
         //
+        //top.forEach(tuple -> HBaseTopKHashtag.INSTANCE().writeTable(tuple));
         System.out.println("c) Nombre d'apparitions d'un hashtag:");
         unionFiles.take(10).forEach(f -> System.out.println(f));
 
         // On finit le travail
         unionFiles.unpersist(); // pas sur que ça ait un effet mais on sait jamais
         files.clear();
-
         long endTime = System.currentTimeMillis();
         System.out.println("That took without Reflexivity : (map + reduce + topK) " + (endTime - startTime) + " milliseconds");
     }
 
 
     public static void usersList (boolean allFiles) {
-        	
-    	long startTime = System.currentTimeMillis();
-    	
-    	JavaPairRDD<String, User> users = null;
+            
+        long startTime = System.currentTimeMillis();
+        
+        JavaPairRDD<String, User> users = null;
 
         if (allFiles){
             openFiles();
             users = files						
                     .get(0)
                     .mapToPair(line -> JsonUserReader.readDataFromNLJSON(line))
-    			    .filter( val ->  val._1() != "")
-    			    .filter( val -> val._2()._hashtags().size() > 0)
-    				.reduceByKey((user1, user2 ) -> user1);
+                    .filter( val ->  val._1() != "")
+                    .filter( val -> val._2()._hashtags().size() > 0)
+                    .reduceByKey((user1, user2 ) -> user1);
   
             for (int i = 1; i < files.size(); i++) {
                 users = users.union(
-                		files
-                		.get(i)
+                        files
+                        .get(i)
                         .mapToPair(line -> JsonUserReader.readDataFromNLJSON(line))
-    		    	    .filter( val ->  val._1() != "")
-    		    	    .filter( val -> val._2()._hashtags().size() > 0)
-    		    		.reduceByKey((user1, user2 ) -> user1)
-                		);
-                users = users.reduceByKey((user1, user2 ) -> user1);
+                        .filter( val ->  val._1() != "")
+                        .filter( val -> val._2()._hashtags().size() > 0)
+                        .reduceByKey((user1, user2 ) -> user1)
+                        ).unpersist();
             }   
+            users = users.reduceByKey((user1, user2 ) -> user1);
         }
         else{
             users = file
-    			    .mapToPair(line -> JsonUserReader.readDataFromNLJSON(line))
-    			    .filter( val ->  val._1() != "")
-    			    .filter( val -> val._2()._hashtags().size() > 0)
-    				.reduceByKey((user1, user2 ) -> user1);
+                    .mapToPair(line -> JsonUserReader.readDataFromNLJSON(line))
+                    .filter( val ->  val._1() != "")
+                    .filter( val -> val._2()._hashtags().size() > 0)
+                    .reduceByKey((user1, user2 ) -> user1);
         }
-    	
-    	// Simplement enregister le set de clés (correspondants aux usernames) dans hbase 
-    	// i.e  users.keys()
-    	//System.out.println(users.collectAsMap()); // A enlever après fais exploser la mémoire
+        
+        // Simplement enregister le set de clés (correspondants aux usernames) dans hbase 
+        // i.e  users.keys()
+        //System.out.println(users.collectAsMap()); // A enlever après fais exploser la mémoire
         users.take(10).forEach(f -> System.out.println(f));
         if (allFiles) {
-        	// On finit le travail
-            users.unpersist(); // pas sur que ça ait un effet mais on sait jamais
+            // On finit le travail
             files.clear();
         }
-        	
+        users.unpersist(); // pas sur que ça ait un effet mais on sait jamais
+            
         long endTime = System.currentTimeMillis();
         System.out.println("That took without Reflexivity : (map + reduce ) " + (endTime - startTime) + " milliseconds");
-    	
+        
         
     }
     
