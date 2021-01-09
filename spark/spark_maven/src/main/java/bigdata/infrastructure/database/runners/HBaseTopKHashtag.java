@@ -11,14 +11,13 @@ import bigdata.data.User;
 import bigdata.infrastructure.database.SparkToDatabase;
 import scala.Tuple2;
 
+import static bigdata.TPSpark.logger;
 // https://github.com/IvanFernandez/hbase-spark-playground/blob/master/src/main/java/spark/examples/SparkToHBase.java
 public class HBaseTopKHashtag extends SparkToDatabase {
 	private static int pos = 0;
     private static final String tableName = "topKHashtag";
     private static final String[] familyName = new String[]{
-        "global",
-        "influence",
-        "misc"
+        "global"
     };
 
 
@@ -31,8 +30,6 @@ public class HBaseTopKHashtag extends SparkToDatabase {
     public static HBaseTopKHashtag INSTANCE() {
         if (__instance__ == null) {
             __instance__ = new HBaseTopKHashtag();
-
-
         }
 
         return __instance__;
@@ -43,20 +40,11 @@ public class HBaseTopKHashtag extends SparkToDatabase {
         SparkContext sc = new SparkContext(mode, "get HBase Data For TopKHashtag");
 
         try {
-
-            // JavaRDD<Tuple2<ImmutableBytesWritable, Result>> hBaseRDD = sc.
-            // .newAPIHadoopRDD(
-            // conf,
-            // TableInputFormat.class,
-            // org.apache.hadoop.hbase.io.ImmutableBytesWritable.class,
-            // org.apache.hadoop.hbase.client.Result.class);
-
-            // long count = hBaseRDD.count();
-            // System.out.println("Number of register in hbase table: " + count);
+            // TODO
 
         } catch (Exception e) {
 
-            System.err.println("Unable to read Table HBaseUser using mode: [" + mode + "] and with configuration: "
+            logger.fatal("Unable to read Table HBaseUser using mode: [" + mode + "] and with configuration: "
                     + conf.toString());
 
         } finally {
@@ -64,18 +52,10 @@ public class HBaseTopKHashtag extends SparkToDatabase {
         }
 
     }
+    
 
-    @Override
-    public void readTableJava(Configuration conf, String mode) {
 
-    }
-
-    @Override
-    public void writeTable(User user) {
-        // rip
-    }
     public void writeTable(Tuple2<String, Integer> data) {
- 
         Put value = new Put(Bytes.toBytes(Integer.toString(pos))); 
         value.add(
                 Bytes.toBytes("global"), // Family Name
@@ -90,18 +70,23 @@ public class HBaseTopKHashtag extends SparkToDatabase {
         
         try {
             if(value == null || data == null || table == null) {
+                logger.error("Unable to put the following value: " + value + "inside the database table.");
+
                 return;
             }
             table.put(value);
             pos++;
         } catch (IllegalArgumentException | IOException e) {
             e.printStackTrace();
+
+            logger.error("Unable to put the following value: " + value + "inside the database table.");
         }
 
 
     }
 
 
+    @Override
     public void writeTable(Put value) {
 
         try {
@@ -110,11 +95,6 @@ public class HBaseTopKHashtag extends SparkToDatabase {
             e.printStackTrace();
         }
 
-
-    }
-
-    @Override
-    public void writeTableJava(User user) {
 
     }
     

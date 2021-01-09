@@ -9,25 +9,26 @@ import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.Function2;
 
+import static bigdata.TPSpark.logger;
+
 import bigdata.data.User;
 import bigdata.data.comparator.HashtagComparator;
 import bigdata.data.parser.JsonUserReader;
 import bigdata.data.parser.JsonUtils;
-import bigdata.infrastructure.database.runners.HBaseUser;
+import bigdata.infrastructure.database.runners.HBaseTopKHashtag;
 import scala.Tuple2;
 
 // import static bigdata.TPSpark.context;
 import static bigdata.TPSpark.file;
 import static bigdata.TPSpark.files;
 import static bigdata.TPSpark.openFiles;
-import static bigdata.TPSpark.database_topk;
 public class RequestHashtags {
 
     
-
+	public static HBaseTopKHashtag hbaseTopk = HBaseTopKHashtag.INSTANCE();
     public static void mostUsedHashtags (int k) {
         if (k < 1 || k > 10000 ) {
-            System.err.println("[ERROR] Invalid range in mostUsedHashtags@void, valid value is between 1 and 10000.");
+            logger.fatal("Invalid range in mostUsedHashtags@void, valid value is between 1 and 10000.");
             
             return;
         }
@@ -37,19 +38,19 @@ public class RequestHashtags {
         JavaRDD<String> hashtags = file.flatMap(line -> JsonUtils.getHashtagFromJson(line));
         JavaPairRDD<String, Integer> r = hashtags.mapToPair(hash -> new Tuple2<>(hash, 1)).reduceByKey((a, b) -> a + b);       
         List<Tuple2<String, Integer>> top = r.top(k, new HashtagComparator());
-        System.out.println(top);
+        logger.debug(top);
         long endTime = System.currentTimeMillis();
         // Ici enregister Hbase
         //
-        top.forEach(tuple -> database_topk.writeTable(tuple));
+        top.forEach(tuple -> hbaseTopk.writeTable(tuple));
         r.unpersist();
-        top.clear();
-        System.out.println("That took without Reflexivity : (map + reduce + topK) " + (endTime - startTime) + " milliseconds");
+        //top.clear();
+        logger.info("Request Hashtag: That took without Reflexivity : (map + reduce + topK) " + (endTime - startTime) + " milliseconds");
     }
 
     public static void mostUsedHashtagsOnAllFiles(int k) {
         if (k < 1 || k > 10000 ) {
-            System.err.println("[ERROR] Invalid range in mostUsedHashtagsWithCount@void, valid value is between 1 and 10000.");
+            logger.fatal("Invalid range in mostUsedHashtagsWithCount@void, valid value is between 1 and 10000.");
             
             return;
         }
@@ -76,19 +77,19 @@ public class RequestHashtags {
 
         List<Tuple2<String, Integer>> top = unionFiles
                                             .top(k, new HashtagComparator());
-        System.out.println(top);
+        logger.debug(top);
        
         // Ici enregister Hbase
-        //
-        //top.forEach(tuple -> HBaseTopKHashtag.INSTANCE().writeTable(tuple));
-        System.out.println("c) Nombre d'apparitions d'un hashtag:");
-        unionFiles.take(10).forEach(f -> System.out.println(f));
+        top.forEach(tuple -> HBaseTopKHashtag.INSTANCE().writeTable(tuple));
+        logger.debug("c) Nombre d'apparitions d'un hashtag:");
+        // unionFiles.take(10).forEach(f -> System.out.println(f));
 
         // On finit le travail
         unionFiles.unpersist(); // pas sur que ça ait un effet mais on sait jamais
         files.clear();
         long endTime = System.currentTimeMillis();
-        System.out.println("That took without Reflexivity : (map + reduce + topK) " + (endTime - startTime) + " milliseconds");
+        
+		logger.info("Request Hashtags: That took without Reflexivity : (map + reduce + topK) " + (endTime - startTime) + " milliseconds");
     }
 
 
@@ -130,7 +131,7 @@ public class RequestHashtags {
         // Simplement enregister le set de clés (correspondants aux usernames) dans hbase 
         // i.e  users.keys()
         //System.out.println(users.collectAsMap()); // A enlever après fais exploser la mémoire
-        users.take(10).forEach(f -> System.out.println(f));
+        // users.take(10).forEach(f -> System.out.println(f));
         if (allFiles) {
             // On finit le travail
             files.clear();
@@ -138,7 +139,7 @@ public class RequestHashtags {
         users.unpersist(); // pas sur que ça ait un effet mais on sait jamais
             
         long endTime = System.currentTimeMillis();
-        System.out.println("That took without Reflexivity : (map + reduce ) " + (endTime - startTime) + " milliseconds");
+        logger.info("RequestHashtags: That took without Reflexivity : (map + reduce ) " + (endTime - startTime) + " milliseconds");
         
         
     }

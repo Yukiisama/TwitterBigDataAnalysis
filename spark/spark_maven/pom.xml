@@ -61,26 +61,47 @@
 			<systemPath>${HADOOP_HOME}/../hbase/lib/hbase-hadoop-compat-1.4.11.jar</systemPath>
 		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/log4j/log4j -->
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+			<version>2.14.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>2.14.0</version>
+		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/org.apache.hbase/hbase-mapreduce -->
+		<dependency>
+			<groupId>org.apache.hbase</groupId>
+			<artifactId>hbase-mapreduce</artifactId>
+			<version>2.4.0</version>
+		</dependency>
 
-<!-- https://mvnrepository.com/artifact/org.apache.hbase/hbase-mapreduce -->
-<dependency>
-    <groupId>org.apache.hbase</groupId>
-    <artifactId>hbase-mapreduce</artifactId>
-    <version>2.4.0</version>
-</dependency>
-
-<!-- https://mvnrepository.com/artifact/com.google.guava/guava-primitives -->
-<dependency>
-    <groupId>com.google.guava</groupId>
-    <artifactId>guava-primitives</artifactId>
-    <version>r03</version>
-</dependency>
-
+		<!-- https://mvnrepository.com/artifact/com.google.guava/guava-primitives -->
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava-primitives</artifactId>
+			<version>r03</version>
+		</dependency>
 
 
 	</dependencies>
 	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+			</resource>
+			<resource>
+				<directory>src/main/java</directory>
+				<includes>
+					<include>**/*.properties</include>
+				</includes>
+			</resource>
+		</resources>
+
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -102,6 +123,7 @@
 					<target>8</target>
 				</configuration>
 			</plugin>
+			
 		</plugins>
 	</build>
 </project>

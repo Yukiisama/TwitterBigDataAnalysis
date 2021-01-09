@@ -18,11 +18,14 @@ import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 import org.apache.hadoop.hbase.mapreduce.TableOutputFormat;
 import org.apache.hadoop.hbase.mapreduce.TableInputFormat;
 
 import bigdata.TPSpark;
+import static bigdata.TPSpark.__FRESH_HBASE__;
 import bigdata.data.User;
 import scala.Tuple2;
 
@@ -40,6 +43,8 @@ public abstract class SparkToDatabase extends Configured implements Tool {
 
     protected Table table;
 
+    protected Logger logger;
+
     public Job APIJobConfiguration;
 
     static {
@@ -54,8 +59,11 @@ public abstract class SparkToDatabase extends Configured implements Tool {
     public SparkToDatabase (String tableName, String[] family, String[] columnsName) {
         this.familyNames = family;
         try{
-            
-            
+            logger = Logger.getLogger(SparkToDatabase.class);
+            logger.setLevel(Level.ALL);
+
+            logger.debug("Creation of the SparkToDatabase Instance for Table: " + tableName + " ...");
+
             COLUMN_NAME = columnsName;
             TABLE_NAME = com.google.common.primitives.Bytes.concat(TABLE_PREFIX, Bytes.toBytes(tableName));
 
@@ -64,22 +72,14 @@ public abstract class SparkToDatabase extends Configured implements Tool {
             APIJobConfiguration = Job.getInstance(config);
             APIJobConfiguration.setOutputFormatClass(TableOutputFormat.class);
 
-            //config.set(TableInputFormat.INPUT_TABLE, Bytes.toString(TABLE_NAME));
-            
-
-  /**
-   * Get an RDD for a given Hadoop file with an arbitrary new API InputFormat
-   * and extra configuration options to pass to the input format.
-   *
-   * '''Note:''' Because Hadoop's RecordReader class re-uses the same Writable object for each
-   * record, directly caching the returned RDD will create many references to the same object.
-   * If you plan to directly cache Hadoop writable objects, you should first copy them using
-   * a `map` function.
-   */
 
             ToolRunner.run(HBaseConfiguration.create(), this, new String[0]);
+
+            logger.debug("Done.");
         } catch (Exception e) {
             e.printStackTrace();
+
+            logger.fatal("Unable to construct a database table (SparkToDatabase instance).");
         }
     }
 
@@ -93,18 +93,23 @@ public abstract class SparkToDatabase extends Configured implements Tool {
         table = this.connection.getTable(TableName.valueOf(TABLE_NAME));
 
         // Init rows
-        System.out.println(COLUMN_NAME[0] + COLUMN_NAME[1]);
-        for(String key : COLUMN_NAME){
-            Put put = new Put(Bytes.toBytes(key));
-            table.put(put);
-        }
+        // System.out.println(COLUMN_NAME[0] + COLUMN_NAME[1]);
+        // for(String key : COLUMN_NAME){
+        //     Put put = new Put(Bytes.toBytes(key));
+        //     table.put(put);
+        // }
 
         return 0;
     }
 
 
 
+    /**
+     * Creates a fresh new table.
+     */
     public void createOrOverwrite(Admin admin, HTableDescriptor table) throws Exception {
+        logger.info("Recreating a fresh table " + table.getTableName() + " ...");
+
         if (admin.tableExists(table.getTableName())) {
             if(admin.isTableEnabled(table.getTableName()))
                 admin.disableTable(table.getTableName());
@@ -114,6 +119,8 @@ public abstract class SparkToDatabase extends Configured implements Tool {
         admin.createTable(table);
         if(admin.isTableDisabled(table.getTableName()))
         admin.enableTable(table.getTableName());
+
+        logger.info("Done.");
     }
 
     public void createTable(Connection connect) throws Exception {
@@ -122,13 +129,15 @@ public abstract class SparkToDatabase extends Configured implements Tool {
             HTableDescriptor tableDescriptor = new HTableDescriptor(TableName.valueOf(TABLE_NAME));
 
 
-            for(String familyName : this.familyNames){
+           for(String familyName : this.familyNames){
                 HColumnDescriptor famLoc = new HColumnDescriptor(familyName);
                 
                 tableDescriptor.addFamily(famLoc);
             }
 
-            //createOrOverwrite(admin, tableDescriptor);
+            // if (__FRESH_HBASE__){
+            //     createOrOverwrite(admin, tableDescriptor);
+            // }
 
 
             admin.close();
@@ -142,10 +151,7 @@ public abstract class SparkToDatabase extends Configured implements Tool {
 
 
     public abstract void readTable(Configuration conf, String mode);
-
-    public abstract void readTableJava(Configuration conf, String mode);
     
-    public abstract void writeTable(User user);
+    public abstract void writeTable(Put user);
    
-    public abstract void writeTableJava(User user);
 }

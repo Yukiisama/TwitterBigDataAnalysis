@@ -42,11 +42,6 @@ public class User  implements Serializable, IData {
 
 
 
-
-
-    /**
-     *
-     */
     private static final long serialVersionUID = 4569293528740761201L;
 
     

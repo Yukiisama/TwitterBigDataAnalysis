@@ -21,7 +21,6 @@ public class HBaseUser extends SparkToDatabase {
 
 
     private static HBaseUser __instance__;
-
     public HBaseUser() {
         super(tableName, familyName, User.getColumnsName());
     }
@@ -29,8 +28,6 @@ public class HBaseUser extends SparkToDatabase {
     public static HBaseUser INSTANCE() {
         if (__instance__ == null) {
             __instance__ = new HBaseUser();
-
-
         }
 
         return __instance__;
@@ -41,21 +38,12 @@ public class HBaseUser extends SparkToDatabase {
         SparkContext sc = new SparkContext(mode, "get HBase Data For Users");
 
         try {
-
-            // JavaRDD<Tuple2<ImmutableBytesWritable, Result>> hBaseRDD = sc.
-            // .newAPIHadoopRDD(
-            // conf,
-            // TableInputFormat.class,
-            // org.apache.hadoop.hbase.io.ImmutableBytesWritable.class,
-            // org.apache.hadoop.hbase.client.Result.class);
-
-            // long count = hBaseRDD.count();
-            // System.out.println("Number of register in hbase table: " + count);
-
+            // TODO
+            
         } catch (Exception e) {
 
-            System.err.println("Unable to read Table HBaseUser using mode: [" + mode + "] and with configuration: "
-                    + conf.toString());
+            // logger.fatal("Unable to read Table HBaseUser using mode: [" + mode + "] and with configuration: "
+            //         + conf.toString());
 
         } finally {
             sc.stop();
@@ -63,12 +51,7 @@ public class HBaseUser extends SparkToDatabase {
 
     }
 
-    @Override
-    public void readTableJava(Configuration conf, String mode) {
 
-    }
-
-    @Override
     public void writeTable(User user) {
         Put value = user.getContent();
 
@@ -79,26 +62,19 @@ public class HBaseUser extends SparkToDatabase {
             table.put(value);
         } catch (IllegalArgumentException | IOException e) {
             e.printStackTrace();
+
+            // logger.error("Unable to put the following value: " + value + "inside the database table. Skipping.");
         }
-
-
     }
 
 
+    @Override
     public void writeTable(Put value) {
-
         try {
             table.put(value);
         } catch (IllegalArgumentException | IOException e) {
             e.printStackTrace();
         }
-
-
-    }
-
-    @Override
-    public void writeTableJava(User user) {
-
     }
 
 

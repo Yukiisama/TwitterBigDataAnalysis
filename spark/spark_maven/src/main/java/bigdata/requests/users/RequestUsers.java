@@ -1,17 +1,24 @@
 package bigdata.requests.users;
 
 import static bigdata.TPSpark.file;
-// import static bigdata.TPSpark.files;
-// import static bigdata.TPSpark.openFiles;
+import static bigdata.TPSpark.files;
+import static bigdata.TPSpark.logger;
+import static bigdata.TPSpark.openFiles;
+
+import java.util.Collections;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.Function2;
 
+import bigdata.TPSpark;
 import bigdata.data.User;
 import bigdata.data.parser.JsonUserReader;
 import bigdata.infrastructure.database.runners.HBaseUser;
 import scala.Tuple2;
+
+
 
 public class RequestUsers {
     
@@ -19,7 +26,7 @@ public class RequestUsers {
 	 * 
 	 * @param user_id
 	 */
-	public static void UserUniqueHashtagsList () {
+	public static void UserUniqueHashtagsList (boolean allFiles) {
 		// Time calculation
 		long startTime = System.currentTimeMillis();
 
@@ -28,30 +35,46 @@ public class RequestUsers {
 		/**
 		 * Multiple Files
 		 */
-		// openFiles();
+		JavaPairRDD<String, User> tuple_users = null;
 
-		// JavaPairRDD<String, User> tuple_users = files.get(0).mapToPair(line -> JsonUserReader.readDataFromNLJSON(line))
-		// .filter(new Function<Tuple2<String, User>, Boolean>() {
-		// 	@Override
-		// 	public Boolean call(Tuple2<String, User> val) throws Exception {
-		// 		return val._1() != "";
-		// 	}
-		// });
+		if(allFiles){
+			logger.info("Opening the whole dataset.");
 
-		/**
-		 * Single File
-		 */
-		JavaPairRDD<String, User> tuple_users = file.mapToPair(line -> JsonUserReader.readDataFromNLJSON(line))
+			logger.debug("Opening every Files...");
+			openFiles();
+			logger.debug("Done.");
+
+			logger.debug("Converting Files to RDD...");
+			tuple_users = files.get(0).mapToPair(line -> JsonUserReader.readDataFromNLJSON(line))
 			.filter(new Function<Tuple2<String, User>, Boolean>() {
 				@Override
 				public Boolean call(Tuple2<String, User> val) throws Exception {
 					return val._1() != "";
 				}
 			});
-		
+			logger.debug("Done.");
+
+		} else {
+			logger.info("Opening a sample dataset.");
+			
+			/**
+			 * Single File of 10k lines
+			 */
+			logger.debug("Converting File to RDD...");
+			tuple_users = file.mapToPair(line -> JsonUserReader.readDataFromNLJSON(line))
+			.filter(new Function<Tuple2<String, User>, Boolean>() {
+				@Override
+				public Boolean call(Tuple2<String, User> val) throws Exception {
+					return val._1() != "";
+				}
+			});
+			logger.debug("Done.");
+	
+		}
+
 
 		if(tuple_users == null) {
-			System.err.println("[ERROR] Null dataset in @void, user probably doesn't have used any hashtags.");
+			logger.fatal("Null dataset in @void, user probably doesn't have used any hashtags or invalid file(s).");
 		}
 
 
@@ -59,6 +82,7 @@ public class RequestUsers {
 		/**
 		 * Reduce and merge data
 		 */
+		logger.debug("Reducing user RDD and merging values...");
 		JavaPairRDD<String, User> users = tuple_users.reduceByKey(new Function2<User, User, User>() {
 			public User call (User a, User b) {
 				a.setNbTweets(a._nbTweets() + b._nbTweets());
@@ -74,46 +98,118 @@ public class RequestUsers {
 				return a;	
 			}
 		});
+		logger.debug("Done.");
 		tuple_users.unpersist();
 
 
-
-
-
-
-
-
-
-		/*
-		 *
-		 * Output inside HBase using RDD (opti)
-		 * 
-		 */
-		// final JavaPairRDD<ImmutableBytesWritable, Put> hbaseRDD = users.mapToPair(row -> row._2.getPuts());
-		// System.out.println("config:" + HBaseUser.INSTANCE().config);
-		// // List<Tuple2<ImmutableBytesWritable, Put>> data = hbaseRDD.take(10); // j'en prends que 10 pour pas exploser la mémoire mais
-		// hbaseRDD.saveAsNewAPIHadoopDataset(HBaseUser.INSTANCE().config);
-		// // hbaseRDD.unpersist();
-
-
-		/**
-		 * Output inside HBase using RDD (intermediate opti)
-		 */
-		users.foreach(tuple -> HBaseUser.INSTANCE().writeTable(tuple._2));
-
-
-		/*
-		 *
-		 * Output inside HBase Using Data Structure (Not opti)
-		 * 
-		 */
-		// List<Tuple2<String, User>> data = users.collect(); //explose la mémoire sur json entier
-		// for(Tuple2<String, User> tuple : data) {
-		// }
+		if(!RDDToServingLayer(users)){
+			logger.fatal("Unable to save the Spark RDD for Users to the Serving Layer.");
+		}
 		
 		long endTime = System.currentTimeMillis();
-		System.out.println("That took without Reflexivity : (map + reduce + HBase) " + (endTime - startTime) + " milliseconds");
+
+		logger.info("Request Users: That took without Reflexivity : (map + reduce + HBase) " + (endTime - startTime) + " milliseconds");
+
+		if (allFiles) {
+            files.clear();
+		}
+		
 	}
+
+
+	private static void printProgress(long startTime, long total, long current) {
+		StringBuilder string = new StringBuilder(140);   
+		int percent = (int) (current * 100 / total);
+		string
+			.append('\r')
+			.append(String.join("", Collections.nCopies(percent == 0 ? 2 : 2 - (int) (Math.log10(percent)), " ")))
+			.append(String.format(" %d%% [", percent))
+			.append(String.join("", Collections.nCopies(percent, "=")))
+			.append('>')
+			.append(String.join("", Collections.nCopies(100 - percent, " ")))
+			.append(']')
+			.append(String.join("", Collections.nCopies((int) (Math.log10(total)) - (int) (Math.log10(current)), " ")))
+			.append(String.format(" %d/%d", current, total));
+	
+		System.out.print(string);
+	}
+
+
+	private static long current_progression = 0;
+	private static long size_rdd = 1;
+	private static boolean RDDToServingLayer(JavaPairRDD<String, User> rdd) {
+		logger.info("Sending RDD's data to the Serving Layer...");
+
+
+		logger.debug("Counting the number of RDD's element to send...");
+		
+		if(TPSpark.__PROGRESS_BAR__)
+			size_rdd = rdd.count();
+		// logger.debug("There is: " + size_rdd + " entries to insert.");
+
+		try {
+			/**
+			 * Output inside HBase using RDD (intermediate opti)
+			 */	
+			// if(value > 50000){
+			// 	logger.debug("The number of entries is too much important. Progress Bar will not be visible.");
+			// 	rdd.foreach(tuple -> {
+			// 		HBaseUser.INSTANCE().writeTable(tuple._2);
+			// 	});
+			// } else {
+				// rdd.foreach(tuple -> {
+				// 	HBaseUser.INSTANCE().writeTable(tuple._2);
+				// 	current_progression = current_progression + 1;
+					
+				// 	printProgress(0, value, current_progression);
+				// });
+			// }
+
+
+
+			if(TPSpark.__PROGRESS_BAR__){
+				rdd.foreach(tuple -> {
+					HBaseUser.INSTANCE().writeTable(tuple._2);
+					current_progression = current_progression + 1;
+					
+					printProgress(0, size_rdd, current_progression);
+				});
+				System.out.println("");
+			} else {
+
+				rdd.foreach(tuple -> {
+					HBaseUser.INSTANCE().writeTable(tuple._2);
+				});
+			}
+
+			logger.info("Done.");
+
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error("Failure.");
+			return false;
+		} finally {
+			rdd.unpersist();
+		}
+	}
+
+	/*
+		*
+		* Output inside HBase Using Data Structure (Not opti) and might even crash on large data
+		* 
+		*/
+	private static boolean RDDToStdout(JavaPairRDD<String, User> rdd) {
+		try {
+			// rdd.forEach(tuple -> System.out.println(tuple._2));
+
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
+
 
 
 
