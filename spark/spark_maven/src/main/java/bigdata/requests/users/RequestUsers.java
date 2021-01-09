@@ -1,8 +1,8 @@
 package bigdata.requests.users;
 
-// import static bigdata.TPSpark.file;
-import static bigdata.TPSpark.files;
-import static bigdata.TPSpark.openFiles;
+import static bigdata.TPSpark.file;
+// import static bigdata.TPSpark.files;
+// import static bigdata.TPSpark.openFiles;
 
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.function.Function;
@@ -28,26 +28,26 @@ public class RequestUsers {
 		/**
 		 * Multiple Files
 		 */
-		openFiles();
+		// openFiles();
 
-		JavaPairRDD<String, User> tuple_users = files.get(0).mapToPair(line -> JsonUserReader.readDataFromNLJSON(line))
-		.filter(new Function<Tuple2<String, User>, Boolean>() {
-			@Override
-			public Boolean call(Tuple2<String, User> val) throws Exception {
-				return val._1() != "";
-			}
-		});
+		// JavaPairRDD<String, User> tuple_users = files.get(0).mapToPair(line -> JsonUserReader.readDataFromNLJSON(line))
+		// .filter(new Function<Tuple2<String, User>, Boolean>() {
+		// 	@Override
+		// 	public Boolean call(Tuple2<String, User> val) throws Exception {
+		// 		return val._1() != "";
+		// 	}
+		// });
 
 		/**
 		 * Single File
 		 */
-		// JavaPairRDD<String, User> tuple_users = file.mapToPair(line -> JsonUserReader.readDataFromNLJSON(line))
-		// 	.filter(new Function<Tuple2<String, User>, Boolean>() {
-		// 		@Override
-		// 		public Boolean call(Tuple2<String, User> val) throws Exception {
-		// 			return val._1() != "";
-		// 		}
-		// 	});
+		JavaPairRDD<String, User> tuple_users = file.mapToPair(line -> JsonUserReader.readDataFromNLJSON(line))
+			.filter(new Function<Tuple2<String, User>, Boolean>() {
+				@Override
+				public Boolean call(Tuple2<String, User> val) throws Exception {
+					return val._1() != "";
+				}
+			});
 		
 
 		if(tuple_users == null) {

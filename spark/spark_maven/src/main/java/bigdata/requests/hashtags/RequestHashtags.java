@@ -14,13 +14,13 @@ import bigdata.data.comparator.HashtagComparator;
 import bigdata.data.parser.JsonUserReader;
 import bigdata.data.parser.JsonUtils;
 import bigdata.infrastructure.database.runners.HBaseUser;
-import bigdata.infrastructure.database.runners.HBaseTopKHashtag;
 import scala.Tuple2;
 
 // import static bigdata.TPSpark.context;
 import static bigdata.TPSpark.file;
 import static bigdata.TPSpark.files;
 import static bigdata.TPSpark.openFiles;
+import static bigdata.TPSpark.database_topk;
 public class RequestHashtags {
 
     
@@ -41,7 +41,7 @@ public class RequestHashtags {
         long endTime = System.currentTimeMillis();
         // Ici enregister Hbase
         //
-        top.forEach(tuple -> HBaseTopKHashtag.INSTANCE().writeTable(tuple));
+        top.forEach(tuple -> database_topk.writeTable(tuple));
         r.unpersist();
         top.clear();
         System.out.println("That took without Reflexivity : (map + reduce + topK) " + (endTime - startTime) + " milliseconds");
