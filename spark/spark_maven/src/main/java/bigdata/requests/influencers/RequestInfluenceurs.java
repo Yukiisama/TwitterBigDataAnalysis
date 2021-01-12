@@ -124,7 +124,7 @@ public class RequestInfluenceurs {
     private static JavaPairRDD<Tuple3<String,String,String>, Set<User>> mapReduceTripleByUser(JavaPairRDD<String, User> r) {
         return r.mapToPair( val -> {
             String[] s = new String[3];
-            val._2._hashtags().toArray(s);
+            val._2._hashtags().keySet().toArray(s);
             Set<User> set = new HashSet<>();
             set.add(val._2);
             return new Tuple2<Tuple3<String,String,String>, Set<User>>(new Tuple3<>(s[0], s[1], s[2]), set);
@@ -138,7 +138,7 @@ public class RequestInfluenceurs {
     private static JavaPairRDD<Tuple3<String, String, String>, Integer> mapReduceTripleTopK(JavaPairRDD<String, User> r) {
         return r.mapToPair( val -> {
             String[] s = new String[3];
-            val._2._hashtags().toArray(s);
+            val._2._hashtags().keySet().toArray(s);
             return new Tuple2<Tuple3<String,String,String>, Integer>(new Tuple3<>(s[0], s[1], s[2]), 1);
         })
         .reduceByKey((a, b) -> a + b);

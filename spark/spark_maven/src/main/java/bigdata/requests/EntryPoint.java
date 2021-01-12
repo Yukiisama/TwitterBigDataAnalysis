@@ -61,7 +61,16 @@ public enum EntryPoint {
     USERS_UNIQUE_HASHTAGS_LIST {        
         @Override
         public void apply (Object ... args) {
-            RequestUsers.UserUniqueHashtagsList();
+        	if(args.length == 1) {
+                if(!(args[0] instanceof Boolean)) {
+                    throw new IllegalArgumentException("Invalid arguments for EntryPoint@HHASHTAGS_APPARITIONS_COUNT. Required argument(s) are: (Boolean).");
+                }
+            } else {
+                throw new IllegalArgumentException("Invalid number of arguments for EntryPoint@HASHTAGS_APPARITIONS_COUNT. Required argument(s) are: (Boolean).");
+            }
+
+            Boolean allFiles = (Boolean) args[0];
+            RequestUsers.UserUniqueHashtagsList(allFiles);
         }
     };
 

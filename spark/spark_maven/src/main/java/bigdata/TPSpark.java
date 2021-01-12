@@ -3,14 +3,17 @@ package bigdata;
 
 import java.util.ArrayList;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 
+import bigdata.data.parser.JsonUtils;
 import bigdata.infrastructure.database.runners.HBaseUser;
 import bigdata.requests.EntryPoint;
-import bigdata.requests.influencers.RequestInfluenceurs;
-import bigdata.data.parser.JsonUtils;
+import bigdata.requests.arguments.ArgumentsManager;
 
 public class TPSpark {
 
@@ -21,41 +24,79 @@ public class TPSpark {
 
     public static JavaSparkContext context = null;
 
+	public static boolean __HASHTAGS__ = false;
+	public static boolean __USERS__ = false;
+	public static boolean __INFLUENCERS__ = false;
+	public static boolean __FRESH_HBASE__ = false;
+    public static boolean __HELP__ = false;
+
+    public static final boolean __PROGRESS_BAR__ = false; // Disable if large dataset and want performances. Does not work with yarn.
+    
+
+    public static Logger logger = Logger.getLogger(TPSpark.class);
+
     public static  void openFiles(){
         for (int i = 1; i < JsonUtils.data.length; i++) 
             files.add(context.textFile(JsonUtils.data[i]));
+
         // ATTENTION je clear files à la fin de la fonction EntryPoint.HASHTAGS_BEST_ALL_FILES_TOPK.apply(10);
         // Il faudra les re-ouvrir dans les context (voir ligne 71 RequestsHashtags)
     }
 
-    public static HBaseUser database_user = HBaseUser.INSTANCE();
-
     static {
+
+
+        logger.info("Creating Spark Context...");
         conf = new SparkConf()
                 .setAppName("TP Spark")
                 .set("spark.executor.instances", "20")
                 .set("spark.executor.cores", "4")
                 .set("spark.shuffle.memoryFraction", "0.8")
-        		.set("spark.files.maxPartitionBytes", "64m");
+                .set("spark.ui.showConsoleProgress ", "true")
+                .set("spark.executor.extraJavaOptions", "-Dlog4j.debug=true");
+
 
         context = new JavaSparkContext(conf);
         context.defaultParallelism();
         context.setLogLevel("ERROR");
 
+        
 
-        //file = context.textFile("/raw_data/tweet_01_03_2020_first10000.nljson");
-        file = context.textFile("/raw_data/tweet_01_03_2020.nljson");
+        // context.getLogger().removeAppender("log4j.logger.org.spark_project.jetty.util.component.AbstractLifeCycle");
+        // context.getLogger().removeAppender("log4j.logger.org.apache.spark.repl.SparkIMain$exprTyper");
+        // context.getLogger().removeAppender("log4j.logger.org.apache.spark.repl.SparkILoop$SparkILoopInterpreter");
+        logger.setLevel(Level.ALL);
+        
+
+
+        file = context.textFile("/raw_data/tweet_01_03_2020_first10000.nljson");
+        // file = context.textFile("/raw_data/tweet_01_03_2020.nljson");
         // System.out.println("There is " + context.sc().statusTracker().getExecutorInfos().length + " Workers.");
         // // file = context.textFile(JsonUtils.data[1]);
         // file = context.textFile("/raw_data/tweet_05_03_2020.nljson");
 
+        logger.info("Done.");
+
+
+        logger.info("Creating HBase Table Manager...");
+        logger.debug(" - HBaseUser...");
+        HBaseUser.INSTANCE();
+        logger.info("Done.");
     }
     public static void main (String[] args) {
 
+        String tmp = "";
+        for(int i = 0; i < args.length; i++) {
+            tmp.concat(args[i]);
+        }
+        logger.debug("Parsing Program Input Arguments: [" + tmp + "]");
+        ArgumentsManager.updateProgramArgument(args);
+        logger.debug("Done.");
+
+
         try {
-            
-            System.out.println("Number of partitions : " + file.getNumPartitions());
-            System.out.println("Lines Count" + file.count());
+            // System.out.println("Number of partitions : " + file.getNumPartitions());
+            // System.out.println("Lines Count" + file.count());
             
             // Print val
             // file.foreach(f -> System.out.println(f));
@@ -63,17 +104,24 @@ public class TPSpark {
             // r.foreach(f -> System.out.println(f));
 
 
-            //AnalysisHashtags();
-            //AnalysisUser();
-            AnalysisInfluencer();
+
+
+            // AnalysisHashtags();
+            AnalysisUser(false);
+            //AnalysisInfluencer();
         } catch (Exception e) {
 
             e.printStackTrace();
 
         } finally {
 
+            logger.info("End of the program, closing spark context...");
             // Always close the Spark Context.
             context.close();
+            logger.info("Done.");
+
+            LogManager.shutdown();
+
         }
     }
 
@@ -82,19 +130,19 @@ public class TPSpark {
      * Run Hashtag Analysis
      */
     private static void AnalysisHashtags() {
-        System.out.println("--- Hashtags ---");
+        logger.info("Hashtags...");
         /**
          * DONE
          */
-        System.out.println("a) K Hashtags les plus utilisés avec nombre d'apparition sur un jour:");
-        EntryPoint.HASHTAGS_DAILY_TOPK.apply(10);
-        System.out.println("b) K Hashtags les plus utilisés avec nombre d'apparition sur toutes les données:");
+        logger.info("a) K Hashtags les plus utilisés avec nombre d'apparition sur un jour:");
+        EntryPoint.HASHTAGS_DAILY_TOPK.apply(10000);
+        logger.info("b) K Hashtags les plus utilisés avec nombre d'apparition sur toutes les données:");
         // Question c en même temps
-        EntryPoint.HASHTAGS_BEST_ALL_FILES_TOPK.apply(10);
+        //EntryPoint.HASHTAGS_BEST_ALL_FILES_TOPK.apply(10);
         
         final Boolean allFiles = true;
-        System.out.println("d) Utilisateurs ayant utilisé un Hashtag:");
-        EntryPoint.HASHTAGS_USED_BY.apply(allFiles);
+        logger.info("d) Utilisateurs ayant utilisé un Hashtag:");
+        //EntryPoint.HASHTAGS_USED_BY.apply(allFiles);
 
         /**
          * Optional
@@ -105,14 +153,14 @@ public class TPSpark {
     /**
      * Run Users Analysis
      */
-    private static void AnalysisUser() {
+    private static void AnalysisUser(boolean allFiles) {
 
-        System.out.println("--- Utilisateurs ---");
+        logger.info("Utilisateurs...");
         /**
          * DONE
          */
         // System.out.println("a) Liste des Hashtags sans doublons:");
-        EntryPoint.USERS_UNIQUE_HASHTAGS_LIST.apply();
+        EntryPoint.USERS_UNIQUE_HASHTAGS_LIST.apply(allFiles);
 
         // /**
         //  * TODO
@@ -129,8 +177,9 @@ public class TPSpark {
     }
     
     private static void AnalysisInfluencer() {
-        System.out.println("a) Récupérer tous les triplets de hashtags ainsi que les utilisateurs qui les ont utilisés");
+        logger.info("Influenceurs...");
+        logger.info("a) Récupérer tous les triplets de hashtags ainsi que les utilisateurs qui les ont utilisés");
         // Question b et c faites en même temps;
-        RequestInfluenceurs.TripleHashtag(true, true, 10000);
+        //RequestInfluenceurs.TripleHashtag(false, true, 10000);
     }
 }
