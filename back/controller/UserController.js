@@ -9,19 +9,15 @@ class UserController {
         this.service = service;
         this._callback = this.user.bind(this);
     }
-
-
-
-
-
+    
     async user(req, res) {
-        // console.log("ID: " + req.body.search);
+        //console.log("ID: " + req.body.search);
 
 
         const response = await this.service.user(req.body.search)
         var data = this.parseInputResponse(response);
 
-        console.log("Data: " + JSON.stringify(data));
+        //console.log("Data: " + JSON.stringify(data));
 
         try{
             let name = data[0].$;
@@ -41,25 +37,28 @@ class UserController {
             // console.log(JSON.stringify(langs));
 
 
-            return res.render("pages/users", {
+            return res.status(200).send({
                 name: name,
                 favs : received_favs,
                 rts: received_rts,
                 tweets: tweets_posted,
-                frequencies: JSON.stringify(daily_frequencies),
-                hashtags: JSON.stringify(hashtags),
-                langs: JSON.stringify(langs),
+                frequencies: this.parseAndReplace(daily_frequencies),
+                hashtags: this.parseAndReplace(hashtags),
+                langs: this.parseAndReplace(langs),
                 localisations: history_localisation,
                 sources: history_sources
             });
+            
         } catch(error) {
             console.log(error);
-            console.log("Actualisez la page.");
+            return res.status(400).send({code: 400, error: "request again please"});
         }
 
     }
 
-
+    parseAndReplace(data){
+        return JSON.parse(JSON.stringify(data).replace(/&#34;/g,'"'));
+    }
 
     parseInputResponse(response) {
         const regex_replace_$ = /('\$')/gi;
@@ -67,7 +66,6 @@ class UserController {
         let raw = JSON.stringify(response.data);
         raw = raw.replace("'$'", '"value"');
         raw = raw.replace("'", '"');
-
         return JSON.parse(raw);
     }
     // Remove trailing [ and ]

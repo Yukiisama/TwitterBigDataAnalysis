@@ -56,8 +56,6 @@ class Service {
         try {
             table.row(uuid).get((error, value) => {
                 this.data_user = value;
-    
-                
                 _callback();
                 return value;
             });
@@ -69,21 +67,21 @@ class Service {
     async user(params){
         let data;
         let start = Date.now()
-
-        // console.log("Params: " + JSON.stringify(params));
+        console.log(params);
         try {
             // data =  this.getUserDataFromHBase(params, function () {
-                data =  this.getUserDataFromHBase("/r/reddevils", function () {
+                data =  await this.getUserDataFromHBase(params, function () {
                     let end = Date.now()
                 console.log(`User HBase Parsing Time: ${end - start} ms`);
+
             });
+            return {code: 200, data: this.data_user, error: false};
         } catch (error) {
             return {code: 400, error: error};
         }
 
 
 
-        return {code: 200, data: this.data_user, error: false};
     }
 
 

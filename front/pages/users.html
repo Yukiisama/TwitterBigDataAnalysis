@@ -10,22 +10,22 @@
         <title>Twitter Analytica</title>
 
         <!-- Bootstrap Core CSS -->
-        <link href="/css/bootstrap.min.css" rel="stylesheet">
+        <link href="../css/bootstrap.min.css" rel="stylesheet">
 
         <!-- MetisMenu CSS -->
-        <link href="/css/metisMenu.min.css" rel="stylesheet">
+        <link href="../css/metisMenu.min.css" rel="stylesheet">
 
         <!-- Timeline CSS -->
-        <link href="/css/timeline.css" rel="stylesheet">
+        <link href="../css/timeline.css" rel="stylesheet">
 
         <!-- Custom CSS -->
-        <link href="/css/startmin.css" rel="stylesheet">
+        <link href="../css/startmin.css" rel="stylesheet">
 
         <!-- Morris Charts CSS -->
-        <link href="/css/morris.css" rel="stylesheet">
+        <link href="../css/morris.css" rel="stylesheet">
 
         <!-- Custom Fonts -->
-        <link href="/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+        <link href="../css/font-awesome.min.css" rel="stylesheet" type="text/css">
 
         <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
         <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -108,21 +108,21 @@
 
                 <div class="navbar-default sidebar" role="navigation">
                     <div class="input-group custom-search-form">
-                        <form action="/user/" method="POST">
+                        <!-- <form action="/user/" method="GET">-->
                             <input 
                                 type="text" 
                                 id="search" 
                                 name="search"
-                                value="999900473216794624" 
+                                value="/r/reddevils" 
                                 class="form-control" 
                                 placeholder="Search (using Twitter ID)...">
+                    </div>
                             <span class="input-group-btn center">
-                                <button class="btn btn-primary" type="submit" href="/user/">
+                                <button class="btn btn-primary" type="submit" id= "searchUser">
                                     <i class="fa fa-search"></i> Rechercher
                                 </button>
                             </span>
-                        </form>
-                    </div>
+                       <!--  </form> -->
                 </div>
 
                 <!-- <div class="navbar-default sidebar" role="navigation">
@@ -157,8 +157,8 @@
                         <!-- /.col-lg-12 -->
                     </div>
 
-                    <h1>
-                        Utilisateur: <%- name %>
+                    <h1 id = "username">
+                       <!--  Utilisateur: <%- name %> -->
                     </h1>
                     <!-- /.row -->
                     <div class="row">
@@ -174,7 +174,7 @@
                                             <i class="fa fa-comments fa-5x"></i>
                                         </div>
                                         <div class="col-xs-9 text-right">
-                                            <div class="huge"><%- tweets %></div>
+                                            <div class="huge" id="tweethuge"><!-- <%- tweets %> --></div>
                                             <div>Nombre de Tweets</div>
                                         </div>
                                     </div>
@@ -197,7 +197,7 @@
                                             <i class="fa fa-retweet fa-5x"></i>
                                         </div>
                                         <div class="col-xs-9 text-right">
-                                            <div class="huge"> <%- rts %> </div>
+                                            <div class="huge" id= "rtshuge"> <!-- <%- rts %> --> </div>
                                             <div>Nombre de Retweets reçus</div>
                                         </div>
                                     </div>
@@ -220,7 +220,7 @@
                                             <i class="fa fa-heart fa-5x"></i>
                                         </div>
                                         <div class="col-xs-9 text-right">
-                                            <div class="huge"> <%- favs %> </div>
+                                            <div class="huge" id = "favhuge"> <!-- <%- favs %> --> </div>
                                             <div>Nombre de favoris reçus</div>
                                         </div>
                                     </div>
@@ -244,19 +244,19 @@
                                         </div>
 
 
-                                        <%  var hashtag = JSON.parse(hashtags.replace(/&#34;/g,'"') )   %>
+                                        <!-- <%  var hashtag = JSON.parse(hashtags.replace(/&#34;/g,'"') )   %>
                                         <%  var hashtagsSum = 0;                            %>
                                         <%  for (var i = 0; i < hashtag.length; i++) {      %>
                                         <%     hashtagsSum += parseInt(hashtag[i].value);   %>
-                                        <%  }                                               %>
+                                        <%  }                                               %> -->
 
-                                        <script>
+                                        <!-- <script>
                                             console.log("Hashtags: " + "<%= JSON.stringify(hashtag) %>");
-                                        </script>
+                                        </script> -->
 
                                         <div class="col-xs-9 text-right">
-                                            <div class="huge"><%- hashtagsSum %></div>
-                                            <div><%- hashtag.length %> Uniques</div>
+                                            <div class="huge" id="hashhuge"><!-- <%- hashtagsSum %> --></div>
+                                            <div id="hashlength"><!-- <%- hashtag.length %>  Uniques --></div>
                                         </div>
 
                                     </div>
@@ -571,16 +571,17 @@
                                 </div>
                                 <!-- /.panel-heading -->
                                 <div class="panel-body">
-                                    <div class="list-group">
+                                    <div class="list-group" id= "panelhash"> 
+                                        <!-- <script>
+                                        for (var i = 0; i < hashtags.length && i < 10; i++) {
+                                            // <a href="#" class="list-group-item">
+                                            //     <i class="fa fa-hashtag fa-fw"></i><%= hashtag[i].label %>
 
-                                        <% for (var i = 0; i < hashtag.length && i < 10; i++) { %>
-                                            <a href="#" class="list-group-item">
-                                                <i class="fa fa-hashtag fa-fw"></i><%= hashtag[i].label %>
-
-                                                <span class="pull-right text-muted small"><em><%= hashtag[i].value %> Utilisations</em>
-                                                </span>
-                                            </a>
-                                        <% } %>
+                                            //     <span class="pull-right text-muted small"><em><%= hashtag[i].value %> Utilisations</em>
+                                            //     </span>
+                                            // </a>
+                                        }
+                                        </script> -->
 
 
                                     </div>
@@ -749,31 +750,97 @@
         <!-- /#wrapper -->
 
         <!-- jQuery -->
-        <script src="/js/jquery.min.js"></script>
+        <script src="../js/jquery.min.js"></script>
 
         <!-- Bootstrap Core JavaScript -->
-        <script src="/js/bootstrap.min.js"></script>
+        <script src="../js/bootstrap.min.js"></script>
 
         <!-- Metis Menu Plugin JavaScript -->
-        <script src="/js/metisMenu.min.js"></script>
+        <script src="../js/metisMenu.min.js"></script>
 
         <!-- Morris Charts JavaScript -->
-        <script src="/js/raphael.min.js"></script>
-        <script src="/js/morris.min.js"></script>
-        <script src="/js/morris-data.js"></script>
+        <script src="../js/raphael.min.js"></script>
+        <script src="../js/morris.min.js"></script>
+        <script src="../js/morris-data.js"></script>
 
         <!-- Custom Theme JavaScript -->
-        <script src="/js/startmin.js"></script>
+        <script src="../js/startmin.js"></script>
 
 
+        <script>
 
+            function fix(){
+                $.post("http://localhost:25559/user/", body, function(data) {
+                    user = data;
+                    return data;
+                });
+            }
+            var name = document.getElementById("search").value;
+                // clear les childrens de panel après reload
+                document.getElementById("panelhash").innerHTML = '';
+
+                var user;
+                $.ajaxSetup({
+                    async: false
+                    });
+                console.log(document.getElementById("search").value);
+                const body = { search: name };
+                fix();
+                fix();
+
+                
+                console.log(user);
+                var hashtags = user.hashtags;
+                console.log(hashtags.length)
+                for (var i = 0; i < hashtags.length && i < 10; i++) { 
+                    var a = document.createElement('a');
+                    a.href = "#"
+                    a.className = "list-group-item"
+                    var link =  document.createElement('i');
+                    link.className = "fa fa-hashtag fa-fw";
+                    link.innerHTML = hashtags[i].label 
+                    a.appendChild(link);
+                    link =  document.createElement('span');
+                    link.className = "pull-right text-muted small";
+                    link.innerHTML = hashtags[i].value + " Utilisations"
+                    a.appendChild(link);
+                    document.getElementById("panelhash").appendChild(a);
+                    // <a href="#" class="list-group-item">
+                    //     <i class="fa fa-hashtag fa-fw"></i><%= hashtag[i].label %>
+
+                    //     <span class="pull-right text-muted small"><em><%= hashtag[i].value %> Utilisations</em>
+                    //     </span>
+                    // </a>
+                }
+                var hashtagsSum = 0;                            
+                for (var i = 0; i < hashtags.length; i++) {     
+                hashtagsSum += parseInt(hashtags[i].value); 
+                }
+                document.getElementById("hashhuge").innerHTML = hashtagsSum;
+                document.getElementById("hashlength").innerHTML = hashtags.length + " Utilisations";
+
+                document.getElementById("favhuge").innerHTML = user.favs;
+                document.getElementById("username").innerHTML = "Utilisateur: " + user.name;
+                document.getElementById("favhuge").innerHTML = user.favs;
+                document.getElementById("rtshuge").innerHTML = user.rts;
+                document.getElementById("tweethuge").innerHTML = user.tweets;
+
+            document.getElementById("searchUser").onclick = function(){
+                const id = document.getElementById("search").value;
+                console.log(id);
+                const body = { search: id };
+                location.reload();
+            }
+            
+
+            
+        </script>
         <!-- CHARTS -->
         <!-- Lang donut -->
         <script> 
-            var value = "<%= langs %>".replace(/&#34;/g,'"');
             
-            var data = JSON.parse(value);
-            console.log("Value ejs:", data);
+            var data = user.langs;
+            console.log("Value :", data);
 
 
             Morris.Donut({
@@ -786,11 +853,8 @@
 
         <!-- Frequency Hours -->
         <script>
-
-            var value = "<%= frequencies %>".replace(/&#34;/g,'"');
-            
-            var data = JSON.parse(value);
-            console.log("Value ejs frequencies:", data);
+            var data = user.frequencies;
+            console.log("Value frequencies:", data);
 
             Morris.Bar({
                 element: 'morris-chart-tweet-freqency',
