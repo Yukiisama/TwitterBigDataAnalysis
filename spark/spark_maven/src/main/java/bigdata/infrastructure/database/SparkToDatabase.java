@@ -134,6 +134,7 @@ public abstract class SparkToDatabase extends Configured implements Tool {
                 
                 tableDescriptor.addFamily(famLoc);
             }
+            createOrOverwrite(admin, tableDescriptor);
 
             // if (__FRESH_HBASE__){
             //     createOrOverwrite(admin, tableDescriptor);

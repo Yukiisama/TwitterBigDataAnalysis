@@ -20,13 +20,28 @@ class Service {
             const table = hbase.table('ape-jma_topKHashtag');
             table.row('*').get((error, value) => {
                 let val = value;
+                
                 if (value.length > params.size){
-                    val = {}
-                    for (let i = 0; i < params.size * 2; i+=2)
-                        val[i / 2] = {
+                    val = [];
+                    let count = [];
+                    let hashtag = [];  
+                    for (let i = 0; i < value.length; i++){  
+                        /* val[i / 2] = {
                             count: (value[i].$),
                             hashtag: (value[i+1].$)
+                        } */
+
+                        if (value[i].column == "global:count") count[value[i].key] =  (value[i].$)
+                        else hashtag[value[i].key] =  (value[i].$)
+                    } 
+                    console.log(params.size);
+                    for (let i = 0; i < params.size; i++){  
+                        val[i] = {
+                            count: (count[i]),
+                            hashtag: (hashtag[i])
                         }
+                    } 
+
                 }
                 return res.status(200).send(val);
             });

@@ -69,7 +69,7 @@ public class TPSpark {
         
 
 
-        file = context.textFile("/raw_data/tweet_01_03_2020_first10000.nljson");
+        file = context.textFile("/raw_data/tweet_01_03_2020.nljson");
         // file = context.textFile("/raw_data/tweet_01_03_2020.nljson");
         // System.out.println("There is " + context.sc().statusTracker().getExecutorInfos().length + " Workers.");
         // // file = context.textFile(JsonUtils.data[1]);
@@ -80,7 +80,7 @@ public class TPSpark {
 
         logger.info("Creating HBase Table Manager...");
         logger.debug(" - HBaseUser...");
-        HBaseUser.INSTANCE();
+        //HBaseUser.INSTANCE();
         logger.info("Done.");
     }
     public static void main (String[] args) {
@@ -106,8 +106,8 @@ public class TPSpark {
 
 
 
-            // AnalysisHashtags();
-            AnalysisUser(false);
+            AnalysisHashtags();
+            //AnalysisUser(false);
             //AnalysisInfluencer();
         } catch (Exception e) {
 
