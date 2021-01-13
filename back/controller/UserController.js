@@ -11,49 +11,7 @@ class UserController {
     }
     
     async user(req, res) {
-        //console.log("ID: " + req.body.search);
-
-
-        const response = await this.service.user(req.body.search)
-        var data = this.parseInputResponse(response);
-
-        //console.log("Data: " + JSON.stringify(data));
-
-        try{
-            let name = data[0].$;
-            let received_favs = data[1].$;
-            let received_rts = data[2].$;
-            let tweets_posted = data[3].$;
-            let daily_frequencies = this.getDateStatistics(data[4].$);
-            let hashtags = this.getHashtags(data[5].$);
-            console.log("Raw Values: " + data[6].$);
-
-            let history_localisation = data[7].$;
-            let history_sources = data[8].$;
-            let langs = this.getLangs(data[6].$);
-                
-
-            // console.log("Dates: " + JSON.stringify(daily_frequencies));
-            // console.log(JSON.stringify(langs));
-
-
-            return res.status(200).send({
-                name: name,
-                favs : received_favs,
-                rts: received_rts,
-                tweets: tweets_posted,
-                frequencies: this.parseAndReplace(daily_frequencies),
-                hashtags: this.parseAndReplace(hashtags),
-                langs: this.parseAndReplace(langs),
-                localisations: history_localisation,
-                sources: history_sources
-            });
-            
-        } catch(error) {
-            console.log(error);
-            return res.status(400).send({code: 400, error: "request again please"});
-        }
-
+        return await this.service.user(req.body.search, this, res);
     }
 
     parseAndReplace(data){
@@ -63,7 +21,7 @@ class UserController {
     parseInputResponse(response) {
         const regex_replace_$ = /('\$')/gi;
 
-        let raw = JSON.stringify(response.data);
+        let raw = JSON.stringify(response);
         raw = raw.replace("'$'", '"value"');
         raw = raw.replace("'", '"');
         return JSON.parse(raw);

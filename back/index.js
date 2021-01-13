@@ -35,7 +35,7 @@ app.use(express.json());
 
 //app.get("/", (req, res) => res.render("index"));
 app.get("/example", Controller.example);
-app.get("/hashtag", HashtagController.example);
+app.get("/hashtagTopK", HashtagController.hashtagTopK);
 
 app.post("/user/", UserController._callback);
 

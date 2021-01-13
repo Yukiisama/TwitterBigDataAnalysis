@@ -5,12 +5,11 @@ class HashtagsController {
 
     constructor(service) {
         this.service = service;
-        this.example = this.hashtag.bind(this);
+        this.hashtagTopK = this.hashtagTopK.bind(this);
     }
 
-    async hashtag(req, res) {
-        const response = await this.service.hashtags(req.params);
-        return res.status(response.code).send(response);
+    async hashtagTopK(req, res) {
+        return await this.service.hashtagsTopK(req.params, res);
     }
 
 }
