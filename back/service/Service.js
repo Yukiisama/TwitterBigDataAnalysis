@@ -1,4 +1,5 @@
 const async = require('async');
+const { param } = require('..');
 const hbase = require('hbase')()
 // const client = new hbase.Client({
 //   host: 'data',
@@ -14,14 +15,21 @@ class Service {
     async hashtagsTopK(params, res) {
         try {
             // exemple hbase
-            let val;
+            if (params.size < 0 || params.size > 10000) 
+                params.size = 10000;
             const table = hbase.table('ape-jma_topKHashtag');
             table.row('*').get((error, value) => {
-                val = value;
-                return res.status(200).send(value);
+                let val = value;
+                if (value.length > params.size){
+                    val = {}
+                    for (let i = 0; i < params.size * 2; i+=2)
+                        val[i / 2] = {
+                            count: (value[i].$),
+                            hashtag: (value[i+1].$)
+                        }
+                }
+                return res.status(200).send(val);
             });
-            console.log(val);
-            return { code: 200, data: { note: "le json qu'on voudra retourner" }, error: false };
         }
         catch (error) {
             return { code: 400, error: error };

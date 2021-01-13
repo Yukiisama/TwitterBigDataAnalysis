@@ -769,7 +769,7 @@
 
         <script>
 
-            function fix(){
+            function request(){
                 $.post("http://localhost:25559/user/", body, function(data) {
                     user = data;
                     return data;
@@ -785,9 +785,7 @@
                     });
                 console.log(document.getElementById("search").value);
                 const body = { search: name };
-                fix();
-                fix();
-
+                request();
                 
                 console.log(user);
                 var hashtags = user.hashtags;
