@@ -26,10 +26,13 @@ public class HBaseTopKHashtag extends SparkToDatabase {
     public HBaseTopKHashtag() {
         super(tableName, familyName, new String[]{"hashtag", "count"});
     }
+    public HBaseTopKHashtag(String tablename) {
+        super(tablename, familyName, new String[]{"hashtag", "count"});
+    }
 
-    public static HBaseTopKHashtag INSTANCE() {
+    public static HBaseTopKHashtag INSTANCE(String tableName) {
         if (__instance__ == null) {
-            __instance__ = new HBaseTopKHashtag();
+            __instance__ = new HBaseTopKHashtag(tableName);
         }
 
         return __instance__;

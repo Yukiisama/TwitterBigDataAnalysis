@@ -25,24 +25,26 @@ import static bigdata.TPSpark.openFiles;
 public class RequestHashtags {
 
     
-	public static HBaseTopKHashtag hbaseTopk = HBaseTopKHashtag.INSTANCE();
+	//public static HBaseTopKHashtag hbaseTopk = HBaseTopKHashtag.INSTANCE("topKHashtag");
+    public static HBaseTopKHashtag hbaseHashtags = HBaseTopKHashtag.INSTANCE("Hashtags");
     public static void mostUsedHashtags (int k) {
         if (k < 1 || k > 10000 ) {
             logger.fatal("Invalid range in mostUsedHashtags@void, valid value is between 1 and 10000.");
             
             return;
         }
-        
         // Premier essai sans construire tout le gson en une classe
         long startTime = System.currentTimeMillis();
         JavaRDD<String> hashtags = file.flatMap(line -> JsonUtils.getHashtagFromJson(line));
         JavaPairRDD<String, Integer> r = hashtags.mapToPair(hash -> new Tuple2<>(hash, 1)).reduceByKey((a, b) -> a + b);       
+        r.foreach(tuple -> hbaseHashtags.writeTable(tuple));
+        
         List<Tuple2<String, Integer>> top = r.top(k, new HashtagComparator());
         logger.debug(top);
         long endTime = System.currentTimeMillis();
         // Ici enregister Hbase
         //
-        top.forEach(tuple -> hbaseTopk.writeTable(tuple));
+        //top.forEach(tuple -> hbaseTopk.writeTable(tuple));
         r.unpersist();
         //top.clear();
         logger.info("Request Hashtag: That took without Reflexivity : (map + reduce + topK) " + (endTime - startTime) + " milliseconds");
@@ -54,7 +56,7 @@ public class RequestHashtags {
             
             return;
         }
-        
+        //HBaseTopKHashtag hbaseTopkall = HBaseTopKHashtag.INSTANCE("topKHashtagAll");
         openFiles();
         long startTime = System.currentTimeMillis();
         JavaPairRDD<String, Integer> unionFiles = files
@@ -80,10 +82,10 @@ public class RequestHashtags {
         logger.debug(top);
        
         // Ici enregister Hbase
-        top.forEach(tuple -> HBaseTopKHashtag.INSTANCE().writeTable(tuple));
+        //top.forEach(tuple -> hbaseTopkall.writeTable(tuple));
         logger.debug("c) Nombre d'apparitions d'un hashtag:");
         // unionFiles.take(10).forEach(f -> System.out.println(f));
-
+        unionFiles.foreach(tuple -> hbaseHashtags.writeTable(tuple));
         // On finit le travail
         unionFiles.unpersist(); // pas sur que ça ait un effet mais on sait jamais
         files.clear();
