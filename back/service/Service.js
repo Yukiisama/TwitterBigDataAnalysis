@@ -12,12 +12,12 @@ class Service {
         this.data_user = "";
     }
 
-    async hashtagsTopK(params, res) {
+    async hashtagsTopK(params, res, tableName) {
         try {
             // exemple hbase
             if (params.size < 0 || params.size > 10000) 
                 params.size = 10000;
-            const table = hbase.table('ape-jma_topKHashtag');
+            const table = hbase.table(tableName);
             table.row('*').get((error, value) => {
                 let val = value;
                 

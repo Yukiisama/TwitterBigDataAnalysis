@@ -42,6 +42,7 @@ public class RequestHashtags {
 
         // Write all hashtags of the day with their count
         r.foreach(tuple -> hbaseHashtagsDay.writeTable(tuple));
+        hbaseHashtagsDay.resetPos();
         
         List<Tuple2<String, Integer>> top = r.top(k, new HashtagComparator());
         logger.debug(top);
@@ -49,6 +50,7 @@ public class RequestHashtags {
 
         // Write top to Hbase
         top.forEach(tuple -> hbaseTopk.writeTable(tuple));
+        hbaseTopk.resetPos();
 
         // Clear memory
         r.unpersist();
@@ -89,13 +91,15 @@ public class RequestHashtags {
        
         // Write top to Hbase for all days
         top.forEach(tuple -> hbaseTopkall.writeTable(tuple));
+        hbaseTopkall.resetPos();
 
         logger.debug("c) Nombre d'apparitions d'un hashtag:");
         // unionFiles.take(10).forEach(f -> System.out.println(f));
 
         // Write all hashtags of the day with their count
         unionFiles.foreach(tuple -> hbaseHashtags.writeTable(tuple));
-
+        hbaseHashtags.resetPos();
+        
         // Clear memory
         unionFiles.unpersist(); 
         files.clear();

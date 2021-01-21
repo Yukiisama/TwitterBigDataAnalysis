@@ -56,7 +56,9 @@ public class HBaseTopKHashtag extends SparkToDatabase {
 
     }
     
-
+    public void resetPos() {
+        pos = 0;
+    }
 
     public void writeTable(Tuple2<String, Integer> data) {
         Put value = new Put(Bytes.toBytes(Integer.toString(pos))); 
