@@ -25,26 +25,32 @@ import static bigdata.TPSpark.openFiles;
 public class RequestHashtags {
 
     
-	//public static HBaseTopKHashtag hbaseTopk = HBaseTopKHashtag.INSTANCE("topKHashtag");
-    public static HBaseTopKHashtag hbaseHashtags = HBaseTopKHashtag.INSTANCE("Hashtags");
+	public static HBaseTopKHashtag hbaseTopk = new HBaseTopKHashtag("topKHashtag");
+    public static HBaseTopKHashtag hbaseHashtagsDay = new HBaseTopKHashtag("HashtagsDay");
+    public static HBaseTopKHashtag hbaseTopkall = new HBaseTopKHashtag("topKHashtagAll");
+    public static HBaseTopKHashtag hbaseHashtags = new HBaseTopKHashtag("Hashtags");
     public static void mostUsedHashtags (int k) {
         if (k < 1 || k > 10000 ) {
             logger.fatal("Invalid range in mostUsedHashtags@void, valid value is between 1 and 10000.");
             
             return;
         }
-        // Premier essai sans construire tout le gson en une classe
+
         long startTime = System.currentTimeMillis();
         JavaRDD<String> hashtags = file.flatMap(line -> JsonUtils.getHashtagFromJson(line));
-        JavaPairRDD<String, Integer> r = hashtags.mapToPair(hash -> new Tuple2<>(hash, 1)).reduceByKey((a, b) -> a + b);       
-        r.foreach(tuple -> hbaseHashtags.writeTable(tuple));
+        JavaPairRDD<String, Integer> r = hashtags.mapToPair(hash -> new Tuple2<>(hash, 1)).reduceByKey((a, b) -> a + b);   
+
+        // Write all hashtags of the day with their count
+        r.foreach(tuple -> hbaseHashtagsDay.writeTable(tuple));
         
         List<Tuple2<String, Integer>> top = r.top(k, new HashtagComparator());
         logger.debug(top);
         long endTime = System.currentTimeMillis();
-        // Ici enregister Hbase
-        //
-        //top.forEach(tuple -> hbaseTopk.writeTable(tuple));
+
+        // Write top to Hbase
+        top.forEach(tuple -> hbaseTopk.writeTable(tuple));
+
+        // Clear memory
         r.unpersist();
         //top.clear();
         logger.info("Request Hashtag: That took without Reflexivity : (map + reduce + topK) " + (endTime - startTime) + " milliseconds");
@@ -56,8 +62,8 @@ public class RequestHashtags {
             
             return;
         }
-        //HBaseTopKHashtag hbaseTopkall = HBaseTopKHashtag.INSTANCE("topKHashtagAll");
         openFiles();
+
         long startTime = System.currentTimeMillis();
         JavaPairRDD<String, Integer> unionFiles = files
                                                 .get(0)
@@ -81,13 +87,17 @@ public class RequestHashtags {
                                             .top(k, new HashtagComparator());
         logger.debug(top);
        
-        // Ici enregister Hbase
-        //top.forEach(tuple -> hbaseTopkall.writeTable(tuple));
+        // Write top to Hbase for all days
+        top.forEach(tuple -> hbaseTopkall.writeTable(tuple));
+
         logger.debug("c) Nombre d'apparitions d'un hashtag:");
         // unionFiles.take(10).forEach(f -> System.out.println(f));
+
+        // Write all hashtags of the day with their count
         unionFiles.foreach(tuple -> hbaseHashtags.writeTable(tuple));
-        // On finit le travail
-        unionFiles.unpersist(); // pas sur que ça ait un effet mais on sait jamais
+
+        // Clear memory
+        unionFiles.unpersist(); 
         files.clear();
         long endTime = System.currentTimeMillis();
         

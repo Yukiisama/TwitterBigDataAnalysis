@@ -135,7 +135,8 @@ public class TPSpark {
          * DONE
          */
         logger.info("a) K Hashtags les plus utilisés avec nombre d'apparition sur un jour:");
-        //EntryPoint.HASHTAGS_DAILY_TOPK.apply(10000);
+        EntryPoint.HASHTAGS_DAILY_TOPK.apply(10000);
+        
         logger.info("b) K Hashtags les plus utilisés avec nombre d'apparition sur toutes les données:");
         // Question c en même temps
         EntryPoint.HASHTAGS_BEST_ALL_FILES_TOPK.apply(10000);
