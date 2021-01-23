@@ -7,6 +7,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.spark.SparkContext;
 import org.apache.hadoop.hbase.util.Bytes;
+
 import bigdata.data.User;
 import bigdata.infrastructure.database.SparkToDatabase;
 import scala.Tuple2;

@@ -8,6 +8,7 @@ import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.Function2;
+import org.apache.hadoop.hbase.KeyValue;
 
 import static bigdata.TPSpark.logger;
 
@@ -16,6 +17,7 @@ import bigdata.data.comparator.HashtagComparator;
 import bigdata.data.parser.JsonUserReader;
 import bigdata.data.parser.JsonUtils;
 import bigdata.infrastructure.database.runners.HBaseTopKHashtag;
+import bigdata.infrastructure.database.runners.HBaseUserHashtag;
 import scala.Tuple2;
 
 // import static bigdata.TPSpark.context;
@@ -26,9 +28,15 @@ public class RequestHashtags {
 
     
 	public static HBaseTopKHashtag hbaseTopk = new HBaseTopKHashtag("topKHashtag");
-    public static HBaseTopKHashtag hbaseHashtagsDay = new HBaseTopKHashtag("HashtagsDay");
     public static HBaseTopKHashtag hbaseTopkall = new HBaseTopKHashtag("topKHashtagAll");
     public static HBaseTopKHashtag hbaseHashtags = new HBaseTopKHashtag("Hashtags");
+    public static HBaseUserHashtag hbaseUserHashtags = HBaseUserHashtag.INSTANCE();
+    //public static HBaseTopKHashtag hbaseHashtagsDay = new HBaseTopKHashtag("HashtagsDay");
+
+    public static void nextDayHbase(int i){
+        hbaseTopk = new HBaseTopKHashtag("topKHashtag" + i);
+    }
+
     public static void mostUsedHashtags (int k) {
         if (k < 1 || k > 10000 ) {
             logger.fatal("Invalid range in mostUsedHashtags@void, valid value is between 1 and 10000.");
@@ -41,11 +49,12 @@ public class RequestHashtags {
         JavaPairRDD<String, Integer> r = hashtags.mapToPair(hash -> new Tuple2<>(hash, 1)).reduceByKey((a, b) -> a + b);   
 
         // Write all hashtags of the day with their count
-        r.foreach(tuple -> hbaseHashtagsDay.writeTable(tuple));
-        hbaseHashtagsDay.resetPos();
+        //r.foreach(tuple -> hbaseHashtagsDay.writeTable(tuple));
+        //hbaseHashtagsDay.resetPos();
         
+
         List<Tuple2<String, Integer>> top = r.top(k, new HashtagComparator());
-        logger.debug(top);
+        //logger.debug(top);
         long endTime = System.currentTimeMillis();
 
         // Write top to Hbase
@@ -54,8 +63,8 @@ public class RequestHashtags {
 
         // Clear memory
         r.unpersist();
-        //top.clear();
-        logger.info("Request Hashtag: That took without Reflexivity : (map + reduce + topK) " + (endTime - startTime) + " milliseconds");
+
+        logger.info("Request Hashtag: That took without Reflexivity : (map + reduce + topK) " + (endTime - startTime) + " milliseconds"); 
     }
 
     public static void mostUsedHashtagsOnAllFiles(int k) {
@@ -87,7 +96,7 @@ public class RequestHashtags {
 
         List<Tuple2<String, Integer>> top = unionFiles
                                             .top(k, new HashtagComparator());
-        logger.debug(top);
+        //logger.debug(top);
        
         // Write top to Hbase for all days
         top.forEach(tuple -> hbaseTopkall.writeTable(tuple));
@@ -105,11 +114,82 @@ public class RequestHashtags {
         files.clear();
         long endTime = System.currentTimeMillis();
         
-		logger.info("Request Hashtags: That took without Reflexivity : (map + reduce + topK) " + (endTime - startTime) + " milliseconds");
+		logger.info("Request Hashtags: That took without Reflexivity : (map + reduce + topK) " + (endTime - startTime) + " milliseconds");  
     }
 
 
+    /** A bit Faster than userListWithFullUser because we get less values in user (only hashtag, username is revelant)
+        27.000ms with hbase writing for one day
+     **/
     public static void usersList (boolean allFiles) {
+            
+        long startTime = System.currentTimeMillis();
+        
+        JavaPairRDD<String, User> users = null;
+
+        if (allFiles){
+            openFiles();
+            users = files						
+                    .get(0)
+                    .mapToPair(line -> JsonUserReader.usernameAndHashtagFromNLJSON(line))
+                    .filter( val ->  val._1() != "")
+                    .filter( val -> val._2()._hashtags().size() > 0)
+                    .reduceByKey((user1, user2 ) -> {
+                        user1.addHashtagsUsed(user2._hashtags());
+                        return user1;
+                    });
+  
+            for (int i = 1; i < files.size(); i++) {
+                users = users.union(
+                        files
+                        .get(i)
+                        .mapToPair(line -> JsonUserReader.usernameAndHashtagFromNLJSON(line))
+                        .filter( val ->  val._1() != "")
+                        .filter( val -> val._2()._hashtags().size() > 0)
+                        .reduceByKey((user1, user2 ) -> {
+                            user1.addHashtagsUsed(user2._hashtags());
+                            return user1;
+                        }).unpersist());
+            }   
+            users = users.reduceByKey((user1, user2 ) -> {
+                        user1.addHashtagsUsed(user2._hashtags());
+                        return user1;
+                    });
+        }
+        else{
+            users = file
+                    .mapToPair(line -> JsonUserReader.usernameAndHashtagFromNLJSON(line))
+                    .filter( val ->  val._1() != "")
+                    .filter( val -> val._2()._hashtags().size() > 0)
+                    .reduceByKey((user1, user2 ) -> {
+                        user1.addHashtagsUsed(user2._hashtags());
+                        return user1;
+                    });
+        }
+        
+        // Simplement enregister le set de clés (correspondants aux usernames) dans hbase 
+        // i.e  users.keys()
+        //System.out.println(users.collectAsMap()); // A enlever après fais exploser la mémoire
+        //logger.info("Give a sample example: 10 users: ");
+        //users.take(10).forEach(f -> System.out.println(f));
+
+        // Write to hbase
+        System.out.println(users.count());
+        users.foreach(tuple -> hbaseUserHashtags.writeTable(tuple));
+
+        if (allFiles) {
+            // On finit le travail
+            files.clear();
+        }
+        users.unpersist(); // pas sur que ça ait un effet mais on sait jamais
+            
+        long endTime = System.currentTimeMillis();
+        logger.info("RequestHashtags: That took without Reflexivity : (map + reduce ) " + (endTime - startTime) + " milliseconds");
+        
+        
+    }
+
+    public static void userListWithFullUser (boolean allFiles) {
             
         long startTime = System.currentTimeMillis();
         
@@ -122,7 +202,10 @@ public class RequestHashtags {
                     .mapToPair(line -> JsonUserReader.readDataFromNLJSON(line))
                     .filter( val ->  val._1() != "")
                     .filter( val -> val._2()._hashtags().size() > 0)
-                    .reduceByKey((user1, user2 ) -> user1);
+                    .reduceByKey((user1, user2 ) -> {
+                        user1.addHashtagsUsed(user2._hashtags());
+                        return user1;
+                    });
   
             for (int i = 1; i < files.size(); i++) {
                 users = users.union(
@@ -131,23 +214,36 @@ public class RequestHashtags {
                         .mapToPair(line -> JsonUserReader.readDataFromNLJSON(line))
                         .filter( val ->  val._1() != "")
                         .filter( val -> val._2()._hashtags().size() > 0)
-                        .reduceByKey((user1, user2 ) -> user1)
-                        ).unpersist();
+                        .reduceByKey((user1, user2 ) -> {
+                            user1.addHashtagsUsed(user2._hashtags());
+                            return user1;
+                        }).unpersist());
             }   
-            users = users.reduceByKey((user1, user2 ) -> user1);
+            users = users.reduceByKey((user1, user2 ) -> {
+                        user1.addHashtagsUsed(user2._hashtags());
+                        return user1;
+                    });
         }
         else{
             users = file
                     .mapToPair(line -> JsonUserReader.readDataFromNLJSON(line))
                     .filter( val ->  val._1() != "")
                     .filter( val -> val._2()._hashtags().size() > 0)
-                    .reduceByKey((user1, user2 ) -> user1);
+                    .reduceByKey((user1, user2 ) -> {
+                        user1.addHashtagsUsed(user2._hashtags());
+                        return user1;
+                    });
         }
         
         // Simplement enregister le set de clés (correspondants aux usernames) dans hbase 
         // i.e  users.keys()
         //System.out.println(users.collectAsMap()); // A enlever après fais exploser la mémoire
-        // users.take(10).forEach(f -> System.out.println(f));
+        // logger.info("Give a sample example: 10 users: ");
+        //users.take(10).forEach(f -> System.out.println(f));
+
+        // Write to hbase
+        users.foreach(tuple -> hbaseUserHashtags.writeTable(tuple));
+
         if (allFiles) {
             // On finit le travail
             files.clear();
@@ -159,5 +255,7 @@ public class RequestHashtags {
         
         
     }
+
+
     
 }
