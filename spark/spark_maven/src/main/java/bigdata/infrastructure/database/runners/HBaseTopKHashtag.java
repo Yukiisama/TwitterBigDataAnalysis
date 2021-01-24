@@ -7,6 +7,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.spark.SparkContext;
 import org.apache.hadoop.hbase.util.Bytes;
+
 import bigdata.data.User;
 import bigdata.infrastructure.database.SparkToDatabase;
 import scala.Tuple2;
@@ -26,10 +27,13 @@ public class HBaseTopKHashtag extends SparkToDatabase {
     public HBaseTopKHashtag() {
         super(tableName, familyName, new String[]{"hashtag", "count"});
     }
+    public HBaseTopKHashtag(String tablename) {
+        super(tablename, familyName, new String[]{"hashtag", "count"});
+    }
 
-    public static HBaseTopKHashtag INSTANCE() {
+    public static HBaseTopKHashtag INSTANCE(String tableName) {
         if (__instance__ == null) {
-            __instance__ = new HBaseTopKHashtag();
+            __instance__ = new HBaseTopKHashtag(tableName);
         }
 
         return __instance__;
@@ -53,7 +57,9 @@ public class HBaseTopKHashtag extends SparkToDatabase {
 
     }
     
-
+    public void resetPos() {
+        pos = 0;
+    }
 
     public void writeTable(Tuple2<String, Integer> data) {
         Put value = new Put(Bytes.toBytes(Integer.toString(pos))); 

@@ -63,6 +63,30 @@ public class JsonUserReader {
 		}
 	}
 	
+	public static Tuple2<String, User> usernameAndHashtagFromNLJSON(String line) {
+
+		String username = "";
+		String user_UUID ="";
+		User user_instance = new User(user_UUID, username, new HashMap<String, Integer>());
+
+
+		try {
+			
+			JsonElement json = new JsonParser().parse(line);
+			JsonObject jsonObj = json.getAsJsonObject();
+			
+			HashMap<String, Integer> hashtags = new HashMap<String, Integer>(JsonUserReader.getHashtagsList(json.getAsJsonObject()));
+			username = JsonUserReader.getUsername(json.getAsJsonObject());
+			user_UUID = JsonUserReader.getUserUUID(json.getAsJsonObject());
+
+			user_instance = new User(user_UUID, username, hashtags);
+
+		} catch(Exception e) {
+
+		} finally {
+			return new Tuple2 <String, User> (username, user_instance);
+		}
+	}
 
 	@Deprecated
 	private static Set<String> getUniqueHashtagsList(JsonObject jsonObj) {

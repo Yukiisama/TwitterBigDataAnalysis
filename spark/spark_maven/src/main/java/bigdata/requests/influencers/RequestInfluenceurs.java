@@ -23,7 +23,7 @@ import static bigdata.TPSpark.openFiles;
 
 
 public class RequestInfluenceurs {
-    // TopK to true compute the topK (question b) and question a
+    // TopK to true compute the topK (question b & c) and question a
     // If false only question a (triple hashtag as key, users as value)
     
     
@@ -87,7 +87,8 @@ public class RequestInfluenceurs {
             List<Tuple2<Tuple3<String,String,String>, Integer>> top = mapredTopKTripleHashtag.top(k, new TripleHashtagComparator());  
             // question ) b à top à enregistrer dans hbase
             System.out.println(top);
-            // Question c) je pars du principe que c'est sur le topk
+
+            // Question c) Sur le topk
             System.out.println("QUESTION C");
             (users.join(context.parallelizePairs(top)))
             .unpersist()

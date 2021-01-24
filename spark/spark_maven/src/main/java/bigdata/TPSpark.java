@@ -14,7 +14,7 @@ import bigdata.data.parser.JsonUtils;
 import bigdata.infrastructure.database.runners.HBaseUser;
 import bigdata.requests.EntryPoint;
 import bigdata.requests.arguments.ArgumentsManager;
-
+import bigdata.requests.hashtags.RequestHashtags;
 public class TPSpark {
 
     public static SparkConf conf = null;
@@ -69,7 +69,7 @@ public class TPSpark {
         
 
 
-        file = context.textFile("/raw_data/tweet_01_03_2020_first10000.nljson");
+        file = context.textFile("/raw_data/tweet_01_03_2020.nljson");
         // file = context.textFile("/raw_data/tweet_01_03_2020.nljson");
         // System.out.println("There is " + context.sc().statusTracker().getExecutorInfos().length + " Workers.");
         // // file = context.textFile(JsonUtils.data[1]);
@@ -80,7 +80,7 @@ public class TPSpark {
 
         logger.info("Creating HBase Table Manager...");
         logger.debug(" - HBaseUser...");
-        HBaseUser.INSTANCE();
+        //HBaseUser.INSTANCE();
         logger.info("Done.");
     }
     public static void main (String[] args) {
@@ -106,8 +106,8 @@ public class TPSpark {
 
 
 
-            // AnalysisHashtags();
-            AnalysisUser(false);
+            AnalysisHashtags();
+            //AnalysisUser(false);
             //AnalysisInfluencer();
         } catch (Exception e) {
 
@@ -136,17 +136,18 @@ public class TPSpark {
          */
         logger.info("a) K Hashtags les plus utilisés avec nombre d'apparition sur un jour:");
         EntryPoint.HASHTAGS_DAILY_TOPK.apply(10000);
+        
+        logger.info("a-bis) K Hashtags les plus utilisés avec nombre d'apparition sur un jour, (tous les jours : jour par jour)");
+        RunTopkDayOnEachDay();
+
         logger.info("b) K Hashtags les plus utilisés avec nombre d'apparition sur toutes les données:");
         // Question c en même temps
-        //EntryPoint.HASHTAGS_BEST_ALL_FILES_TOPK.apply(10);
+        EntryPoint.HASHTAGS_BEST_ALL_FILES_TOPK.apply(10000);
         
         final Boolean allFiles = true;
         logger.info("d) Utilisateurs ayant utilisé un Hashtag:");
-        //EntryPoint.HASHTAGS_USED_BY.apply(allFiles);
+        EntryPoint.HASHTAGS_USED_BY.apply(allFiles);
 
-        /**
-         * Optional
-         */
     }
 
 
@@ -159,21 +160,10 @@ public class TPSpark {
         /**
          * DONE
          */
-        // System.out.println("a) Liste des Hashtags sans doublons:");
+        logger.info("Question a, b, c, d en même temps");
+        // Question a, b, c, d faites en même temps
         EntryPoint.USERS_UNIQUE_HASHTAGS_LIST.apply(allFiles);
 
-        // /**
-        //  * TODO
-        //  */
-        // System.out.println("c) Nombre de tweets par langue:");
-        // EntryPoint.USERS_NUMBER_OF_TWEETS_PER_LANGAGE.apply("fr");
-        // /**
-        //  * Optional
-        //  */
-        // System.out.println("* Message le plus liké d'un utilisateur:");
-        // // EntryPoint.USERS_MOST_LIKED_TWEET.apply("gouvernementFR");
-        // System.out.println("* Message le plus retweeté d'un utilisateur:");
-        // // EntryPoint.USERS_MOST_RETWEETED_TWEET.apply("LEXPRESS");
     }
     
     private static void AnalysisInfluencer() {
@@ -181,5 +171,20 @@ public class TPSpark {
         logger.info("a) Récupérer tous les triplets de hashtags ainsi que les utilisateurs qui les ont utilisés");
         // Question b et c faites en même temps;
         //RequestInfluenceurs.TripleHashtag(false, true, 10000);
+    }
+
+    private static void RunTopkDayOnEachDay() {
+        final JavaRDD<String> old_file = file;
+        openFiles();
+        //Do Daily_Topk on all files, one by one (topk day) 
+        for (int i = 0; i < files.size(); i++) {
+            file = files.get(i);
+            RequestHashtags.nextDayHbase(i);
+            EntryPoint.HASHTAGS_DAILY_TOPK.apply(10000);
+        }
+
+        // Clean and set up as before
+        file = old_file;
+        files.clear();
     }
 }

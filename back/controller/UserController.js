@@ -9,65 +9,21 @@ class UserController {
         this.service = service;
         this._callback = this.user.bind(this);
     }
-
-
-
-
-
+    
     async user(req, res) {
-        // console.log("ID: " + req.body.search);
-
-
-        const response = await this.service.user(req.body.search)
-        var data = this.parseInputResponse(response);
-
-        console.log("Data: " + JSON.stringify(data));
-
-        try{
-            let name = data[0].$;
-            let received_favs = data[1].$;
-            let received_rts = data[2].$;
-            let tweets_posted = data[3].$;
-            let daily_frequencies = this.getDateStatistics(data[4].$);
-            let hashtags = this.getHashtags(data[5].$);
-            console.log("Raw Values: " + data[6].$);
-
-            let history_localisation = data[7].$;
-            let history_sources = data[8].$;
-            let langs = this.getLangs(data[6].$);
-                
-
-            // console.log("Dates: " + JSON.stringify(daily_frequencies));
-            // console.log(JSON.stringify(langs));
-
-
-            return res.render("pages/users", {
-                name: name,
-                favs : received_favs,
-                rts: received_rts,
-                tweets: tweets_posted,
-                frequencies: JSON.stringify(daily_frequencies),
-                hashtags: JSON.stringify(hashtags),
-                langs: JSON.stringify(langs),
-                localisations: history_localisation,
-                sources: history_sources
-            });
-        } catch(error) {
-            console.log(error);
-            console.log("Actualisez la page.");
-        }
-
+        return await this.service.user(req.body.search, this, res);
     }
 
-
+    parseAndReplace(data){
+        return JSON.parse(JSON.stringify(data).replace(/&#34;/g,'"'));
+    }
 
     parseInputResponse(response) {
         const regex_replace_$ = /('\$')/gi;
 
-        let raw = JSON.stringify(response.data);
+        let raw = JSON.stringify(response);
         raw = raw.replace("'$'", '"value"');
         raw = raw.replace("'", '"');
-
         return JSON.parse(raw);
     }
     // Remove trailing [ and ]

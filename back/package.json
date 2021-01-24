@@ -12,11 +12,12 @@
   "dependencies": {
     "async": "^3.2.0",
     "body-parser": "*",
+    "cors": "^2.8.5",
     "ejs": "*",
     "express": "^4.17.1",
     "hbase": "^0.6.1",
+    "language-tags": "*",
     "new-line": "*",
-    "nodemon": "^2.0.6",
-    "language-tags": "*"
+    "nodemon": "^2.0.6"
   }
 }
