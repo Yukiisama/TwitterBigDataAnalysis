@@ -52,7 +52,7 @@ public class RequestHashtags {
         //r.foreach(tuple -> hbaseHashtagsDay.writeTable(tuple));
         //hbaseHashtagsDay.resetPos();
         
-
+        
         List<Tuple2<String, Integer>> top = r.top(k, new HashtagComparator());
         //logger.debug(top);
         long endTime = System.currentTimeMillis();
