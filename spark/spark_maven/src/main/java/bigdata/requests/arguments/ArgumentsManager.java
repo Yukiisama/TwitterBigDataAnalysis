@@ -26,6 +26,10 @@ public class ArgumentsManager {
                 logger.debug("Help message");
                 TPSpark.__HELP__ = true;
             }
+            else if(arg.equals("help")) {
+                logger.debug("Help message");
+                TPSpark.__HELP__ = true;
+            }
         }
 
         return;

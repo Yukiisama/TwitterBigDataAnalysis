@@ -10,7 +10,12 @@ class HashtagsController {
     }
 
     async hashtagTopK(req, res) {
-        return await this.service.hashtagsTopK(req.params, res, 'ape-jma_topKHashtag');
+        if (req.params.day < 0)
+            req.params.day = 0;
+        if (req.params.day > 20)
+            req.params.day = 20;
+        console.log(req.params);
+        return await this.service.hashtagsTopK(req.params, res, 'ape-jma_topKHashtag' + req.params.day);
     }
 
     async hashtagTopKAllDays(req, res) {
