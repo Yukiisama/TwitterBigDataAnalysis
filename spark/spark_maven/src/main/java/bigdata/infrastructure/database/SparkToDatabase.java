@@ -108,7 +108,7 @@ public abstract class SparkToDatabase extends Configured implements Tool {
      * Creates a fresh new table.
      */
     public void createOrOverwrite(Admin admin, HTableDescriptor table) throws Exception {
-        logger.info("Recreating a fresh table " + table.getTableName() + " ...");
+        logger.debug("Recreating a fresh table " + table.getTableName() + " ...");
 
         if (admin.tableExists(table.getTableName())) {
             if(admin.isTableEnabled(table.getTableName()))
@@ -120,7 +120,7 @@ public abstract class SparkToDatabase extends Configured implements Tool {
         if(admin.isTableDisabled(table.getTableName()))
         admin.enableTable(table.getTableName());
 
-        logger.info("Done.");
+        logger.debug("Done.");
     }
 
     public void createTable(Connection connect) throws Exception {
@@ -135,6 +135,7 @@ public abstract class SparkToDatabase extends Configured implements Tool {
                 tableDescriptor.addFamily(famLoc);
             }
             createOrOverwrite(admin, tableDescriptor);
+            
 
             // if (__FRESH_HBASE__){
             //     createOrOverwrite(admin, tableDescriptor);

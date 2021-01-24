@@ -30,6 +30,8 @@ public class RequestUsers {
 		// Time calculation
 		long startTime = System.currentTimeMillis();
 
+		allFiles = false;
+
 
 		// Content
 		/**
