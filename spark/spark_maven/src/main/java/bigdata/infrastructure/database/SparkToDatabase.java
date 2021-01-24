@@ -46,6 +46,8 @@ public abstract class SparkToDatabase extends Configured implements Tool {
     protected Logger logger;
 
     public Job APIJobConfiguration;
+    
+    private static boolean overwrite = true;
 
     static {
         config.addResource(new Path("/espace/Auber_PLE-203/hbase/conf/hbase-site.xml"));
@@ -134,7 +136,9 @@ public abstract class SparkToDatabase extends Configured implements Tool {
                 
                 tableDescriptor.addFamily(famLoc);
             }
-            createOrOverwrite(admin, tableDescriptor);
+           
+            if (overwrite)
+            	createOrOverwrite(admin, tableDescriptor);
 
             // if (__FRESH_HBASE__){
             //     createOrOverwrite(admin, tableDescriptor);
@@ -150,7 +154,10 @@ public abstract class SparkToDatabase extends Configured implements Tool {
     }
 
 
-
+    public static void overWriting(boolean doOverwrite) {
+    	overwrite = doOverwrite;
+    }
+    
     public abstract void readTable(Configuration conf, String mode);
     
     public abstract void writeTable(Put user);

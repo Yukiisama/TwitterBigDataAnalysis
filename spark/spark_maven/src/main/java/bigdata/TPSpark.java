@@ -11,10 +11,12 @@ import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 
 import bigdata.data.parser.JsonUtils;
+import bigdata.infrastructure.database.SparkToDatabase;
 import bigdata.infrastructure.database.runners.HBaseUser;
 import bigdata.requests.EntryPoint;
 import bigdata.requests.arguments.ArgumentsManager;
 import bigdata.requests.hashtags.RequestHashtags;
+import bigdata.requests.influencers.RequestInfluenceurs;
 public class TPSpark {
 
     public static SparkConf conf = null;
@@ -95,20 +97,12 @@ public class TPSpark {
 
 
         try {
-            // System.out.println("Number of partitions : " + file.getNumPartitions());
-            // System.out.println("Lines Count" + file.count());
-            
-            // Print val
-            // file.foreach(f -> System.out.println(f));
-            // hashtags.foreach( f -> System.out.println(f));
-            // r.foreach(f -> System.out.println(f));
 
-
-
-
-            AnalysisHashtags();
+        	// Si tu veux tester une seule analyse et que t'as pas besoin d'overwrite ( et sans que ça efface celle des analyses commentées )
+        	//SparkToDatabase.overWriting(false);
+            //AnalysisHashtags();
             //AnalysisUser(false);
-            //AnalysisInfluencer();
+            AnalysisInfluencer();
         } catch (Exception e) {
 
             e.printStackTrace();
@@ -134,10 +128,15 @@ public class TPSpark {
         /**
          * DONE
          */
+        
+        // Activate hbase
+        
+        RequestHashtags.activateHbase(true);
+        
         logger.info("a) K Hashtags les plus utilisés avec nombre d'apparition sur un jour:");
         EntryPoint.HASHTAGS_DAILY_TOPK.apply(10000);
         
-        logger.info("a-bis) K Hashtags les plus utilisés avec nombre d'apparition sur un jour, (tous les jours : jour par jour)");
+        /*logger.info("a-bis) K Hashtags les plus utilisés avec nombre d'apparition sur un jour, (tous les jours : jour par jour)");
         RunTopkDayOnEachDay();
 
         logger.info("b) K Hashtags les plus utilisés avec nombre d'apparition sur toutes les données:");
@@ -146,7 +145,7 @@ public class TPSpark {
         
         final Boolean allFiles = true;
         logger.info("d) Utilisateurs ayant utilisé un Hashtag:");
-        EntryPoint.HASHTAGS_USED_BY.apply(allFiles);
+        EntryPoint.HASHTAGS_USED_BY.apply(allFiles);*/
 
     }
 
@@ -170,7 +169,7 @@ public class TPSpark {
         logger.info("Influenceurs...");
         logger.info("a) Récupérer tous les triplets de hashtags ainsi que les utilisateurs qui les ont utilisés");
         // Question b et c faites en même temps;
-        //RequestInfluenceurs.TripleHashtag(false, true, 10000);
+        RequestInfluenceurs.TripleHashtag(false, true, 10000);
     }
 
     private static void RunTopkDayOnEachDay() {

@@ -26,11 +26,18 @@ import static bigdata.TPSpark.files;
 import static bigdata.TPSpark.openFiles;
 public class RequestHashtags {
 
+	public static HBaseTopKHashtag hbaseTopk = null;
+    public static HBaseTopKHashtag hbaseTopkall = null;
+    public static HBaseTopKHashtag hbaseHashtags = null;
+    public static HBaseUserHashtag hbaseUserHashtags = null;
     
-	public static HBaseTopKHashtag hbaseTopk = new HBaseTopKHashtag("topKHashtag");
-    public static HBaseTopKHashtag hbaseTopkall = new HBaseTopKHashtag("topKHashtagAll");
-    public static HBaseTopKHashtag hbaseHashtags = new HBaseTopKHashtag("Hashtags");
-    public static HBaseUserHashtag hbaseUserHashtags = HBaseUserHashtag.INSTANCE();
+    public static void activateHbase(boolean activate) {
+    	hbaseTopk = (activate) ? new HBaseTopKHashtag("topKHashtag") : null;
+        hbaseTopkall = (activate) ? new HBaseTopKHashtag("topKHashtagAll") : null;
+        hbaseHashtags = (activate) ? new HBaseTopKHashtag("Hashtags") : null;
+        hbaseUserHashtags = (activate) ? HBaseUserHashtag.INSTANCE() : null;
+    }
+	
     //public static HBaseTopKHashtag hbaseHashtagsDay = new HBaseTopKHashtag("HashtagsDay");
 
     public static void nextDayHbase(int i){
@@ -93,6 +100,7 @@ public class RequestHashtags {
         }
 
         unionFiles = unionFiles.reduceByKey((a, b) -> a + b);
+        logger.info("count union" + unionFiles.count());
 
         List<Tuple2<String, Integer>> top = unionFiles
                                             .top(k, new HashtagComparator());
