@@ -15,7 +15,7 @@ class Service {
     async hashtagsTopK(params, res, tableName) {
         try {
             // exemple hbase
-            if (params.size < 0 || params.size > 10000) 
+            if (params.size < 0) 
                 params.size = 10000;
             const table = hbase.table(tableName);
             table.row('*').get((error, value) => {

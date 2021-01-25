@@ -20,12 +20,14 @@ class HashtagsController {
     }
 
     async hashtagTopKAllDays(req, res) {
-        console.log('yo');
-        return await this.service.hashtagsTopK(req.params, res, 'ape-jma_topKHashtagAll');
+        return await this.service.hashtagsTopK(req.params, res, 'ape-jma_usersHashtagsList');
     }
 
     async allHashtags(req, res){
-        console.log('yo2');
+        return await this.service.hashtagsTopK(req.params, res, 'ape-jma_Hashtags');
+    }
+
+    async userHashtags(req, res){
         return await this.service.hashtagsTopK(req.params, res, 'ape-jma_Hashtags');
     }
 

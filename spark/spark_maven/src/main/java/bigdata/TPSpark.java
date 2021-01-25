@@ -102,9 +102,9 @@ public class TPSpark {
 
         	// Si tu veux tester une seule analyse et que t'as pas besoin d'overwrite ( et sans que ça efface celle des analyses commentées )
         	//SparkToDatabase.overWriting(false);
-            AnalysisHashtags();
+            //AnalysisHashtags();
             //AnalysisUser(false);
-            //AnalysisInfluencer();
+            AnalysisInfluencer();
         } catch (Exception e) {
 
             e.printStackTrace();
