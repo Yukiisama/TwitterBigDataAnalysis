@@ -20,8 +20,10 @@ class Service {
             const table = hbase.table(tableName);
             table.row('*').get((error, value) => {
                 let val = value;
-                
-                if (value.length > params.size){
+                params.size = Number(params.size);
+                if (value.length < params.size)
+                    params.size = value.length;
+                if (value.length >= params.size){
                     val = [];
                     let count = [];
                     let hashtag = [];  

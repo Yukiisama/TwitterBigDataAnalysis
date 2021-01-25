@@ -7,6 +7,7 @@ class HashtagsController {
         this.service = service;
         this.hashtagTopK = this.hashtagTopK.bind(this);
         this.hashtagTopKAllDays = this.hashtagTopKAllDays.bind(this);
+        this.allHashtags = this.allHashtags.bind(this);
     }
 
     async hashtagTopK(req, res) {
@@ -19,7 +20,13 @@ class HashtagsController {
     }
 
     async hashtagTopKAllDays(req, res) {
+        console.log('yo');
         return await this.service.hashtagsTopK(req.params, res, 'ape-jma_topKHashtagAll');
+    }
+
+    async allHashtags(req, res){
+        console.log('yo2');
+        return await this.service.hashtagsTopK(req.params, res, 'ape-jma_Hashtags');
     }
 
 }

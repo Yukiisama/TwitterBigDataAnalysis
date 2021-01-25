@@ -37,6 +37,7 @@ app.use(express.json());
 app.get("/example", Controller.example);
 app.get("/hashtagTopK/:day/:size", HashtagController.hashtagTopK);
 app.get("/hashtagTopKAllDays/:day/:size", HashtagController.hashtagTopKAllDays);
+app.get("/hashtags/:day/:size", HashtagController.allHashtags);
 app.post("/user/", UserController._callback);
 
 //alexandradss8

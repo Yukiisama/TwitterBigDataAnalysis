@@ -10,8 +10,8 @@ $.ajaxSetup({
 
 builder(table);
 AllDaysOnClick();
+Hashtags();
 reload("resetTopk");
-
 
 function builder(tableName){
     $.getJSON("http://localhost:25559/" + tableName + "/" + day + '/' + size, function (data) {
@@ -47,9 +47,20 @@ function AllDaysOnClick() {
     element.innerHTML = "";
     table = "hashtagTopKAllDays"
     swap.onclick = function() {
-        builder(table);
+        builder("hashtagTopKAllDays");
     }
 }
+
+function Hashtags() {
+    const element = document.getElementById("topkDescription");
+    element.innerHTML = "";
+    const all = document.getElementById("allHashs");
+    table = "hashtags"
+    all.onclick = function() {
+        builder("hashtags");
+    }
+}
+
 
 
 function reload(name){
