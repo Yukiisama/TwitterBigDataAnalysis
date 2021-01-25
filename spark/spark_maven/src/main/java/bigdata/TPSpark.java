@@ -102,8 +102,8 @@ public class TPSpark {
 
         	// Si tu veux tester une seule analyse et que t'as pas besoin d'overwrite ( et sans que ça efface celle des analyses commentées )
         	//SparkToDatabase.overWriting(false);
-            //AnalysisHashtags();
-            AnalysisUser(false);
+            AnalysisHashtags();
+            //AnalysisUser(false);
             //AnalysisInfluencer();
         } catch (Exception e) {
 
@@ -136,10 +136,10 @@ public class TPSpark {
         RequestHashtags.activateHbase(true);
         
         logger.info("a) K Hashtags les plus utilisés avec nombre d'apparition sur un jour:");
-        EntryPoint.HASHTAGS_DAILY_TOPK.apply(10000);
+        //EntryPoint.HASHTAGS_DAILY_TOPK.apply(10000);
         
-        /*logger.info("a-bis) K Hashtags les plus utilisés avec nombre d'apparition sur un jour, (tous les jours : jour par jour)");
-        RunTopkDayOnEachDay();
+        logger.info("a-bis) K Hashtags les plus utilisés avec nombre d'apparition sur un jour, (tous les jours : jour par jour)");
+        //RunTopkDayOnEachDay();
 
         logger.info("b) K Hashtags les plus utilisés avec nombre d'apparition sur toutes les données:");
         // Question c en même temps
@@ -147,7 +147,7 @@ public class TPSpark {
         
         final Boolean allFiles = true;
         logger.info("d) Utilisateurs ayant utilisé un Hashtag:");
-        EntryPoint.HASHTAGS_USED_BY.apply(allFiles);*/
+        EntryPoint.HASHTAGS_USED_BY.apply(allFiles);
 
     }
 

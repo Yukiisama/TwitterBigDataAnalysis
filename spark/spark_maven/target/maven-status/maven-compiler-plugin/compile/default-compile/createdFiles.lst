@@ -14,9 +14,11 @@ bigdata/requests/EntryPoint$4.class
 bigdata/data/comparator/TripleHashtagComparator.class
 bigdata/requests/EntryPoint.class
 bigdata/requests/users/RequestUsers$2.class
+bigdata/infrastructure/database/runners/HBaseInfluenceurs.class
 bigdata/data/comparator/UniqueHashtagComparator.class
 bigdata/data/User.class
 bigdata/requests/EntryPoint$2.class
+bigdata/infrastructure/database/runners/HBaseTopKTripleHashtag.class
 bigdata/data/parser/JsonUtils.class
 bigdata/infrastructure/database/runners/HBaseTopKHashtag.class
 bigdata/infrastructure/database/SparkToDatabase.class

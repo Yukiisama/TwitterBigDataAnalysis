@@ -32,8 +32,8 @@ public class RequestHashtags {
     public static HBaseUserHashtag hbaseUserHashtags = null;
     
     public static void activateHbase(boolean activate) {
-    	hbaseTopk = (activate) ? new HBaseTopKHashtag("topKHashtag") : null;
-        hbaseTopkall = (activate) ? new HBaseTopKHashtag("topKHashtagAll") : null;
+    	//hbaseTopk = (activate) ? new HBaseTopKHashtag("topKHashtag") : null;
+        //hbaseTopkall = (activate) ? new HBaseTopKHashtag("topKHashtagAll") : null;
         hbaseHashtags = (activate) ? new HBaseTopKHashtag("Hashtags") : null;
         hbaseUserHashtags = (activate) ? HBaseUserHashtag.INSTANCE() : null;
     }
@@ -100,7 +100,7 @@ public class RequestHashtags {
         }
 
         unionFiles = unionFiles.reduceByKey((a, b) -> a + b);
-        logger.info("count union" + unionFiles.count());
+        //logger.info("count union" + unionFiles.count());
 
         List<Tuple2<String, Integer>> top = unionFiles
                                             .top(k, new HashtagComparator());

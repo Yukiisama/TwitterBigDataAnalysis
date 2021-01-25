@@ -17,7 +17,8 @@ import bigdata.data.parser.JsonUserReader;
 import bigdata.data.parser.JsonUtils;
 import scala.Tuple2;
 import scala.Tuple3;
-
+import bigdata.infrastructure.database.runners.HBaseTopKTripleHashtag;
+import bigdata.infrastructure.database.runners.HBaseInfluenceurs;
 import static bigdata.TPSpark.context;
 import static bigdata.TPSpark.file;
 import static bigdata.TPSpark.files;
@@ -28,7 +29,8 @@ public class RequestInfluenceurs {
     // TopK to true compute the topK (question b & c) and question a
     // If false only question a (triple hashtag as key, users as value)
     
-    
+    public static HBaseTopKTripleHashtag tripleHashHbase = new HBaseTopKTripleHashtag("TripleHashtags");
+    public static HBaseInfluenceurs influenceursHbase = HBaseInfluenceurs.INSTANCE();
     
     public static void TripleHashtag (boolean allFiles, boolean topK, int k) {
         
@@ -75,7 +77,7 @@ public class RequestInfluenceurs {
         }
         
         //users.take(10).forEach(f -> System.out.println(f));
-        System.out.println("VUE SIMPLIFIE");
+        logger.info("Printing a sample, 100 triple hashtags +  users");
         users.take(100).forEach(f ->{
             System.out.println();
             System.out.print(f._1 + " : [");
@@ -85,21 +87,38 @@ public class RequestInfluenceurs {
         // users -> question a) à enregistrer dans hbase
         if (topK) {
             System.out.println();
-            System.out.println(" b) Donner k triplets de hashtags les plus utilisés");
+            logger.info(" b) Donner k triplets de hashtags les plus utilisés");
             List<Tuple2<Tuple3<String,String,String>, Integer>> top = mapredTopKTripleHashtag.top(k, new TripleHashtagComparator());  
-            // question ) b à top à enregistrer dans hbase
-            System.out.println(top);
+            logger.info("Printing a sample, the first 100 of the topk triple hashtag");
+            for (int i = 0; i < 100 ; i++){
+                System.out.println(top.get(i));
+            }
+
+            // Hbase
+            logger.info("Writing to hbase triple hashtags with their count ...");
+            top.forEach(tuple -> tripleHashHbase.writeTable(tuple));
+            logger.info("Writing Done");
 
             // Question c) Sur le topk
-            System.out.println("QUESTION C");
+            System.out.println("Question C: Trouver les influencersc.a.d les personnes avec le plus grand nombre de tweets dans les triplets que l’on a trouvé.");
             JavaRDD<User> us = (users.join(context.parallelizePairs(top)))
             .unpersist()
             .flatMap(val -> val._2._1().iterator());
 
+            logger.info("Calculating topk influenceurs ...");
             List<Tuple2<String, Integer>> influenceurs = calculateInfluenceurs(us, k);
-            influenceurs.forEach(f -> System.out.println(f));
+            
+            logger.info("Printing a sample, the first 100 of the topk influenceurs");
+            for (int i = 0; i < 100 ; i++){
+                System.out.println(influenceurs.get(i));
+            }
 
-            logger.info("Question d : fake Influenceurs");
+            // Hbase
+            logger.info("Writing to hbase influenceurs with their number of messages ...");
+            influenceurs.forEach(tuple -> influenceursHbase.writeTable(tuple));
+            logger.info("Writing Done");
+
+            logger.info("Question d : Trouver les faux influencer, personnes avec beaucoup de followers dont les tweets ne sont jamais retweeté.");
             List<Tuple2<String, User>> fakeInfluenceurs = calculateFakeInfluenceurs(us, k);
             fakeInfluenceurs.forEach(f -> System.out.println(f));
             

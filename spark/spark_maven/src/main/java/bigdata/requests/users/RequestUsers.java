@@ -21,7 +21,9 @@ import scala.Tuple2;
 
 
 public class RequestUsers {
-    
+	
+	public static HBaseUser hbaseUser = HBaseUser.INSTANCE();
+
 	/**
 	 * 
 	 * @param user_id
@@ -169,7 +171,7 @@ public class RequestUsers {
 
 			if(TPSpark.__PROGRESS_BAR__){
 				rdd.foreach(tuple -> {
-					HBaseUser.INSTANCE().writeTable(tuple._2);
+					hbaseUser.writeTable(tuple._2);
 					current_progression = current_progression + 1;
 					
 					printProgress(0, size_rdd, current_progression);
@@ -178,7 +180,7 @@ public class RequestUsers {
 			} else {
 
 				rdd.foreach(tuple -> {
-					HBaseUser.INSTANCE().writeTable(tuple._2);
+					hbaseUser.writeTable(tuple._2);
 				});
 			}
 
