@@ -1,8 +1,10 @@
 bigdata/TPSpark.class
+bigdata/data/comparator/RtComparator.class
 bigdata/requests/users/RequestUsers$1.class
 bigdata/data/comparator/HashtagComparator.class
 bigdata/data/parser/JsonUserReader.class
 bigdata/requests/EntryPoint$1.class
+bigdata/data/comparator/TweetComparator.class
 bigdata/requests/users/RequestUsers.class
 bigdata/data/IData.class
 bigdata/requests/arguments/ArgumentsManager.class

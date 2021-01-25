@@ -53,6 +53,7 @@ public class TPSpark {
                 .setAppName("TP Spark")
                 .set("spark.executor.instances", "20")
                 .set("spark.executor.cores", "4")
+                .set("spark.executor.memory", "7g")
                 .set("spark.shuffle.memoryFraction", "0.8")
                 .set("spark.ui.showConsoleProgress ", "true")
                 .set("spark.executor.extraJavaOptions", "-Dlog4j.debug=true");
@@ -168,7 +169,7 @@ public class TPSpark {
     private static void AnalysisInfluencer() {
         logger.info("Influenceurs...");
         logger.info("a) Récupérer tous les triplets de hashtags ainsi que les utilisateurs qui les ont utilisés");
-        // Question b et c faites en même temps;
+        // Question b et c et d faites en même temps;
         RequestInfluenceurs.TripleHashtag(false, true, 10000);
     }
 
