@@ -62,7 +62,14 @@ class UserController {
             if(!name.length == 0) {
                 name = name[0];
                 if(k.includes("fr")){
-                    name = "Français";
+                    name = "Français"; // Turn "French" to "Français"
+                }
+            }
+
+            if(!name.length == 0) {
+                name = name[0];
+                if(k.includes("und")){ // Undefined language tag: https://tools.ietf.org/html/bcp47
+                    name = "Inconnu";
                 }
             }
 

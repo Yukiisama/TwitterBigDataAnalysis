@@ -32,6 +32,8 @@ public class RequestUsers {
 		// Time calculation
 		long startTime = System.currentTimeMillis();
 
+		allFiles = false;
+
 
 		// Content
 		/**
@@ -83,21 +85,15 @@ public class RequestUsers {
 
 		/**
 		 * Reduce and merge data
+		 *
+		 * Should be using a function as merge(User u)#User
+		 * to offers more resilience.
+		 *
 		 */
 		logger.debug("Reducing user RDD and merging values...");
 		JavaPairRDD<String, User> users = tuple_users.reduceByKey(new Function2<User, User, User>() {
 			public User call (User a, User b) {
-				a.setNbTweets(a._nbTweets() + b._nbTweets());
-				a.setReceivedFavs(a._received_favs() + b._received_favs());
-				a.setReceivedRTs(a._received_rts() + b._received_rts());
-
-				a.addGeo(b._geos());
-				a.addLangUsed(b._langs());
-				a.addHashtagsUsed(b._hashtags());
-				a.addPublicationSource(b._sources());
-				a.addDailyFrequencyData(b._frequencies());
-
-				return a;	
+				return User.merge(a, b);	
 			}
 		});
 		logger.debug("Done.");
@@ -143,10 +139,9 @@ public class RequestUsers {
 		logger.info("Sending RDD's data to the Serving Layer...");
 
 
-		logger.debug("Counting the number of RDD's element to send...");
-		
-		if(TPSpark.__PROGRESS_BAR__)
-			size_rdd = rdd.count();
+		// logger.debug("Counting the number of RDD's element to send...");
+		// if(TPSpark.__PROGRESS_BAR__)
+			// size_rdd = rdd.count();
 		// logger.debug("There is: " + size_rdd + " entries to insert.");
 
 		try {
@@ -180,7 +175,12 @@ public class RequestUsers {
 			} else {
 
 				rdd.foreach(tuple -> {
-					hbaseUser.writeTable(tuple._2);
+					try{
+						HBaseUser.INSTANCE().writeTable(tuple._2);
+					} catch (Exception e) {
+						logger.error("unable to insert an user value in hbase.");
+						logger.error(tuple._2);
+					}
 				});
 			}
 

@@ -11,7 +11,7 @@ import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 
 import bigdata.data.parser.JsonUtils;
-import bigdata.infrastructure.database.SparkToDatabase;
+import bigdata.infrastructure.database.runners.HBaseUserHashtag;
 import bigdata.infrastructure.database.runners.HBaseUser;
 import bigdata.requests.EntryPoint;
 import bigdata.requests.arguments.ArgumentsManager;
@@ -85,7 +85,10 @@ public class TPSpark {
 
         logger.info("Creating HBase Table Manager...");
         logger.debug(" - HBaseUser...");
-        //HBaseUser.INSTANCE();
+        HBaseUser.INSTANCE();
+        // logger.debug(" - HBaseHashtag...");
+        // HBaseUserHashtag.INSTANCE();
+
         logger.info("Done.");
     }
     public static void main (String[] args) {
@@ -101,24 +104,15 @@ public class TPSpark {
 
         try {
 
-        	// Si tu veux tester une seule analyse et que t'as pas besoin d'overwrite ( et sans que ça efface celle des analyses commentées )
-        	//SparkToDatabase.overWriting(false);
-            //AnalysisHashtags();
-            //AnalysisUser(true);
+            // AnalysisHashtags();
+            AnalysisUser(true); // false: sample, true: big big data set
             //AnalysisInfluencer();
         } catch (Exception e) {
 
             e.printStackTrace();
 
         } finally {
-
-            logger.info("End of the program, closing spark context...");
-            // Always close the Spark Context.
-            context.close();
-            logger.info("Done.");
-
-            LogManager.shutdown();
-
+            stopSpark();
         }
     }
 
@@ -188,5 +182,16 @@ public class TPSpark {
         // Clean and set up as before
         file = old_file;
         files.clear();
+    }
+
+
+    public static void stopSpark() {
+
+        logger.info("End of the program, closing spark context...");
+        // Always close the Spark Context.
+        context.close();
+        logger.info("Done.");
+
+        LogManager.shutdown();
     }
 }
