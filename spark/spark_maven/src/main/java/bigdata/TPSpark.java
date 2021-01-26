@@ -74,8 +74,8 @@ public class TPSpark {
         
 
 
-        //file = context.textFile("/raw_data/tweet_01_03_2020.nljson");
-        file = context.textFile("/raw_data/tweet_01_03_2020_first10000.nljson");
+        file = context.textFile("/raw_data/tweet_01_03_2020.nljson");
+        //file = context.textFile("/raw_data/tweet_01_03_2020_first10000.nljson");
         // System.out.println("There is " + context.sc().statusTracker().getExecutorInfos().length + " Workers.");
         // // file = context.textFile(JsonUtils.data[1]);
         // file = context.textFile("/raw_data/tweet_05_03_2020.nljson");
@@ -104,9 +104,9 @@ public class TPSpark {
 
         try {
 
-            // AnalysisHashtags();
-            AnalysisUser(true); // false: sample, true: big big data set
-            //AnalysisInfluencer();
+            //AnalysisHashtags();
+            //AnalysisUser(true); // false: sample, true: big big data set
+            AnalysisInfluencer();
         } catch (Exception e) {
 
             e.printStackTrace();
@@ -131,10 +131,10 @@ public class TPSpark {
         //RequestHashtags.activateHbase(true);
         
         logger.info("a) K Hashtags les plus utilisés avec nombre d'apparition sur un jour:");
-        //EntryPoint.HASHTAGS_DAILY_TOPK.apply(10000);
+        EntryPoint.HASHTAGS_DAILY_TOPK.apply(10000);
         
         logger.info("a-bis) K Hashtags les plus utilisés avec nombre d'apparition sur un jour, (tous les jours : jour par jour)");
-        //RunTopkDayOnEachDay();
+        RunTopkDayOnEachDay();
 
         logger.info("b) K Hashtags les plus utilisés avec nombre d'apparition sur toutes les données:");
         // Question c en même temps

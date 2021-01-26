@@ -18,7 +18,9 @@ import bigdata.data.parser.JsonUtils;
 import scala.Tuple2;
 import scala.Tuple3;
 import bigdata.infrastructure.database.runners.HBaseTopKTripleHashtag;
+import bigdata.infrastructure.database.runners.HBaseFakeInfluenceurs;
 import bigdata.infrastructure.database.runners.HBaseInfluenceurs;
+import bigdata.infrastructure.database.runners.HBaseTripleHashtagUser;
 import static bigdata.TPSpark.context;
 import static bigdata.TPSpark.file;
 import static bigdata.TPSpark.files;
@@ -30,7 +32,9 @@ public class RequestInfluenceurs {
     // If false only question a (triple hashtag as key, users as value)
     
     public static HBaseTopKTripleHashtag tripleHashHbase = new HBaseTopKTripleHashtag("TripleHashtags");
+    public static HBaseTripleHashtagUser allTripleHashHbase = new HBaseTripleHashtagUser("AllTripleHashtags");
     public static HBaseInfluenceurs influenceursHbase = HBaseInfluenceurs.INSTANCE();
+    public static HBaseFakeInfluenceurs fakeInfluenceursHbase = HBaseFakeInfluenceurs.INSTANCE();
     
     public static void TripleHashtag (boolean allFiles, boolean topK, int k) {
         
@@ -77,6 +81,11 @@ public class RequestInfluenceurs {
         }
         
         //users.take(10).forEach(f -> System.out.println(f));
+        logger.info("Writing to hbase all triple hashtags with their users ...");
+        users.foreach(tuple -> allTripleHashHbase.writeTable(tuple));
+        logger.info("Writing Done");
+        long endTime = System.currentTimeMillis();
+        
         logger.info("Printing a sample, 100 triple hashtags +  users");
         users.take(100).forEach(f ->{
             System.out.println();
@@ -84,6 +93,7 @@ public class RequestInfluenceurs {
             f._2().forEach(u -> System.out.print(u._id() + ", "));
             System.out.print("]");
         });
+        logger.info("That took without Reflexivity a) : (map + reduce ) " + (endTime - startTime) + " milliseconds");
         // users -> question a) à enregistrer dans hbase
         if (topK) {
             System.out.println();
@@ -95,9 +105,11 @@ public class RequestInfluenceurs {
             }
 
             // Hbase
-            logger.info("Writing to hbase triple hashtags with their count ...");
+            logger.info("Writing to hbase triple hashtags topk with their count ...");
             top.forEach(tuple -> tripleHashHbase.writeTable(tuple));
             logger.info("Writing Done");
+            endTime = System.currentTimeMillis();
+            logger.info("That took without Reflexivity b) : (map + reduce + hbase ) " + (endTime - startTime) + " milliseconds");
 
             // Question c) Sur le topk
             System.out.println("Question C: Trouver les influencersc.a.d les personnes avec le plus grand nombre de tweets dans les triplets que l’on a trouvé.");
@@ -117,10 +129,23 @@ public class RequestInfluenceurs {
             logger.info("Writing to hbase influenceurs with their number of messages ...");
             influenceurs.forEach(tuple -> influenceursHbase.writeTable(tuple));
             logger.info("Writing Done");
+            endTime = System.currentTimeMillis();
+            logger.info("That took without Reflexivity c) : (map + reduce + hbase ) " + (endTime - startTime) + " milliseconds");
 
             logger.info("Question d : Trouver les faux influencer, personnes avec beaucoup de followers dont les tweets ne sont jamais retweeté.");
             List<Tuple2<String, User>> fakeInfluenceurs = calculateFakeInfluenceurs(us, k);
-            fakeInfluenceurs.forEach(f -> System.out.println(f));
+
+            logger.info("Writing to hbase influenceurs with their number of messages ...");
+            fakeInfluenceurs.forEach(tuple -> fakeInfluenceursHbase.writeTable(tuple));
+            logger.info("Writing Done");
+            endTime = System.currentTimeMillis();
+
+            logger.info("Printing a sample, the first 100 of the topk fake influenceurs");
+            for (int i = 0; i < 100 ; i++){
+                System.out.println(fakeInfluenceurs.get(i));
+            }
+
+            logger.info("That took without Reflexivity d) : (map + reduce + hbase ) " + (endTime - startTime) + " milliseconds");
             
         }
         
@@ -130,8 +155,8 @@ public class RequestInfluenceurs {
             files.clear();
         }
             
-        long endTime = System.currentTimeMillis();
-        System.out.println("That took without Reflexivity : (map + reduce ) " + (endTime - startTime) + " milliseconds");
+        endTime = System.currentTimeMillis();
+        System.out.println("That took without Reflexivity : (map + reduce + hbase ) " + (endTime - startTime) + " milliseconds");
         
         
     }

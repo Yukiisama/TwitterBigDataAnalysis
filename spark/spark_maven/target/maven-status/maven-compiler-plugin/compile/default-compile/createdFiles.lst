@@ -1,4 +1,5 @@
 bigdata/TPSpark.class
+bigdata/infrastructure/database/runners/HBaseTripleHashtagUser.class
 bigdata/data/comparator/RtComparator.class
 bigdata/requests/users/RequestUsers$1.class
 bigdata/data/comparator/HashtagComparator.class
@@ -16,6 +17,7 @@ bigdata/requests/EntryPoint.class
 bigdata/requests/users/RequestUsers$2.class
 bigdata/infrastructure/database/runners/HBaseInfluenceurs.class
 bigdata/data/comparator/UniqueHashtagComparator.class
+bigdata/infrastructure/database/runners/HBaseFakeInfluenceurs.class
 bigdata/data/User.class
 bigdata/requests/EntryPoint$2.class
 bigdata/infrastructure/database/runners/HBaseTopKTripleHashtag.class

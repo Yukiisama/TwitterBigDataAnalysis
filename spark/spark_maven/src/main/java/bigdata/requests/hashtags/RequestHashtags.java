@@ -26,14 +26,14 @@ import static bigdata.TPSpark.files;
 import static bigdata.TPSpark.openFiles;
 public class RequestHashtags {
 
-	/*public static HBaseTopKHashtag hbaseTopk = new HBaseTopKHashtag("topKHashtag");
+    public static HBaseTopKHashtag hbaseTopk = new HBaseTopKHashtag("topKHashtag");
     public static HBaseTopKHashtag hbaseTopkall = new HBaseTopKHashtag("topKHashtagAll");
     public static HBaseTopKHashtag hbaseHashtags = new HBaseTopKHashtag("Hashtags");
-    public static HBaseUserHashtag hbaseUserHashtags = HBaseUserHashtag.INSTANCE();*/
-    public static HBaseTopKHashtag hbaseTopk = null;
+    public static HBaseUserHashtag hbaseUserHashtags = HBaseUserHashtag.INSTANCE();
+    /*public static HBaseTopKHashtag hbaseTopk = null;
     public static HBaseTopKHashtag hbaseTopkall = null;
     public static HBaseTopKHashtag hbaseHashtags = null;
-    public static HBaseUserHashtag hbaseUserHashtags = null;
+    public static HBaseUserHashtag hbaseUserHashtags = null;*/
 
     
     public static void activateHbase(boolean activate) {
@@ -67,11 +67,11 @@ public class RequestHashtags {
         
         List<Tuple2<String, Integer>> top = r.top(k, new HashtagComparator());
         //logger.debug(top);
-        long endTime = System.currentTimeMillis();
 
         // Write top to Hbase
         top.forEach(tuple -> hbaseTopk.writeTable(tuple));
         hbaseTopk.resetPos();
+        long endTime = System.currentTimeMillis();
 
         // Clear memory
         r.unpersist();
@@ -112,9 +112,10 @@ public class RequestHashtags {
         logger.debug(top);
        
         // Write top to Hbase for all days
-        //top.forEach(tuple -> hbaseTopkall.writeTable(tuple));
-        //hbaseTopkall.resetPos();
-
+        top.forEach(tuple -> hbaseTopkall.writeTable(tuple));
+        hbaseTopkall.resetPos();
+        long endTime = System.currentTimeMillis();
+        logger.info("topkALL Hashtags: That took without Reflexivity : (map + reduce + topK) " + (endTime - startTime) + " milliseconds");
         logger.debug("c) Nombre d'apparitions d'un hashtag:");
         // unionFiles.take(10).forEach(f -> System.out.println(f));
 
@@ -125,7 +126,7 @@ public class RequestHashtags {
         // Clear memory
         unionFiles.unpersist(); 
         files.clear();
-        long endTime = System.currentTimeMillis();
+        endTime = System.currentTimeMillis();
         
 		logger.info("Request Hashtags: That took without Reflexivity : (map + reduce + topK) " + (endTime - startTime) + " milliseconds");  
     }
@@ -187,7 +188,7 @@ public class RequestHashtags {
         //users.take(10).forEach(f -> System.out.println(f));
 
         // Write to hbase
-        System.out.println(users.count());
+        
         users.foreach(tuple -> hbaseUserHashtags.writeTable(tuple));
 
         if (allFiles) {
@@ -264,7 +265,7 @@ public class RequestHashtags {
         users.unpersist(); // pas sur que ça ait un effet mais on sait jamais
             
         long endTime = System.currentTimeMillis();
-        logger.info("RequestHashtags: That took without Reflexivity : (map + reduce ) " + (endTime - startTime) + " milliseconds");
+        logger.info("RequestHashtags: That took without Reflexivity : (map + reduce + hbase ) " + (endTime - startTime) + " milliseconds");
         
         
     }
