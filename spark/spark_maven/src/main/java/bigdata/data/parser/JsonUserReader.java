@@ -25,8 +25,8 @@ public class JsonUserReader {
 	public static Tuple2<String, User> readDataFromNLJSON(String line) {
 		
 		// String user_UUID = "";
-		String username = "";
-		String user_UUID ="";
+		String username = "unknown";
+		String user_UUID ="unknown";
 		User user_instance = new User(user_UUID, username, new HashMap<String, Integer>());
 
 
@@ -67,8 +67,8 @@ public class JsonUserReader {
 	
 	public static Tuple2<String, User> usernameAndHashtagFromNLJSON(String line) {
 
-		String username = "";
-		String user_UUID ="";
+		String username = "unknown";
+		String user_UUID ="unknown";
 		User user_instance = new User(user_UUID, username, new HashMap<String, Integer>());
 
 
@@ -80,6 +80,10 @@ public class JsonUserReader {
 			HashMap<String, Integer> hashtags = new HashMap<String, Integer>(JsonUserReader.getHashtagsList(json.getAsJsonObject()));
 			username = JsonUserReader.getUsername(json.getAsJsonObject());
 			user_UUID = JsonUserReader.getUserUUID(json.getAsJsonObject());
+
+			if(user_UUID.equals("unknown")) {
+				return null;
+			}
 
 			user_instance = new User(user_UUID, username, hashtags);
 
@@ -151,7 +155,7 @@ public class JsonUserReader {
 	}
 
 	private static String getUsername (JsonObject jsonObj) {
-		String res = "";
+		String res = "unknown";
 
 		
 		JsonElement user = jsonObj.get("user");
@@ -169,7 +173,7 @@ public class JsonUserReader {
 
 		res = username.getAsString();
 		if (res == null) {
-			res = "";
+			res = "unknown";
 		}
 
 		return res;
@@ -180,7 +184,7 @@ public class JsonUserReader {
 	private static String getUserUUID (JsonElement json) {
 
 		JsonObject jsonObj = json.getAsJsonObject();
-		String res = "";
+		String res = "unknown";
 
 		
 		JsonElement user = jsonObj.get("user");
@@ -199,7 +203,7 @@ public class JsonUserReader {
 
 		res = username.getAsString();
 		if (res == null) {
-			res = "";
+			res = "unknown";
 		}
 
 		return res;

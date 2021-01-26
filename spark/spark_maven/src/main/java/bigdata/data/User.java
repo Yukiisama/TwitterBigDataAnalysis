@@ -17,6 +17,11 @@ import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
 import org.apache.hadoop.hbase.util.Bytes;
 
+
+
+import bigdata.TPSpark;
+
+
 import scala.Tuple2;
 
 public class User  implements Serializable, IData {
@@ -66,6 +71,14 @@ public class User  implements Serializable, IData {
      */
     public User(String UUID, String id, Map<String, Integer> hashtags, int nb_tweets) {
         super();
+
+        if(UUID.equals("")) {
+            UUID = "unknown";
+        }
+
+        if(id.equals("")) {
+			id = "unknown";
+        }
         this.UUID = UUID;
         
         this.id = id;
@@ -80,7 +93,6 @@ public class User  implements Serializable, IData {
 
         this.received_favs = 0;
         this.received_retweets = 0;
-
     }
 
     public User(String UUID, String id, Map<String, Integer> hashtags) {
@@ -357,7 +369,8 @@ public class User  implements Serializable, IData {
 
     @Override
     public String toString() {
-        String output = "{ User: " + this.id + ", "
+        String output = "{ User UUID: " + this.UUID + ", " 
+        + "Username: " + this.id + ", "
         + "tweets_count:" + this.nb_tweets + ", " 
         + "retweets_count:" + this.received_retweets + ", " 
         + "favorites_count:" + this.received_favs + ", "
@@ -365,7 +378,7 @@ public class User  implements Serializable, IData {
         + "daily_frequency: {[" + this.daily_frequencies + "]}" + ", "
         + "Hashtags: {[" + this.hashtags + "]}" + ", " 
         + "geo: {[" + this.localisations + "]}" + ", "
-        + "lang_count: {[" + this.used_lang + "]}" + ", "
+        + "lang_count: {[" + this.used_lang + "]}"
         // + "source_list: {[" + this.source_history + "]}"
         
         + "}";

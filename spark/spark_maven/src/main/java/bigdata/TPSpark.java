@@ -82,8 +82,8 @@ public class TPSpark {
         logger.info("Creating HBase Table Manager...");
         logger.debug(" - HBaseUser...");
         HBaseUser.INSTANCE();
-        logger.debug(" - HBaseHashtag...");
-        HBaseUserHashtag.INSTANCE();
+        // logger.debug(" - HBaseHashtag...");
+        // HBaseUserHashtag.INSTANCE();
 
         logger.info("Done.");
     }
@@ -111,7 +111,7 @@ public class TPSpark {
 
 
             // AnalysisHashtags();
-            AnalysisUser(false);
+            AnalysisUser(true); // false: sample, true: big big data set
             //AnalysisInfluencer();
         } catch (Exception e) {
 
