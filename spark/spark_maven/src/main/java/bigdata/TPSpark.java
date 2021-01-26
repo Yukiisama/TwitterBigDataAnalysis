@@ -74,8 +74,8 @@ public class TPSpark {
         
 
 
-        file = context.textFile("/raw_data/tweet_01_03_2020.nljson");
-         //file = context.textFile("/raw_data/tweet_01_03_2020_first10000.nljson");
+        //file = context.textFile("/raw_data/tweet_01_03_2020.nljson");
+        file = context.textFile("/raw_data/tweet_01_03_2020_first10000.nljson");
         // System.out.println("There is " + context.sc().statusTracker().getExecutorInfos().length + " Workers.");
         // // file = context.textFile(JsonUtils.data[1]);
         // file = context.textFile("/raw_data/tweet_05_03_2020.nljson");
