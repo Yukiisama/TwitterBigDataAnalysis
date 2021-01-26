@@ -54,6 +54,86 @@ class Service {
 
     }
 
+     async influenceursTopK(params, res, tableName) {
+        try {
+            // exemple hbase
+            if (params.size < 0) 
+                params.size = 10000;
+            const table = hbase.table(tableName);
+            table.row('*').get((error, value) => {
+                let val = value;
+                params.size = Number(params.size);
+                if (value.length < params.size)
+                    params.size = value.length;
+                if (value.length >= params.size){
+                    val = [];
+                    let nb_messages = [];
+                    let influenceurs = [];  
+                    for (let i = 0; i < value.length; i++){  
+                        if (value[i].column == "global:nb_messages") nb_messages[value[i].key] =  (value[i].$)
+                        else influenceurs[value[i].key] =  (value[i].$)
+                    } 
+                    console.log(params.size);
+                    for (let i = 0; i < params.size; i++){  
+                        val[i] = {
+                            nb_messages: (nb_messages[i]),
+                            influenceurs: (influenceurs[i])
+                        }
+                    } 
+
+                }
+                return res.status(200).send(val);
+            });
+        }
+        catch (error) {
+            return { code: 400, error: error };
+        }
+
+    }
+
+    async tripleHashtagsTopK(params, res, tableName) {
+        try {
+            // exemple hbase
+            if (params.size < 0) 
+                params.size = 10000;
+            const table = hbase.table(tableName);
+            table.row('*').get((error, value) => {
+                let val = value;
+                params.size = Number(params.size);
+                if (value.length < params.size)
+                    params.size = value.length;
+                if (value.length >= params.size){
+                    val = [];
+                    let count = [];
+                    let hashtag1 = [];  
+                    let hashtag2 = [];  
+                    let hashtag3 = [];  
+                    for (let i = 0; i < value.length; i++){  
+                        if (value[i].column == "global:count") count[value[i].key] =  (value[i].$)
+                        else if (value[i].column == "global:hashtag1") hashtag1[value[i].key] =  (value[i].$)
+                        else if (value[i].column == "global:hashtag2") hashtag2[value[i].key] =  (value[i].$)
+                        else hashtag3[value[i].key] =  (value[i].$)
+                    } 
+                    console.log(params.size);
+                    for (let i = 0; i < params.size; i++){  
+                        val[i] = {
+                            count: (count[i]),
+                            hashtag1: (hashtag1[i]),
+                            hashtag2: (hashtag2[i]),
+                            hashtag3: (hashtag3[i])
+                        }
+                    } 
+
+                }
+                return res.status(200).send(val);
+            });
+        }
+        catch (error) {
+            return { code: 400, error: error };
+        }
+
+    }
+
     async userList(params, res, tableName) {
         try {
             const table = hbase.table(tableName);

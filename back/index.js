@@ -9,6 +9,7 @@ var cors = require('cors');
 const Controller = require("./controller/Controller");
 const HashtagController = require("./controller/HashtagController");
 const UserController = require("./controller/UserController");
+const InfluenceursController = require("./controller/InfluenceursController");
 const PORT = process.env.PORT || 25559;
 const path = require('path');
  
@@ -39,6 +40,8 @@ app.get("/hashtagTopK/:day/:size", HashtagController.hashtagTopK);
 app.get("/hashtagTopKAllDays/:day/:size", HashtagController.hashtagTopKAllDays);
 app.get("/hashtags/:day/:size", HashtagController.allHashtags);
 app.get("/userHashtags/:size", HashtagController.userHashtags);
+app.get("/tripleHashtags/:size", InfluenceursController.tripleHashtagTopK);
+app.get("/influenceurs/:size", InfluenceursController.influenceursTopK);
 app.post("/user/", UserController._callback);
 
 //alexandradss8
