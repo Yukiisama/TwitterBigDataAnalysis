@@ -91,17 +91,7 @@ public class RequestUsers {
 		logger.debug("Reducing user RDD and merging values...");
 		JavaPairRDD<String, User> users = tuple_users.reduceByKey(new Function2<User, User, User>() {
 			public User call (User a, User b) {
-				a.setNbTweets(a._nbTweets() + b._nbTweets());
-				a.setReceivedFavs(a._received_favs() + b._received_favs());
-				a.setReceivedRTs(a._received_rts() + b._received_rts());
-
-				a.addGeo(b._geos());
-				a.addLangUsed(b._langs());
-				a.addHashtagsUsed(b._hashtags());
-				a.addPublicationSource(b._sources());
-				a.addDailyFrequencyData(b._frequencies());
-
-				return a;	
+				return User.merge(a, b);	
 			}
 		});
 		logger.debug("Done.");

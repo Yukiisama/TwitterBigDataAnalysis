@@ -104,6 +104,21 @@ public class User  implements Serializable, IData {
         return __DATABASE_COLUMNS__;
     }
 
+    public static User merge(User a, User b) {
+        a.setNbTweets(a._nbTweets() + b._nbTweets());
+        a.setReceivedFavs(a._received_favs() + b._received_favs());
+        a.setReceivedRTs(a._received_rts() + b._received_rts());
+
+        a.addGeo(b._geos());
+        a.addLangUsed(b._langs());
+        a.addHashtagsUsed(b._hashtags());
+        a.addPublicationSource(b._sources());
+        a.addDailyFrequencyData(b._frequencies());
+
+        b = null; // Making b user garbage collectable
+
+        return a;	
+    }
 
     /**
      * Families are available in @see HBaseUser::familyName
