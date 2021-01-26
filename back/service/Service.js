@@ -54,6 +54,36 @@ class Service {
 
     }
 
+    async userList(params, res, tableName) {
+        try {
+            const table = hbase.table(tableName);
+            table.row('*').get((error, value) => {
+                let val = value;
+                val = [];
+                let username = [];
+                let hashtag = [];  
+                console.log(value.length);
+                for (let i = 0; i < value.length; i++){  
+                    
+                    if (value[i].column == "global:username") username[value[i].key] =  (value[i].$)
+                    else hashtag[value[i].key] =  (value[i].$)
+                } 
+                for (let i = 0; i < params.size; i++){  
+                    val[i] = {
+                        username: (username[i]),
+                        hashtag: (hashtag[i])
+                    }
+                    
+                } 
+                return res.status(200).send(val);
+            });
+        }
+        catch (error) {
+            return { code: 400, error: error };
+        }
+
+    }
+
 
 
     async getUserDataFromHBase(uuid, _this, res, _callback) {

@@ -38,6 +38,7 @@ app.get("/example", Controller.example);
 app.get("/hashtagTopK/:day/:size", HashtagController.hashtagTopK);
 app.get("/hashtagTopKAllDays/:day/:size", HashtagController.hashtagTopKAllDays);
 app.get("/hashtags/:day/:size", HashtagController.allHashtags);
+app.get("/userHashtags/:size", HashtagController.userHashtags);
 app.post("/user/", UserController._callback);
 
 //alexandradss8

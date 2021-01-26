@@ -11,6 +11,7 @@ $.ajaxSetup({
 builder(table);
 AllDaysOnClick();
 Hashtags();
+userList();
 reload("resetTopk");
 
 function builder(tableName){
@@ -21,6 +22,10 @@ function builder(tableName){
 
     const table = document.getElementById("tabHashtag");
     table.innerHTML = "";
+    const key = document.getElementById("secondKey");
+    key.innerHTML = "Count"
+    const key2 = document.getElementById("firstKey");
+    key2.innerHTML = "TopK Position"
     for (let i = 0 ; i < size; i++){
 
         const tr = document.createElement("tr");
@@ -32,6 +37,30 @@ function builder(tableName){
 
     reload('Sday');
     reload('Ssize');
+}
+
+function builderUserList(){
+    $.getJSON("http://localhost:25559/" + "userHashtags/" + size, function (data) {
+        topk = data;
+        return data;
+    });
+
+    const table = document.getElementById("tabHashtag");
+    table.innerHTML = "";
+    const key = document.getElementById("secondKey");
+    key.innerHTML = "Username"
+    const key2 = document.getElementById("firstKey");
+    key2.innerHTML = "position"
+
+    for (let i = 0 ; i < size; i++){
+
+        const tr = document.createElement("tr");
+        createEntries(tr, i);
+        createEntries(tr, topk[i].username);
+        createEntries(tr, topk[i].hashtag);
+        table.appendChild(tr);
+    }
+
 }
 
 function createEntries(tr, data) {    
@@ -58,6 +87,15 @@ function Hashtags() {
     table = "hashtags"
     all.onclick = function() {
         builder("hashtags");
+    }
+}
+
+function userList() {
+    const element = document.getElementById("topkDescription");
+    element.innerHTML = "";
+    const all = document.getElementById("userHashtags");
+    all.onclick = function() {
+        builderUserList();
     }
 }
 
