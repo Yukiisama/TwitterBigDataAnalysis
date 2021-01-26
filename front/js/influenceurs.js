@@ -19,7 +19,7 @@ function builder(tableName){
         topk = data;
         return data;
     });
-
+    document.getElementById('head').innerHTML = "triple hashtag TopK "
     const table = document.getElementById("tabInfluenceurs");
     table.innerHTML = "";
     const key = document.getElementById("secondKeyInf");
@@ -30,7 +30,7 @@ function builder(tableName){
     key4.innerHTML = "Hashtag3"
     const key2 = document.getElementById("firstKeyInf");
     key2.innerHTML = "position topK"
-
+    
     for (let i = 0 ; i < size; i++){
 
         const tr = document.createElement("tr");
@@ -50,7 +50,7 @@ function builderInfluenceurs(tableName){
         topk = data;
         return data;
     });
-
+    document.getElementById('head').innerHTML = " Top k Influenceurs"
     const table = document.getElementById("tabInfluenceurs");
     table.innerHTML = "";
     const key = document.getElementById("secondKeyInf");

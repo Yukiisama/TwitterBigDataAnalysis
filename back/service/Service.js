@@ -23,6 +23,7 @@ class Service {
                 params.size = Number(params.size);
                 if (value.length < params.size)
                     params.size = value.length;
+                console.log(value.length, params.size)
                 if (value.length >= params.size){
                     val = [];
                     let count = [];

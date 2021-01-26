@@ -8,18 +8,18 @@ $.ajaxSetup({
     async: false
 });
 
-builder(table);
+builder(table, document.getElementById('size').value, " User list with hashtags");
 AllDaysOnClick();
 Hashtags();
 userList();
 reload("resetTopk");
 
-function builder(tableName){
+function builder(tableName, size, name){
     $.getJSON("http://localhost:25559/" + tableName + "/" + day + '/' + size, function (data) {
         topk = data;
         return data;
     });
-
+    document.getElementById("head1").innerHTML = name;
     const table = document.getElementById("tabHashtag");
     table.innerHTML = "";
     const key = document.getElementById("secondKey");
@@ -28,11 +28,13 @@ function builder(tableName){
     key2.innerHTML = "TopK Position"
     for (let i = 0 ; i < size; i++){
 
-        const tr = document.createElement("tr");
-        createEntries(tr, i);
-        createEntries(tr, topk[i].count);
-        createEntries(tr, topk[i].hashtag);
-        table.appendChild(tr);
+        if(topk[i]) {
+            const tr = document.createElement("tr");
+            createEntries(tr, i);
+            createEntries(tr, topk[i].count);
+            createEntries(tr, topk[i].hashtag);
+            table.appendChild(tr);
+        }
     }
 
     reload('Sday');
@@ -44,7 +46,7 @@ function builderUserList(){
         topk = data;
         return data;
     });
-
+    document.getElementById("head1").innerHTML = " User list with hashtags";
     const table = document.getElementById("tabHashtag");
     table.innerHTML = "";
     const key = document.getElementById("secondKey");
@@ -76,7 +78,7 @@ function AllDaysOnClick() {
     element.innerHTML = "";
     table = "hashtagTopKAllDays"
     swap.onclick = function() {
-        builder("hashtagTopKAllDays");
+        builder("hashtagTopKAllDays", document.getElementById('size').value, " Hashtags Topk all days");
     }
 }
 
@@ -86,7 +88,7 @@ function Hashtags() {
     const all = document.getElementById("allHashs");
     table = "hashtags"
     all.onclick = function() {
-        builder("hashtags");
+        builder("hashtags", document.getElementById('size').value, " All hashtags");
     }
 }
 

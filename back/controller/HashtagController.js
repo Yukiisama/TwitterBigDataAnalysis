@@ -25,7 +25,6 @@ class HashtagsController {
     }
 
     async allHashtags(req, res){
-        console.log("yo");
         return await this.service.hashtagsTopK(req.params, res, 'ape-jma_Hashtags');
     }
 
