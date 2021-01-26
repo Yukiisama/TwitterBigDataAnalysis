@@ -41,7 +41,9 @@ app.get("/hashtagTopKAllDays/:day/:size", HashtagController.hashtagTopKAllDays);
 app.get("/hashtags/:day/:size", HashtagController.allHashtags);
 app.get("/userHashtags/:size", HashtagController.userHashtags);
 app.get("/tripleHashtags/:size", InfluenceursController.tripleHashtagTopK);
+app.get("/allTripleHashtag/:size", InfluenceursController.allTripleHashtag);
 app.get("/influenceurs/:size", InfluenceursController.influenceursTopK);
+app.get("/fakeInfluenceurs/:size", InfluenceursController.fakeInfluenceursTopK);
 app.post("/user/", UserController._callback);
 
 //alexandradss8

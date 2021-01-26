@@ -8,7 +8,7 @@ $.ajaxSetup({
     async: false
 });
 
-builder(table, document.getElementById('size').value, " User list with hashtags");
+builder(table, document.getElementById('size').value, " Top K hashtag day n°" + day);
 AllDaysOnClick();
 Hashtags();
 userList();

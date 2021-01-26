@@ -9,10 +9,44 @@ $.ajaxSetup({
 
 builder(table);
 Influenceurs();
+FakeInfluenceurs();
+allTripleHashtag();
 /*AllDaysOnClick();
 Hashtags();
 userList();*/
 reload("resetTopk");
+
+function builderAllTriple(tableName){
+    $.getJSON("http://localhost:25559/" + tableName + size, function (data) {
+        topk = data;
+        return data;
+    });
+    document.getElementById('head').innerHTML = "All triple hashtags "
+    const table = document.getElementById("tabInfluenceurs");
+    table.innerHTML = "";
+    const key = document.getElementById("secondKeyInf");
+    key.innerHTML = "Hashtag1"
+    const key3 = document.getElementById("threeKeyInf");
+    key3.innerHTML = "Hashtag2"
+    const key4 = document.getElementById("fourKeyInf");
+    key4.innerHTML = "Hashtag3"
+    const key2 = document.getElementById("firstKeyInf");
+    key2.innerHTML = "position topK"
+    document.getElementById("fiveKeyInf").innerHTML = "usernames";
+    
+    for (let i = 0 ; i < size; i++){
+
+        const tr = document.createElement("tr");
+        createEntries(tr, i);
+        createEntries(tr, topk[i].hashtag1);
+        createEntries(tr, topk[i].hashtag2);
+        createEntries(tr, topk[i].hashtag3);
+        createEntries(tr, topk[i].usernames);
+        table.appendChild(tr);
+    }
+    reload('Isize');
+
+}
 
 function builder(tableName){
     $.getJSON("http://localhost:25559/" + tableName + size, function (data) {
@@ -30,6 +64,7 @@ function builder(tableName){
     key4.innerHTML = "Hashtag3"
     const key2 = document.getElementById("firstKeyInf");
     key2.innerHTML = "position topK"
+    document.getElementById("fiveKeyInf").innerHTML = "count";
     
     for (let i = 0 ; i < size; i++){
 
@@ -61,13 +96,44 @@ function builderInfluenceurs(tableName){
     key4.innerHTML = ""
     const key2 = document.getElementById("firstKeyInf");
     key2.innerHTML = "position topK"
-    console.log(topk);
+    document.getElementById("fiveKeyInf").innerHTML = "";
     for (let i = 0 ; i < size; i++){
 
         const tr = document.createElement("tr");
         createEntries(tr, i);
         createEntries(tr, topk[i].influenceurs);
         createEntries(tr, topk[i].nb_messages);
+        table.appendChild(tr);
+    }
+    reload('Isize');
+
+}
+
+
+function builderFakeInfluenceurs(tableName){
+    $.getJSON("http://localhost:25559/" + tableName + size, function (data) {
+        topk = data;
+        return data;
+    });
+    document.getElementById('head').innerHTML = " Top k Fake Influenceurs"
+    const table = document.getElementById("tabInfluenceurs");
+    table.innerHTML = "";
+    const key = document.getElementById("secondKeyInf");
+    key.innerHTML = "influenceurs"
+    const key3 = document.getElementById("threeKeyInf");
+    key3.innerHTML = "nb_messages"
+    const key4 = document.getElementById("fourKeyInf");
+    key4.innerHTML = "retweets_count"
+    const key2 = document.getElementById("firstKeyInf");
+    key2.innerHTML = "position topK"
+    document.getElementById("fiveKeyInf").innerHTML = "";
+    for (let i = 0 ; i < size; i++){
+
+        const tr = document.createElement("tr");
+        createEntries(tr, i);
+        createEntries(tr, topk[i].influenceurs);
+        createEntries(tr, topk[i].nb_messages);
+        createEntries(tr, topk[i].retweets_count);
         table.appendChild(tr);
     }
     reload('Isize');
@@ -91,11 +157,28 @@ function AllDaysOnClick() {
     }
 }
 
+function allTripleHashtag() {
+    const all = document.getElementById("alltriple");
+    table = "allTripleHashtag/"
+    all.onclick = function() {
+        builderAllTriple("allTripleHashtag/");
+    }
+}
+
 function Influenceurs() {
     const all = document.getElementById("allinf");
     table = "influenceurs/"
     all.onclick = function() {
         builderInfluenceurs("influenceurs/");
+    }
+}
+
+
+function FakeInfluenceurs() {
+    const all = document.getElementById("allFakeinf");
+    table = "influenceurs/"
+    all.onclick = function() {
+        builderFakeInfluenceurs("fakeInfluenceurs/");
     }
 }
 
