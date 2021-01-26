@@ -53,9 +53,9 @@ public class HBaseUser extends SparkToDatabase {
 
 
     public void writeTable(User user) {
-        Put value = user.getContent();
 
         try {
+            Put value = user.getContent();
             if(value == null || user == null || table == null) {
                 return;
             }

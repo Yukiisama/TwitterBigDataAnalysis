@@ -26,14 +26,19 @@ import static bigdata.TPSpark.files;
 import static bigdata.TPSpark.openFiles;
 public class RequestHashtags {
 
-	public static HBaseTopKHashtag hbaseTopk = null;
+	/*public static HBaseTopKHashtag hbaseTopk = new HBaseTopKHashtag("topKHashtag");
+    public static HBaseTopKHashtag hbaseTopkall = new HBaseTopKHashtag("topKHashtagAll");
+    public static HBaseTopKHashtag hbaseHashtags = new HBaseTopKHashtag("Hashtags");
+    public static HBaseUserHashtag hbaseUserHashtags = HBaseUserHashtag.INSTANCE();*/
+    public static HBaseTopKHashtag hbaseTopk = null;
     public static HBaseTopKHashtag hbaseTopkall = null;
     public static HBaseTopKHashtag hbaseHashtags = null;
     public static HBaseUserHashtag hbaseUserHashtags = null;
+
     
     public static void activateHbase(boolean activate) {
-    	//hbaseTopk = (activate) ? new HBaseTopKHashtag("topKHashtag") : null;
-        //hbaseTopkall = (activate) ? new HBaseTopKHashtag("topKHashtagAll") : null;
+    	hbaseTopk = (activate) ? new HBaseTopKHashtag("topKHashtag") : null;
+        hbaseTopkall = (activate) ? new HBaseTopKHashtag("topKHashtagAll") : null;
         hbaseHashtags = (activate) ? new HBaseTopKHashtag("Hashtags") : null;
         hbaseUserHashtags = (activate) ? HBaseUserHashtag.INSTANCE() : null;
     }
@@ -104,11 +109,11 @@ public class RequestHashtags {
 
         List<Tuple2<String, Integer>> top = unionFiles
                                             .top(k, new HashtagComparator());
-        //logger.debug(top);
+        logger.debug(top);
        
         // Write top to Hbase for all days
-        top.forEach(tuple -> hbaseTopkall.writeTable(tuple));
-        hbaseTopkall.resetPos();
+        //top.forEach(tuple -> hbaseTopkall.writeTable(tuple));
+        //hbaseTopkall.resetPos();
 
         logger.debug("c) Nombre d'apparitions d'un hashtag:");
         // unionFiles.take(10).forEach(f -> System.out.println(f));

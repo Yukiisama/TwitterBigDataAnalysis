@@ -55,6 +55,7 @@ public class TPSpark {
                 .set("spark.executor.instances", "20")
                 .set("spark.executor.cores", "4")
                 .set("spark.executor.memory", "7g")
+
                 .set("spark.shuffle.memoryFraction", "0.8")
                 .set("spark.ui.showConsoleProgress ", "true")
                 .set("spark.executor.extraJavaOptions", "-Dlog4j.debug=true");
@@ -74,7 +75,7 @@ public class TPSpark {
 
 
         file = context.textFile("/raw_data/tweet_01_03_2020.nljson");
-        // file = context.textFile("/raw_data/tweet_01_03_2020.nljson");
+         //file = context.textFile("/raw_data/tweet_01_03_2020_first10000.nljson");
         // System.out.println("There is " + context.sc().statusTracker().getExecutorInfos().length + " Workers.");
         // // file = context.textFile(JsonUtils.data[1]);
         // file = context.textFile("/raw_data/tweet_05_03_2020.nljson");
@@ -103,8 +104,8 @@ public class TPSpark {
         	// Si tu veux tester une seule analyse et que t'as pas besoin d'overwrite ( et sans que ça efface celle des analyses commentées )
         	//SparkToDatabase.overWriting(false);
             //AnalysisHashtags();
-            //AnalysisUser(false);
-            AnalysisInfluencer();
+            //AnalysisUser(true);
+            //AnalysisInfluencer();
         } catch (Exception e) {
 
             e.printStackTrace();
@@ -133,7 +134,7 @@ public class TPSpark {
         
         // Activate hbase
         
-        RequestHashtags.activateHbase(true);
+        //RequestHashtags.activateHbase(true);
         
         logger.info("a) K Hashtags les plus utilisés avec nombre d'apparition sur un jour:");
         //EntryPoint.HASHTAGS_DAILY_TOPK.apply(10000);
@@ -171,7 +172,7 @@ public class TPSpark {
         logger.info("Influenceurs...");
         logger.info("a) Récupérer tous les triplets de hashtags ainsi que les utilisateurs qui les ont utilisés");
         // Question b et c et d faites en même temps;
-        RequestInfluenceurs.TripleHashtag(false, true, 10000);
+        RequestInfluenceurs.TripleHashtag(true, true, 10000);
     }
 
     private static void RunTopkDayOnEachDay() {
