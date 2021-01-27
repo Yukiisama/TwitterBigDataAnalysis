@@ -104,8 +104,8 @@ public class TPSpark {
 
         try {
 
-            //AnalysisHashtags();
-            //AnalysisUser(true); // false: sample, true: big big data set
+            AnalysisHashtags();
+            AnalysisUser(true); // false: sample, true: big big data set
             AnalysisInfluencer();
         } catch (Exception e) {
 
