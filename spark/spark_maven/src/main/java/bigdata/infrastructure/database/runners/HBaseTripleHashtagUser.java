@@ -78,10 +78,13 @@ public class HBaseTripleHashtagUser extends SparkToDatabase {
                 Bytes.toBytes("hashtag3"),  // column qualifier
                 Bytes.toBytes(data._1._3().toString())  // Value
             );
+                String usernames = "";
+                for (User user: data._2())
+                    usernames +=  ", " + user._id();
         value.add(
                 Bytes.toBytes("global"), // Family Name
                 Bytes.toBytes("usernames"),  // column qualifier
-                Bytes.toBytes(data._2.toString())  // Value
+                Bytes.toBytes(usernames.toString())  // Value
             );
         
         try {
