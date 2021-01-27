@@ -162,7 +162,7 @@ public class JsonUserReader {
 
 		// Fail-safe
 		if(user == null) {
-			// Lot of leaks here
+			// Lot of leaks here, every non tweets messages will end here.
 			// logger.error("Error while getting user from json." + jsonObj.toString());
 
 			return res;
@@ -191,7 +191,7 @@ public class JsonUserReader {
 
 		// Fail-safe
 		if(user == null) {
-			// Lot of leaks here
+			// Lot of leaks here, every non tweets messages will end here.
 			// logger.info(" --- ");
 			// logger.error("Error while getting user from json:  " + json.toString());
 

@@ -75,10 +75,6 @@ public class TPSpark {
 
 
         file = context.textFile("/raw_data/tweet_01_03_2020.nljson");
-        //file = context.textFile("/raw_data/tweet_01_03_2020_first10000.nljson");
-        // System.out.println("There is " + context.sc().statusTracker().getExecutorInfos().length + " Workers.");
-        // // file = context.textFile(JsonUtils.data[1]);
-        // file = context.textFile("/raw_data/tweet_05_03_2020.nljson");
 
         logger.info("Done.");
 
@@ -86,9 +82,6 @@ public class TPSpark {
         logger.info("Creating HBase Table Manager...");
         logger.debug(" - HBaseUser...");
         HBaseUser.INSTANCE();
-        // logger.debug(" - HBaseHashtag...");
-        // HBaseUserHashtag.INSTANCE();
-
         logger.info("Done.");
     }
     public static void main (String[] args) {

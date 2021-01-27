@@ -32,15 +32,11 @@ public class RequestUsers {
 		// Time calculation
 		long startTime = System.currentTimeMillis();
 
-		allFiles = false;
+		JavaPairRDD<String, User> tuple_users = null;
 
-
-		// Content
 		/**
 		 * Multiple Files
 		 */
-		JavaPairRDD<String, User> tuple_users = null;
-
 		if(allFiles){
 			logger.info("Opening the whole dataset.");
 
@@ -138,33 +134,9 @@ public class RequestUsers {
 	private static boolean RDDToServingLayer(JavaPairRDD<String, User> rdd) {
 		logger.info("Sending RDD's data to the Serving Layer...");
 
-
-		// logger.debug("Counting the number of RDD's element to send...");
-		// if(TPSpark.__PROGRESS_BAR__)
-			// size_rdd = rdd.count();
-		// logger.debug("There is: " + size_rdd + " entries to insert.");
-
 		try {
-			/**
-			 * Output inside HBase using RDD (intermediate opti)
-			 */	
-			// if(value > 50000){
-			// 	logger.debug("The number of entries is too much important. Progress Bar will not be visible.");
-			// 	rdd.foreach(tuple -> {
-			// 		HBaseUser.INSTANCE().writeTable(tuple._2);
-			// 	});
-			// } else {
-				// rdd.foreach(tuple -> {
-				// 	HBaseUser.INSTANCE().writeTable(tuple._2);
-				// 	current_progression = current_progression + 1;
-					
-				// 	printProgress(0, value, current_progression);
-				// });
-			// }
-
-
-
 			if(TPSpark.__PROGRESS_BAR__){
+				size_rdd = rdd.count();
 				rdd.foreach(tuple -> {
 					hbaseUser.writeTable(tuple._2);
 					current_progression = current_progression + 1;
@@ -196,11 +168,12 @@ public class RequestUsers {
 		}
 	}
 
-	/*
-		*
-		* Output inside HBase Using Data Structure (Not opti) and might even crash on large data
-		* 
-		*/
+	/**
+	*
+	* Output inside HBase Using Data Structure (Not opti) and might even crash on large dataset
+	* TODO
+	* 
+	*/
 	private static boolean RDDToStdout(JavaPairRDD<String, User> rdd) {
 		try {
 			// rdd.forEach(tuple -> System.out.println(tuple._2));

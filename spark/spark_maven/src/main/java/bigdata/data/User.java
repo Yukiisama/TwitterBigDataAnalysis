@@ -104,6 +104,11 @@ public class User  implements Serializable, IData {
         return __DATABASE_COLUMNS__;
     }
 
+    /**
+     * Used to merge User b values with those of User a.
+     * 
+     * Return the updated User a.
+     */
     public static User merge(User a, User b) {
         a.setNbTweets(a._nbTweets() + b._nbTweets());
         a.setReceivedFavs(a._received_favs() + b._received_favs());
@@ -255,6 +260,11 @@ public class User  implements Serializable, IData {
 
 
 
+    /**
+     * used to add a single lang to the user map
+     * 
+     * TODO Refactoring using Genericity.
+     */
     public void addLangUsed(String lang) {
         if(this.used_lang.containsKey(lang)) {
             this.used_lang.put(lang, this.daily_frequencies.get(lang) + 1);
@@ -262,6 +272,12 @@ public class User  implements Serializable, IData {
             this.used_lang.put(lang, 1);
         }
     }
+    
+    /**
+     * Used to merge two languages map.
+     * 
+     * TODO Refactoring using Genericity.
+     */
     public void addLangUsed(HashMap<String, Integer> langs) {
         
 
@@ -275,6 +291,11 @@ public class User  implements Serializable, IData {
         }
     }
 
+    /**
+     * used to add a single hashtag to the user map
+     * 
+     * TODO Refactoring using Genericity.
+     */
     public void addHashtagsUsed(String hashtag) {
         if(this.used_lang.containsKey(hashtag)) {
             this.used_lang.put(hashtag, this.daily_frequencies.get(hashtag) + 1);
@@ -282,6 +303,12 @@ public class User  implements Serializable, IData {
             this.used_lang.put(hashtag, 1);
         }
     }
+    
+    /**
+     * Used to merge two Hashtags map.
+     * 
+     * TODO Refactoring using Genericity.
+     */
     public void addHashtagsUsed(HashMap<String, Integer> hashtags_input) {
         for (Map.Entry<String, Integer> entry : hashtags_input.entrySet()) {
             String hashtag = entry.getKey();
@@ -296,6 +323,11 @@ public class User  implements Serializable, IData {
 
 
 
+    /**
+     * used to add a new frequency date to the user map
+     * 
+     * TODO Refactoring using Genericity.
+     */
     public void addDailyFrequencyData(Date date) {
         Calendar cal = GregorianCalendar.getInstance();
         cal.setTime(date);
@@ -306,6 +338,12 @@ public class User  implements Serializable, IData {
             this.daily_frequencies.put(cal.get(Calendar.HOUR), 1);
         }
     }
+    
+    /**
+     * Used to merge two frequencies date map.
+     * 
+     * TODO Refactoring using Genericity.
+     */
     public void addDailyFrequencyData(HashMap<Integer, Integer> frequencies) {
         for (Map.Entry<Integer, Integer> entry : frequencies.entrySet()) {
             int key = entry.getKey();
@@ -406,7 +444,6 @@ public class User  implements Serializable, IData {
         int hash = UUID.hashCode() 
             * localisations.hashCode()
             * hashtags.hashCode() 
-            * localisations.hashCode() 
             * used_lang.hashCode()
             * daily_frequencies.hashCode()
             * nb_tweets 

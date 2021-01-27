@@ -1,3 +1,7 @@
+/**
+ * Interface currently does not work with the used compiler? Requesting for body during compilation...
+ */
+
 /*
 
 package bigdata.infrastructure.database.runners;
